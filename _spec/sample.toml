@@ -1,4 +1,7 @@
 
+[scene]
+name = "sample"
+
 [[scene.prop]]
 mesh = "floor_a"
 layout = [
