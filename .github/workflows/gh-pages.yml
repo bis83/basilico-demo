@@ -21,7 +21,9 @@ jobs:
           name: basilico-linux-amd64
           path: ./bin/
       - name: Execute Basilico
-        run: ./bin/basilico/basilico build ./
+        run: |
+          chmod +x ./bin/basilico
+          ./bin/basilico build ./
       - name: Move Files
         run: |
           mkdir ./site
