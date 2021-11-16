@@ -4,6 +4,7 @@ name = "sample"
 
 [[scene.prop]]
 mesh = "floor_a"
+collision = "dop6"
 layout = [
     [0.0, 0.0, 0.0],
     [2.0, 0.0, 0.0],
@@ -42,6 +43,7 @@ layout = [
 
 [[scene.prop]]
 mesh = "wall_a"
+collision = "dop6"
 layout = [
     [0.0, 0.0, 9.0],
     [2.0, 0.0, 9.0],
@@ -76,6 +78,7 @@ layout = [
 
 [[scene.prop]]
 mesh = "pillar_a"
+collision = "dop6"
 layout = [
     [-1.0, 0.0, -1.0],
     [9.0, 0.0, -1.0],
@@ -85,6 +88,7 @@ layout = [
 
 [[scene.prop]]
 mesh = "ceil_a"
+collision = "dop6"
 layout = [
     [0.0, 0.0, 0.0],
     [2.0, 0.0, 0.0],
