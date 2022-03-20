@@ -23,7 +23,7 @@ jobs:
       - name: Execute Basilico
         run: |
           chmod +x ./bin/basilico
-          ./bin/basilico build ./
+          ./bin/basilico ./ build
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
