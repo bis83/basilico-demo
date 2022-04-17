@@ -1,1 +1,1 @@
-{"start":{"scene":0,"position":[2,0.5,2],"angle":[45,0]},"data":{"reticle":6,"mesh_pc":1,"mesh_pnc":0},"scene":[{"name":"sample","update":null,"draw":null}]}
+{"data":{"reticle":3,"box":1,"stack":2,"debug_grid":4,"mesh_pc":1,"mesh_pnc":0}}
