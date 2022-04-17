@@ -3,8 +3,3 @@ addr = ":8080"
 logging = false
 assert = false
 minify = true
-
-[start]
-scene = "sample"
-position = [2.0, 0.5, 2.0]
-angle = [45.0, 0.0]
