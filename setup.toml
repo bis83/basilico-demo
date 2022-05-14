@@ -3,3 +3,16 @@ addr = ":8080"
 logging = false
 assert = false
 minify = true
+
+[ui-layout]
+pause = [
+    "button-newgame",
+    "button-loadgame",
+]
+main = [
+    "reticle",
+    "button-act",
+    "button-sub",
+    "left-stick",
+    "right-stick",
+]

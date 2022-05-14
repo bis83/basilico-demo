@@ -1,0 +1,47 @@
+
+[[ui]]
+name = "reticle"
+mesh = "reticle"
+shader = "mesh_pc"
+width = 8
+height = 8
+
+[[ui]]
+name = "button-act"
+mesh = "rect"
+shader = "mesh_pc"
+width = 48
+height = 48
+offset = [-50,0]
+interact = "button"
+gamepad = "b0"
+keyboard = "z"
+
+[[ui]]
+name = "button-sub"
+mesh = "rect"
+shader = "mesh_pc"
+width = 48
+height = 48
+offset = [50,0]
+interact = "button"
+gamepad = "b1"
+keyboard = "x"
+
+[[ui]]
+name = "left-stick"
+mesh = "rect"
+shader = "mesh_pc"
+width = 96
+height = 96
+offset = [-200,0]
+interact = "left-stick"
+
+[[ui]]
+name = "right-stick"
+mesh = "rect"
+shader = "mesh_pc"
+width = 96
+height = 96
+offset = [200,0]
+interact = "right-stick"

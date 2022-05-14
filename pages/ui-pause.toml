@@ -1,0 +1,22 @@
+
+[[ui]]
+name = "button-newgame"
+mesh = "rect"
+shader = "mesh_pc"
+width = 96
+height = 96
+offset = [-100,0]
+interact = "button"
+gamepad = "b0"
+keyboard = "z"
+
+[[ui]]
+name = "button-loadgame"
+mesh = "rect"
+shader = "mesh_pc"
+width = 96
+height = 96
+offset = [100,0]
+interact = "button"
+gamepad = "b1"
+keyboard = "x"
