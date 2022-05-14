@@ -45,3 +45,14 @@ width = 96
 height = 96
 offset = [200,0]
 interact = "right-stick"
+
+[[ui]]
+name = "button-escape"
+mesh = "rect"
+shader = "mesh_pc"
+width = 48
+height = 48
+offset = [0,200]
+interact = "button"
+gamepad = "b9"
+keyboard = "esc"

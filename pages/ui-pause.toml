@@ -7,7 +7,7 @@ width = 96
 height = 96
 offset = [-100,0]
 interact = "button"
-gamepad = "b0"
+gamepad = "b8"
 keyboard = "z"
 
 [[ui]]
@@ -18,5 +18,5 @@ width = 96
 height = 96
 offset = [100,0]
 interact = "button"
-gamepad = "b1"
-keyboard = "x"
+gamepad = "b9"
+keyboard = "xx"
