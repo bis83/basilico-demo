@@ -3,17 +3,25 @@ addr = ":8080"
 logging = false
 assert = false
 minify = true
+initial-view = "pause"
 
-[ui-layout]
-pause = [
+[[view]]
+name = "pause"
+ui = [
     "button-newgame",
-    "button-loadgame",
+    "button-loadgame",    
 ]
-main = [
+
+[[view]]
+name = "main"
+draw3d = true
+ui = [
     "reticle",
     "button-act",
     "button-sub",
     "button-escape",
     "left-stick",
-    "right-stick",
+    "right-stick",    
 ]
+
+script = []
