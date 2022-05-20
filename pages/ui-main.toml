@@ -56,3 +56,36 @@ offset = [0,200]
 interact = "button"
 gamepad = "b9"
 keyboard = "esc"
+
+[[event]]
+name = "movement"
+trigger = "always"
+action = [
+    ["playermove", "left-stick", "right-stick"],
+]
+
+[[event]]
+name = "act"
+trigger = "button"
+target = "button-act"
+action = [
+    ["pushstack"],
+    ["savegame"],
+]
+
+[[event]]
+name = "sub"
+trigger = "button"
+target = "button-sub"
+action = [
+    ["popstack"],
+    ["savegame"],
+]
+
+[[event]]
+name = "escape"
+trigger = "button"
+target = "button-escape"
+action = [
+    ["resetgame"],
+]

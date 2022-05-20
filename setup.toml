@@ -11,6 +11,10 @@ ui = [
     "button-newgame",
     "button-loadgame",    
 ]
+event = [
+    "newgame",
+    "loadgame",
+]
 
 [[view]]
 name = "main"
@@ -22,6 +26,12 @@ ui = [
     "button-escape",
     "left-stick",
     "right-stick",    
+]
+event = [
+    "movement",
+    "act",
+    "sub",
+    "escape",
 ]
 
 script = []

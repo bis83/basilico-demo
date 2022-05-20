@@ -20,3 +20,21 @@ offset = [100,0]
 interact = "button"
 gamepad = "b9"
 keyboard = "xx"
+
+[[event]]
+name = "newgame"
+trigger = "button"
+target = "button-newgame"
+action = [
+    ["newgame", "slot0"],
+    ["nextview", "main"],
+]
+
+[[event]]
+name = "loadgame"
+trigger = "button"
+target = "button-loadgame"
+action = [
+    ["loadgame", "slot0"],
+    ["nextview", "main"],
+]
