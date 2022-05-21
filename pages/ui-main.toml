@@ -61,7 +61,7 @@ keyboard = "esc"
 name = "movement"
 trigger = "always"
 action = [
-    ["playermove", "left-stick", "right-stick"],
+    ["fpsmove", "left-stick", "right-stick"],
 ]
 
 [[event]]

@@ -5,6 +5,10 @@ assert = false
 minify = true
 initial-view = "pause"
 
+script = [
+    "js/action.js",
+]
+
 [[view]]
 name = "pause"
 ui = [
@@ -33,5 +37,3 @@ event = [
     "sub",
     "escape",
 ]
-
-script = []
