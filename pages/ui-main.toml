@@ -89,3 +89,21 @@ target = "button-escape"
 action = [
     ["resetview"],
 ]
+
+[[view]]
+name = "main"
+draw3d = true
+ui = [
+    "reticle",
+    "button-act",
+    "button-sub",
+    "button-escape",
+    "left-stick",
+    "right-stick",    
+]
+event = [
+    "movement",
+    "act",
+    "sub",
+    "escape",
+]

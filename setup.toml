@@ -8,32 +8,3 @@ initial-view = "pause"
 script = [
     "js/action.js",
 ]
-
-[[view]]
-name = "pause"
-ui = [
-    "button-newgame",
-    "button-loadgame",    
-]
-event = [
-    "newgame",
-    "loadgame",
-]
-
-[[view]]
-name = "main"
-draw3d = true
-ui = [
-    "reticle",
-    "button-act",
-    "button-sub",
-    "button-escape",
-    "left-stick",
-    "right-stick",    
-]
-event = [
-    "movement",
-    "act",
-    "sub",
-    "escape",
-]
