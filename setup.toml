@@ -8,3 +8,7 @@ initial-view = "pause"
 script = [
     "js/action.js",
 ]
+
+[skybox]
+Mesh = "skybox"
+Shader = "mesh_pc"
