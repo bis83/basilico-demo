@@ -1,8 +1,7 @@
 
 [[ui]]
 name = "button-newgame"
-mesh = "rect"
-shader = "mesh_pc"
+draw = "ui-rect"
 width = 96
 height = 96
 offset = [-100,0]
@@ -12,8 +11,7 @@ keyboard = "z"
 
 [[ui]]
 name = "button-loadgame"
-mesh = "rect"
-shader = "mesh_pc"
+draw = "ui-rect"
 width = 96
 height = 96
 offset = [100,0]

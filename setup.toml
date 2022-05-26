@@ -4,11 +4,8 @@ logging = false
 assert = false
 minify = true
 initial-view = "pause"
+skybox = "skybox"
 
 script = [
     "js/action.js",
 ]
-
-[skybox]
-Mesh = "skybox"
-Shader = "mesh_pc"

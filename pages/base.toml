@@ -1,8 +1,32 @@
 
-[[stack]]
-id = 1
+[[draw]]
+name = "skybox"
+mesh = "skybox"
+shader = "mesh_pc"
+camera = "vp"
+
+[[draw]]
+name = "stack"
 mesh = "stack"
 shader = "mesh_pc"
+camera = "vp"
+depth = true
+
+[[draw]]
+name = "ui-reticle"
+mesh = "reticle"
+shader = "mesh_pc"
+ortho = "vp"
+
+[[draw]]
+name = "ui-rect"
+mesh = "rect"
+shader = "mesh_pc"
+ortho = "vp"
+
+[[stack]]
+id = 1
+draw = "stack"
 height = 1
 
 [[mesh]]

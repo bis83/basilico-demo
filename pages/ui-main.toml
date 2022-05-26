@@ -1,15 +1,13 @@
 
 [[ui]]
 name = "reticle"
-mesh = "reticle"
-shader = "mesh_pc"
+draw = "ui-reticle"
 width = 8
 height = 8
 
 [[ui]]
 name = "button-act"
-mesh = "rect"
-shader = "mesh_pc"
+draw = "ui-rect"
 width = 48
 height = 48
 offset = [-50,0]
@@ -19,8 +17,7 @@ keyboard = "z"
 
 [[ui]]
 name = "button-sub"
-mesh = "rect"
-shader = "mesh_pc"
+draw = "ui-rect"
 width = 48
 height = 48
 offset = [50,0]
@@ -30,8 +27,7 @@ keyboard = "x"
 
 [[ui]]
 name = "left-stick"
-mesh = "rect"
-shader = "mesh_pc"
+draw = "ui-rect"
 width = 96
 height = 96
 offset = [-200,0]
@@ -39,8 +35,7 @@ interact = "left-stick"
 
 [[ui]]
 name = "right-stick"
-mesh = "rect"
-shader = "mesh_pc"
+draw = "ui-rect"
 width = 96
 height = 96
 offset = [200,0]
@@ -48,8 +43,7 @@ interact = "right-stick"
 
 [[ui]]
 name = "button-escape"
-mesh = "rect"
-shader = "mesh_pc"
+draw = "ui-rect"
 width = 48
 height = 48
 offset = [0,200]
