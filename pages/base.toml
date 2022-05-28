@@ -3,26 +3,24 @@
 name = "skybox"
 mesh = "skybox"
 shader = "mesh_pc"
-camera = "vp"
 
 [[draw]]
 name = "stack"
 mesh = "stack"
 shader = "mesh_pc"
-camera = "vp"
 depth = true
 
 [[draw]]
 name = "ui-reticle"
 mesh = "reticle"
 shader = "mesh_pc"
-ortho = "vp"
+ortho = true
 
 [[draw]]
 name = "ui-rect"
 mesh = "rect"
 shader = "mesh_pc"
-ortho = "vp"
+ortho = true
 
 [[stack]]
 id = 1
