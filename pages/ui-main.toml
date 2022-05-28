@@ -87,6 +87,7 @@ action = [
 [[view]]
 name = "main"
 draw3d = true
+skybox = "skybox"
 ui = [
     "reticle",
     "button-act",
