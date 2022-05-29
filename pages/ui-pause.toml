@@ -1,20 +1,46 @@
 
+[[texture]]
+name = "tex-newgame"
+text = "NEW GAME"
+width = 256
+height = 256
+
+[[texture]]
+name = "tex-loadgame"
+text = "CONTINUE"
+width = 256
+height = 256
+
+[[draw]]
+name = "ui-newgame"
+mesh = "rect"
+shader = "mesh_pt"
+texture = "tex-newgame"
+ortho = true
+
+[[draw]]
+name = "ui-loadgame"
+mesh = "rect"
+shader = "mesh_pt"
+texture = "tex-loadgame"
+ortho = true
+
 [[ui]]
 name = "button-newgame"
-draw = "ui-rect"
-width = 96
-height = 96
-offset = [-100,0]
+draw = "ui-newgame"
+width = 256
+height = 256
+offset = [-160,0]
 interact = "button"
 gamepad = "b8"
 keyboard = "z"
 
 [[ui]]
 name = "button-loadgame"
-draw = "ui-rect"
-width = 96
-height = 96
-offset = [100,0]
+draw = "ui-loadgame"
+width = 256
+height = 256
+offset = [160,0]
 interact = "button"
 gamepad = "b9"
 keyboard = "xx"
