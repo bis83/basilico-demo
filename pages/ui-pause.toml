@@ -1,12 +1,14 @@
 
 [[texture]]
 name = "tex-newgame"
+[texture.canvas]
 text = "NEW GAME"
 width = 256
 height = 256
 
 [[texture]]
 name = "tex-loadgame"
+[texture.canvas]
 text = "CONTINUE"
 width = 256
 height = 256

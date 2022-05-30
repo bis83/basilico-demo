@@ -16,10 +16,15 @@ mesh = "reticle"
 shader = "mesh_pc"
 ortho = true
 
+[[texture]]
+name = "icon"
+src = "icon.png"
+
 [[draw]]
 name = "ui-rect"
 mesh = "rect"
-shader = "mesh_pc"
+shader = "mesh_pt"
+texture = "icon"
 ortho = true
 
 [[stack]]
