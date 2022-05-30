@@ -63,7 +63,7 @@ name = "act"
 trigger = "button"
 target = "button-act"
 action = [
-    ["pushstack"],
+    ["pushtile"],
     ["savegame"],
 ]
 
@@ -72,7 +72,7 @@ name = "sub"
 trigger = "button"
 target = "button-sub"
 action = [
-    ["popstack"],
+    ["poptile"],
     ["savegame"],
 ]
 

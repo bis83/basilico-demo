@@ -1,44 +1,44 @@
 
 $action["makeworld"] = () => {
-    $stack.w = 64;
-    $stack.h = 64;
-    $stack.a.length = 0;
-    $stack.a.length = $stack.w * $stack.h;
-    for(let i=0; i<$stack.a.length; ++i) {
-        $stack.a[i] = [];
-        $stack.a[i].push(stack_set(1, 1));
+    $tile.w = 64;
+    $tile.h = 64;
+    $tile.a.length = 0;
+    $tile.a.length = $tile.w * $tile.h;
+    for(let i=0; i<$tile.a.length; ++i) {
+        $tile.a[i] = [];
+        $tile.a[i].push(tile_set(1, 1));
     }
 
-    $pos.x = $stack.w/2 + 0.5;
-    $pos.y = $stack.h/2 + 0.5;
+    $pos.x = $tile.w/2 + 0.5;
+    $pos.y = $tile.h/2 + 0.5;
 };
 
-$action["pushstack"] = () => {
-    const stack = stack_value($pos.x, $pos.y);
-    if(!stack) {
+$action["pushtile"] = () => {
+    const tile = tile_value($pos.x, $pos.y);
+    if(!tile) {
         return;
     }
-    if(stack.length > 0) {
-        let [id, count] = stack_get(stack[stack.length-1]);
+    if(tile.length > 0) {
+        let [id, count] = tile_get(tile[tile.length-1]);
         count += 1;
-        stack[stack.length-1] = stack_set(id, count);
+        tile[tile.length-1] = tile_set(id, count);
     } else {
-        stack.push(stack_set(1,1));
+        tile.push(tile_set(1,1));
     }
 };
 
-$action["popstack"] = () => {
-    const stack = stack_value($pos.x, $pos.y);
-    if(!stack) {
+$action["poptile"] = () => {
+    const tile = tile_value($pos.x, $pos.y);
+    if(!tile) {
         return;
     }
-    if(stack.length > 0) {
-        let [id, count] = stack_get(stack[stack.length-1]);
+    if(tile.length > 0) {
+        let [id, count] = tile_get(tile[tile.length-1]);
         count -= 1;
         if(count > 0) { 
-            stack[stack.length-1] = stack_set(id, count);
+            tile[tile.length-1] = tile_set(id, count);
         } else {
-            stack.pop();
+            tile.pop();
         }
     }
 };

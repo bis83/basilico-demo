@@ -5,8 +5,8 @@ mesh = "skybox"
 shader = "mesh_pc"
 
 [[draw]]
-name = "stack"
-mesh = "stack"
+name = "tile"
+mesh = "tile"
 shader = "mesh_pc"
 depth = true
 
@@ -27,13 +27,13 @@ shader = "mesh_pt"
 texture = "icon"
 ortho = true
 
-[[stack]]
+[[tile]]
 id = 1
-draw = "stack"
+draw = "tile"
 height = 1
 
 [[mesh]]
-name = "stack"
+name = "tile"
 position = [
   0.0, 0.0, 0.0,
   2.0, 0.0, 0.0,
