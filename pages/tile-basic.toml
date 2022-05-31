@@ -61,3 +61,4 @@ index = [
 [[texture]]
 name = "tile"
 src = "tile.png"
+point-sampling = true
