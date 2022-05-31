@@ -5,12 +5,6 @@ mesh = "skybox"
 shader = "mesh_pc"
 
 [[draw]]
-name = "tile"
-mesh = "tile"
-shader = "mesh_pc"
-depth = true
-
-[[draw]]
 name = "ui-reticle"
 mesh = "reticle"
 shader = "mesh_pc"
@@ -26,48 +20,6 @@ mesh = "rect"
 shader = "mesh_pt"
 texture = "icon"
 ortho = true
-
-[[tile]]
-id = 1
-draw = "tile"
-height = 1
-
-[[mesh]]
-name = "tile"
-position = [
-  0.0, 0.0, 0.0,
-  2.0, 0.0, 0.0,
-  0.0, 2.0, 0.0,
-  2.0, 2.0, 0.0,
-  0.0, 0.0, 0.5,
-  2.0, 0.0, 0.5,
-  0.0, 2.0, 0.5,
-  2.0, 2.0, 0.5,
-]
-color = [
-  32, 32, 32, 255,
-  32, 32, 32, 255,
-  32, 32, 32, 255,
-  32, 32, 32, 255,
-  64, 64, 64, 255,
-  64, 64, 64, 255,
-  64, 64, 64, 255,
-  64, 64, 64, 255,
-]
-index = [
-  0, 1, 2,
-  2, 1, 3,
-  1, 5, 3,
-  3, 5, 7,
-  5, 4, 7,
-  7, 4, 6,
-  4, 0, 6,
-  6, 0, 2,
-  2, 3, 6,
-  6, 3, 7,
-  5, 1, 4,
-  4, 1, 0,
-]
 
 [[mesh]]
 name = "skybox"
