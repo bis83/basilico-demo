@@ -13,7 +13,6 @@ ortho = true
 [[texture]]
 name = "icon"
 src = "icon.png"
-point-sampling = true
 
 [[draw]]
 name = "ui-rect"

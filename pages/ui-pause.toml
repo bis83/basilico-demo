@@ -1,7 +1,6 @@
 
 [[texture]]
 name = "tex-newgame"
-point-sampling = true
 [texture.canvas]
 text = "NEW GAME"
 width = 256
@@ -9,7 +8,6 @@ height = 256
 
 [[texture]]
 name = "tex-loadgame"
-point-sampling = true
 [texture.canvas]
 text = "CONTINUE"
 width = 256
