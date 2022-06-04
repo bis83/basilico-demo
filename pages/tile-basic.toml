@@ -1,8 +1,9 @@
 
 [[tile]]
-id = 1
+name = "tile"
 draw = "tile"
 height = 1
+save-id = 1
 
 [[draw]]
 name = "tile"
