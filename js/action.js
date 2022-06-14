@@ -43,6 +43,6 @@ $action["text"] = (tex) => {
     if(!data) {
         return;
     }
-    cvs_text(data.cvs, ""+$listen.timer.count);
+    cvs_text(data.cvs, ""+$timer.n);
     gl_updateGLTexture2D(data.tex, data.cvs);
 };
