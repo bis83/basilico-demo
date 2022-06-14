@@ -37,3 +37,12 @@ $action["poptile"] = () => {
     }
     tile.count -= 1;
 };
+
+$action["text"] = (tex) => {
+    const data = data_texture(data_texture_index(tex));
+    if(!data) {
+        return;
+    }
+    cvs_text(data.cvs, ""+$listen.timer.count);
+    gl_updateGLTexture2D(data.tex, data.cvs);
+};

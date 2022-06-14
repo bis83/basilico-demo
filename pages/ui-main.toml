@@ -1,4 +1,25 @@
 
+[[texture]]
+name = "tex-counter"
+[texture.canvas]
+width = 256
+height = 64
+
+[[draw]]
+name = "ui-counter"
+mesh = "rect"
+shader = "mesh_pt"
+texture = "tex-counter"
+ortho = true
+alpha = true
+
+[[ui]]
+name = "counter"
+draw = "ui-counter"
+width = 256
+height = 64
+offset = [0,-160]
+
 [[ui]]
 name = "reticle"
 draw = "ui-reticle"
@@ -52,6 +73,13 @@ gamepad = "b9"
 keyboard = "esc"
 
 [[event]]
+name = "update-counter"
+trigger = "always"
+action = [
+    ["text", "tex-counter"],
+]
+
+[[event]]
 name = "movement"
 trigger = "always"
 action = [
@@ -89,6 +117,7 @@ name = "main"
 draw3d = true
 skybox = "skybox"
 ui = [
+    "counter",
     "reticle",
     "button-act",
     "button-sub",
@@ -97,6 +126,7 @@ ui = [
     "right-stick",    
 ]
 event = [
+    "update-counter",
     "movement",
     "act",
     "sub",
