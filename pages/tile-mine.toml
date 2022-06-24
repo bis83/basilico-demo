@@ -1,6 +1,8 @@
 
 [[tile]]
 name = "mine"
+text = "鉱物"
+desc = "素材が採掘できる岩場"
 draw = "mine"
 height = 5
 save-id = 2
