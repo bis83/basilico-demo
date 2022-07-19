@@ -21,32 +21,6 @@ height = 64
 offset = [0,-160]
 
 [[ui]]
-name = "reticle"
-draw = "ui-reticle"
-width = 8
-height = 8
-
-[[ui]]
-name = "button-act"
-draw = "ui-rect"
-width = 48
-height = 48
-offset = [-50,0]
-interact = "button"
-gamepad = "b0"
-keyboard = "z"
-
-[[ui]]
-name = "button-sub"
-draw = "ui-rect"
-width = 48
-height = 48
-offset = [50,0]
-interact = "button"
-gamepad = "b1"
-keyboard = "x"
-
-[[ui]]
 name = "left-stick"
 draw = "ui-rect"
 width = 96
@@ -87,24 +61,6 @@ action = [
 ]
 
 [[event]]
-name = "act"
-trigger = "button"
-target = "button-act"
-action = [
-    ["pushtile"],
-    ["savegame"],
-]
-
-[[event]]
-name = "sub"
-trigger = "button"
-target = "button-sub"
-action = [
-    ["poptile"],
-    ["savegame"],
-]
-
-[[event]]
 name = "escape"
 trigger = "button"
 target = "button-escape"
@@ -118,9 +74,6 @@ draw3d = true
 skybox = "skybox"
 ui = [
     "counter",
-    "reticle",
-    "button-act",
-    "button-sub",
     "button-escape",
     "left-stick",
     "right-stick",    
@@ -128,7 +81,5 @@ ui = [
 event = [
     "update-counter",
     "movement",
-    "act",
-    "sub",
     "escape",
 ]

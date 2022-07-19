@@ -23,25 +23,6 @@ $action["makeworld"] = () => {
     item_gain(data_item_index("pick"), 1);
 };
 
-$action["pushtile"] = () => {
-    const tile = tile_base($pos.x, $pos.y);
-    if(!tile) {
-        return;
-    }
-    tile.count += 1;
-};
-
-$action["poptile"] = () => {
-    const tile = tile_base($pos.x, $pos.y);
-    if(!tile) {
-        return;
-    }
-    if(tile.count <= 1) {
-        return;
-    }
-    tile.count -= 1;
-};
-
 $action["text"] = (tex) => {
     const data = data_texture(data_texture_index(tex));
     if(!data) {

@@ -4,12 +4,6 @@ name = "skybox"
 mesh = "skybox"
 shader = "mesh_pc"
 
-[[draw]]
-name = "ui-reticle"
-mesh = "reticle"
-shader = "mesh_pc"
-ortho = true
-
 [[texture]]
 name = "icon"
 src = "icon.png"
