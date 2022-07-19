@@ -1,26 +1,27 @@
 
 [[texture]]
-name = "tex-counter"
+name = "inventory"
 [texture.canvas]
 width = 256
-height = 64
+height = 256
 
 [[draw]]
-name = "ui-counter"
+name = "inventory"
 mesh = "rect"
 shader = "mesh_pt"
-texture = "tex-counter"
+texture = "inventory"
 ortho = true
 alpha = true
 
 [[ui]]
-name = "counter"
-draw = "ui-counter"
-x = 0
-y = 64
+name = "inventory"
+draw = "inventory"
+x = 128
+y = 0
 width = 256
-height = 64
-origin_y = -1.0
+height = 256
+origin_x = -1.0
+origin_y = 0.0
 
 [[ui]]
 name = "left-stick"
@@ -57,10 +58,10 @@ keyboard = "esc"
 origin_y = 1.0
 
 [[event]]
-name = "update-counter"
+name = "inventory"
 trigger = "always"
 action = [
-    ["text", "tex-counter"],
+    ["inventory", "inventory"],
 ]
 
 [[event]]
@@ -83,13 +84,13 @@ name = "main"
 draw3d = true
 skybox = "skybox"
 ui = [
-    "counter",
+    "inventory",
     "button-escape",
     "left-stick",
     "right-stick",    
 ]
 event = [
-    "update-counter",
+    "inventory",
     "movement",
     "escape",
 ]

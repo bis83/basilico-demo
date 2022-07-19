@@ -23,11 +23,28 @@ $action["makeworld"] = () => {
     item_gain(data_item_index("pick"), 1);
 };
 
-$action["text"] = (tex) => {
+$action["inventory"] = (tex) => {
     const data = data_texture(data_texture_index(tex));
     if(!data) {
         return;
     }
-    cvs_text(data.cvs, ""+$timer.n);
+    let text = "";
+    for(let i=0; i<$item.s.length; ++i) {
+        if($item.i === i) {
+            text += ">";
+        } else {
+            text += " ";
+        }
+        text += "[" + i + "]";
+        if($item.s[i] != null) {
+            const item = data_item($item.s[i].no);
+            if(!item) {
+                continue;
+            }
+            text += item.text + ":" + $item.s[i].num;
+        }
+        text += "\n";
+    }
+    cvs_text(data.cvs, text);
     gl_updateGLTexture2D(data.tex, data.cvs);
 };
