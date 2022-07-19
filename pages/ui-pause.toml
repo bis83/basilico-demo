@@ -30,9 +30,10 @@ ortho = true
 [[ui]]
 name = "button-newgame"
 draw = "ui-newgame"
+x = -160
+y = 0
 width = 256
 height = 256
-offset = [-160,0]
 interact = "button"
 gamepad = "b8"
 keyboard = "z"
@@ -40,9 +41,10 @@ keyboard = "z"
 [[ui]]
 name = "button-loadgame"
 draw = "ui-loadgame"
+x = 160
+y = 0
 width = 256
 height = 256
-offset = [160,0]
 interact = "button"
 gamepad = "b9"
 keyboard = "xx"

@@ -16,35 +16,45 @@ alpha = true
 [[ui]]
 name = "counter"
 draw = "ui-counter"
+x = 0
+y = 64
 width = 256
 height = 64
-offset = [0,-160]
+origin_y = -1.0
 
 [[ui]]
 name = "left-stick"
 draw = "ui-rect"
+x = 128
+y = -128
 width = 96
 height = 96
-offset = [-200,0]
 interact = "left-stick"
+origin_x = -1.0
+origin_y = 1.0
 
 [[ui]]
 name = "right-stick"
 draw = "ui-rect"
+x = -128
+y = -128
 width = 96
 height = 96
-offset = [200,0]
 interact = "right-stick"
+origin_x = 1.0
+origin_y = 1.0
 
 [[ui]]
 name = "button-escape"
 draw = "ui-rect"
+x = 0
+y = -64
 width = 48
 height = 48
-offset = [0,200]
 interact = "button"
 gamepad = "b9"
 keyboard = "esc"
+origin_y = 1.0
 
 [[event]]
 name = "update-counter"
