@@ -23,6 +23,13 @@ $action["makeworld"] = () => {
     item_gain(data_item_index("pick"), 1);
 };
 
+$action["inventory_next"] = () => {
+    item_set_cursor(1);
+};
+$action["inventory_prev"] = () => {
+    item_set_cursor(-1);
+};
+
 $action["inventory"] = (tex) => {
     const data = data_texture(data_texture_index(tex));
     if(!data) {

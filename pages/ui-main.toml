@@ -24,6 +24,32 @@ origin_x = -1.0
 origin_y = 0.0
 
 [[ui]]
+name = "button-inventory-prev"
+draw = "ui-rect"
+x = 128
+y = -160
+width = 32
+height = 32
+interact = "button"
+gamepad = "b1"
+keyboard = "e"
+origin_x = -1.0
+origin_y = 0.0
+
+[[ui]]
+name = "button-inventory-next"
+draw = "ui-rect"
+x = 128
+y = 160
+width = 32
+height = 32
+interact = "button"
+gamepad = "b0"
+keyboard = "q"
+origin_x = -1.0
+origin_y = 0.0
+
+[[ui]]
 name = "left-stick"
 draw = "ui-rect"
 x = 128
@@ -65,6 +91,22 @@ action = [
 ]
 
 [[event]]
+name = "inventory-prev"
+trigger = "button"
+target = "button-inventory-prev"
+action = [
+    ["inventory_prev"],
+]
+
+[[event]]
+name = "inventory-next"
+trigger = "button"
+target = "button-inventory-next"
+action = [
+    ["inventory_next"],
+]
+
+[[event]]
 name = "movement"
 trigger = "always"
 action = [
@@ -85,12 +127,16 @@ draw3d = true
 skybox = "skybox"
 ui = [
     "inventory",
+    "button-inventory-prev",
+    "button-inventory-next",
     "button-escape",
     "left-stick",
     "right-stick",    
 ]
 event = [
     "inventory",
+    "inventory-prev",
+    "inventory-next",
     "movement",
     "escape",
 ]
