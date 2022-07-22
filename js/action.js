@@ -52,6 +52,16 @@ $action["inventory"] = (tex) => {
         }
         text += "\n";
     }
+    text += "\n";
+    {
+        const slot = item_select();
+        if(slot != null) {
+            const item = data_item(slot.no);
+            if(item != null) {
+                text += item.desc + "\n";
+            }
+        }
+    }
     cvs_text(data.cvs, text);
     gl_updateGLTexture2D(data.tex, data.cvs);
 };
