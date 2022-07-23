@@ -1,0 +1,24 @@
+[[ui]]
+name = "button-loadgame"
+draw = "ui-loadgame"
+x = 160
+y = 0
+width = 256
+height = 256
+interact = "button"
+gamepad = "b9"
+keyboard = "xx"
+
+[[draw]]
+name = "ui-loadgame"
+mesh = "rect"
+shader = "mesh_pt"
+texture = "tex-loadgame"
+ortho = true
+
+[[texture]]
+name = "tex-loadgame"
+[texture.canvas]
+text = "CONTINUE"
+width = 256
+height = 256

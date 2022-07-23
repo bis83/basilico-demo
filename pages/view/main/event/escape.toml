@@ -1,0 +1,7 @@
+[[event]]
+name = "escape"
+trigger = "button"
+target = "button-escape"
+action = [
+    ["resetview"],
+]

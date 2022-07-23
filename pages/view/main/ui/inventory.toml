@@ -1,0 +1,23 @@
+[[ui]]
+name = "inventory"
+draw = "inventory"
+x = 128
+y = 0
+width = 256
+height = 256
+origin_x = -1.0
+origin_y = 0.0
+
+[[draw]]
+name = "inventory"
+mesh = "rect"
+shader = "mesh_pt"
+texture = "inventory"
+ortho = true
+alpha = true
+
+[[texture]]
+name = "inventory"
+[texture.canvas]
+width = 256
+height = 256

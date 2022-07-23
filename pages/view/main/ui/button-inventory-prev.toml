@@ -1,0 +1,12 @@
+[[ui]]
+name = "button-inventory-prev"
+draw = "ui-rect"
+x = 128
+y = -160
+width = 32
+height = 32
+interact = "button"
+gamepad = "b1"
+keyboard = "e"
+origin_x = -1.0
+origin_y = 0.0

@@ -1,0 +1,10 @@
+[[ui]]
+name = "right-stick"
+draw = "ui-rect"
+x = -128
+y = -128
+width = 96
+height = 96
+interact = "right-stick"
+origin_x = 1.0
+origin_y = 1.0

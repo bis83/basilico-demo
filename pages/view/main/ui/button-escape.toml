@@ -1,0 +1,11 @@
+[[ui]]
+name = "button-escape"
+draw = "ui-rect"
+x = 0
+y = -64
+width = 48
+height = 48
+interact = "button"
+gamepad = "b9"
+keyboard = "esc"
+origin_y = 1.0

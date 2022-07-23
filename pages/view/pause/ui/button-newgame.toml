@@ -1,0 +1,24 @@
+[[ui]]
+name = "button-newgame"
+draw = "ui-newgame"
+x = -160
+y = 0
+width = 256
+height = 256
+interact = "button"
+gamepad = "b8"
+keyboard = "z"
+
+[[draw]]
+name = "ui-newgame"
+mesh = "rect"
+shader = "mesh_pt"
+texture = "tex-newgame"
+ortho = true
+
+[[texture]]
+name = "tex-newgame"
+[texture.canvas]
+text = "NEW GAME"
+width = 256
+height = 256

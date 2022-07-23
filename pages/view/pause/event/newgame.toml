@@ -1,0 +1,9 @@
+[[event]]
+name = "newgame"
+trigger = "button"
+target = "button-newgame"
+action = [
+    ["newgame", "slot0"],
+    ["makeworld"],
+    ["nextview", "main"],
+]
