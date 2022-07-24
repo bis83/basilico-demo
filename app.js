@@ -1,5 +1,1511 @@
-(()=>{const V=t=>{const e=window.atob(t),n=new ArrayBuffer(e.length),o=new DataView(n);for(let r=0;r<e.length;++r)o.setUint8(r,e.charCodeAt(r));return n};const Et=(t,e)=>(t%e+e)%e,P=t=>t/180*Math.PI,rt=(t,e)=>Math.sqrt(t*t+e*e),D=(t,e)=>{const n=rt(t,e);return n!=0?[t/n,e/n]:[0,0]},xt=([t,e],n)=>[t*n,e*n],At=([t,e],n,o,r,c)=>n<=t&&t<=o&&r<=e&&e<=c,O=([t,e],n,[o,r])=>{const[c,i]=[o-t,r-e],l=rt(c,i);if(n<=l)return[t,e];const[f,E]=D(c,i),[x,w]=xt([f,E],l-n);return[t+x,e+w]},k=(t,e)=>t[0]*e[0]+t[1]*e[1]+t[2]*e[2],wt=t=>{const e=k(t,t);return Math.sqrt(e)},gt=(t,e)=>[t[0]+e[0],t[1]+e[1],t[2]+e[2]],vt=(t,e)=>[t[0]-e[0],t[1]-e[1],t[2]-e[2]];const K=t=>{const e=wt(t);return[t[0]/e,t[1]/e,t[2]/e]},z=(t,e)=>[t[1]*e[2]-t[2]*e[1],t[2]*e[0]-t[0]*e[2],t[0]*e[1]-t[1]*e[0]],Tt=(t,e)=>{const n=P(t),o=P(e);return[Math.cos(o)*Math.cos(n),Math.cos(o)*Math.sin(n),Math.sin(o)]},pt=()=>[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],yt=(t,e)=>[t[0]*e[0]+t[1]*e[4]+t[2]*e[8]+t[3]*e[12],t[0]*e[1]+t[1]*e[5]+t[2]*e[9]+t[3]*e[13],t[0]*e[2]+t[1]*e[6]+t[2]*e[10]+t[3]*e[14],t[0]*e[3]+t[1]*e[7]+t[2]*e[11]+t[3]*e[15],t[4]*e[0]+t[5]*e[4]+t[6]*e[8]+t[7]*e[12],t[4]*e[1]+t[5]*e[5]+t[6]*e[9]+t[7]*e[13],t[4]*e[2]+t[5]*e[6]+t[6]*e[10]+t[7]*e[14],t[4]*e[3]+t[5]*e[7]+t[6]*e[11]+t[7]*e[15],t[8]*e[0]+t[9]*e[4]+t[10]*e[8]+t[11]*e[12],t[8]*e[1]+t[9]*e[5]+t[10]*e[9]+t[11]*e[13],t[8]*e[2]+t[9]*e[6]+t[10]*e[10]+t[11]*e[14],t[8]*e[3]+t[9]*e[7]+t[10]*e[11]+t[11]*e[15],t[12]*e[0]+t[13]*e[4]+t[14]*e[8]+t[15]*e[12],t[12]*e[1]+t[13]*e[5]+t[14]*e[9]+t[15]*e[13],t[12]*e[2]+t[13]*e[6]+t[14]*e[10]+t[15]*e[14],t[12]*e[3]+t[13]*e[7]+t[14]*e[11]+t[15]*e[15]],Dt=t=>{const e=t[0]*t[5]-t[1]*t[4],n=t[0]*t[6]-t[2]*t[4],o=t[0]*t[7]-t[3]*t[4],r=t[1]*t[6]-t[2]*t[5],c=t[1]*t[7]-t[3]*t[5],i=t[2]*t[7]-t[3]*t[6],l=t[8]*t[13]-t[9]*t[12],f=t[8]*t[14]-t[10]*t[12],E=t[8]*t[15]-t[11]*t[12],x=t[9]*t[14]-t[10]*t[13],w=t[9]*t[15]-t[11]*t[13],y=t[10]*t[15]-t[11]*t[14];let h=e*y-n*w+o*x+r*E-c*f+i*l;return h?(h=1/h,[(t[5]*y-t[6]*w+t[7]*x)*h,(t[2]*w-t[1]*y-t[3]*x)*h,(t[13]*i-t[14]*c+t[15]*r)*h,(t[10]*c-t[9]*i-t[11]*r)*h,(t[6]*E-t[4]*y-t[7]*f)*h,(t[0]*y-t[2]*E+t[3]*f)*h,(t[14]*o-t[12]*i-t[15]*n)*h,(t[8]*i-t[10]*o+t[11]*n)*h,(t[4]*w-t[5]*E+t[7]*l)*h,(t[1]*E-t[0]*w-t[3]*l)*h,(t[12]*c-t[13]*o+t[15]*e)*h,(t[9]*o-t[8]*c-t[11]*e)*h,(t[5]*f-t[4]*x-t[6]*l)*h,(t[0]*x-t[1]*f+t[2]*l)*h,(t[13]*n-t[12]*r-t[14]*e)*h,(t[8]*r-t[9]*n+t[10]*e)*h]):pt()},F=(t,e,n)=>[1,0,0,0,0,1,0,0,0,0,1,0,t,e,n,1],Mt=(t,e,n,o)=>{t[12]=e,t[13]=n,t[14]=o},Rt=(t,e,n)=>[t,0,0,0,0,e,0,0,0,0,n,0,0,0,0,1],St=(t,e,n)=>{const o=K(vt(e,t)),r=K(z(n,o)),c=z(o,r),i=k(t,r),l=k(t,c),f=k(t,o);return[r[0],c[0],o[0],0,r[1],c[1],o[1],0,r[2],c[2],o[2],0,-i,-l,-f,1]},Pt=(t,e,n,o)=>{const r=1/Math.tan(t),c=r/e,i=o/(o-n),l=-(i*n);return[c,0,0,0,0,r,0,0,0,0,i,1,0,0,l,0]},Ot=(t,e,n,o)=>{const r=2/t,c=2/e,i=1/(o-n),l=n/(n-o);return[r,0,0,0,0,c,0,0,0,0,i,0,0,0,l,1]},B=(t,e,n)=>[t*2,e*2,n*.5];var u=null;const A=(t,e,n)=>{t.addEventListener(e,n)},It=()=>{const t=document.body;t.style.userSelect="none",t.style.webkitUserSelect="none",t.style.msUserSelect="none",t.style.mozUserSelect="none"},Gt=()=>{const t=document.body;t.style.touchAction="none"},kt=()=>{It(),Gt(),u={},u.mode=0,u.gamepad={index:null,lx:0,ly:0,rx:0,ry:0,b0:!1,b1:!1,b8:!1,b9:!1,lt:!1,rt:!1},u.keyboard={w:!1,a:!1,s:!1,d:!1,up:!1,left:!1,down:!1,right:!1,z:!1,x:!1,space:!1,lctrl:!1,esc:!1},u.touch=new Map,u.click=[],A(window,"focus",t=>{}),A(window,"blur",t=>{}),A(window,"resize",t=>{}),A(window,"gamepadconnected",t=>{u.gamepad.index=t.gamepad.index,u.mode=1}),A(window,"gamepaddisconnected",t=>{u.gamepad.index===t.gamepad.index&&(u.gamepad.index=null)}),A(document,"keydown",t=>{W(u.keyboard,t.code,!0)&&(u.mode=2,t.preventDefault())}),A(document,"keyup",t=>{W(u.keyboard,t.code,!1)&&(u.mode=2,t.preventDefault())}),A(document.body,"contextmenu",t=>{t.preventDefault()}),A(document.body,"pointerdown",t=>{u.touch.set(t.pointerId,{x:t.clientX,y:t.clientY,sx:t.clientX,sy:t.clientY,time:performance.now()}),u.mode=0}),A(document.body,"pointerup",t=>{bt(t.pointerId),u.touch.delete(t.pointerId),u.mode=0}),A(document.body,"pointerout",t=>{u.touch.delete(t.pointerId),u.mode=0}),A(document.body,"pointermove",t=>{const e=u.touch.get(t.pointerId);e&&(e.x=t.clientX,e.y=t.clientY,u.mode=0)})},W=(t,e,n)=>{switch(e){case"KeyW":t.w=n;break;case"KeyA":t.a=n;break;case"KeyS":t.s=n;break;case"KeyD":t.d=n;break;case"ArrowUp":t.up=n;break;case"ArrowLeft":t.left=n;break;case"ArrowDown":t.down=n;break;case"ArrowRight":t.right=n;break;case"KeyZ":t.z=n;break;case"KeyX":t.x=n;break;case"Space":t.space=n;break;case"ControlLeft":t.lctrl=n;break;case"Escape":t.esc=n;break;default:return!1}return!0},bt=t=>{const e=u.touch.get(t);e&&performance.now()-e.time<250&&u.click.push({x:e.x,y:e.y})},Lt=t=>{if(t.index!==null){const n=navigator.getGamepads()[t.index];t.lx=Math.trunc(n.axes[0]*4)/4,t.ly=Math.trunc(n.axes[1]*4)/4,t.rx=Math.trunc(n.axes[2]*4)/4,t.ry=Math.trunc(n.axes[3]*4)/4,t.b0=n.buttons[0].value>=.5,t.b1=n.buttons[1].value>=.5,t.b8=n.buttons[8].value>=.5,t.b9=n.buttons[9].value>=.5,t.lt=n.buttons[6].value>=.5,t.rt=n.buttons[7].value>=.5,!!(t.lx||t.ly||t.rx||t.ry||t.b0||t.b1||t.b8||t.b9||t.lt||t.rt)&&(u.mode=1)}},Ut=()=>{Lt(u.gamepad)},Nt=()=>{u.click.length=0},Ft=t=>{const e=localStorage.getItem(t);return e==null?null:JSON.parse(e)},Bt=(t,e)=>{const n=JSON.stringify(e);localStorage.setItem(t,n)};var s=null;const Xt=()=>{s=document.getElementById("main").getContext("webgl2")},q=(t,e)=>{let n=s.createTexture();return s.bindTexture(s.TEXTURE_2D,n),e==0&&(s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MAG_FILTER,s.NEAREST),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MIN_FILTER,s.NEAREST)),e==1&&(s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MAG_FILTER,s.LINEAR),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MIN_FILTER,s.LINEAR)),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_S,s.CLAMP_TO_EDGE),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_T,s.CLAMP_TO_EDGE),s.texImage2D(s.TEXTURE_2D,0,s.RGBA,s.RGBA,s.UNSIGNED_BYTE,t),s.bindTexture(s.TEXTURE_2D,null),n},Yt=(t,e)=>{s.bindTexture(s.TEXTURE_2D,t),s.texSubImage2D(s.TEXTURE_2D,0,0,0,s.RGBA,s.UNSIGNED_BYTE,e),s.bindTexture(s.TEXTURE_2D,null)},J=(t,e)=>{const n=s.createShader(t);return s.shaderSource(n,e),s.compileShader(n),s.getShaderParameter(n,s.COMPILE_STATUS)?n:(s.deleteShader(n),null)},Ct=(t,e)=>{const n=s.createProgram();return s.attachShader(n,t),s.attachShader(n,e),s.linkProgram(n),s.getProgramParameter(n,s.LINK_STATUS)?n:(s.deleteProgram(n),null)},j=(t,e)=>{let n=s.createBuffer();return s.bindBuffer(t,n),s.bufferData(t,e,s.STATIC_DRAW),n},I=(t,e,n,o,r,c)=>{s.enableVertexAttribArray(t),s.vertexAttribPointer(t,e,n,o,r,c)},$t=()=>{const t=window.innerWidth;t!==s.canvas.width&&(s.canvas.width=t);const e=window.innerHeight;e!==s.canvas.height&&(s.canvas.height=e)},Ht=()=>{s.viewport(0,0,s.canvas.width,s.canvas.height),s.clearColor(0,0,0,1),s.clearDepth(1),s.clear(s.COLOR_BUFFER_BIT|s.DEPTH_BUFFER_BIT)},Vt=(t,e)=>{s.enable(s.CULL_FACE),t?(s.enable(s.DEPTH_TEST),s.depthFunc(s.LEQUAL)):s.disable(s.DEPTH_TEST),e?(s.enable(s.BLEND),s.blendFunc(s.SRC_ALPHA,s.ONE_MINUS_SRC_ALPHA)):(s.disable(s.BLEND),s.blendFunc(s.SRC_ALPHA,s.ONE_MINUS_SRC_ALPHA))},Kt=(t,e)=>{e=e||0;const n=t.iv[e*3+0],o=t.iv[e*3+1],r=t.iv[e*3+2],c=[null,s.POINTS,s.LINES,s.TRIANGLES];t.i?s.drawElements(c[n],r,s.UNSIGNED_SHORT,2*o):s.drawArrays(c[n],o,r)},zt=(t,e)=>{s.activeTexture(s.TEXTURE0),s.bindTexture(s.TEXTURE_2D,t.tex),s.uniform1i(e,0)},Wt=(t,e)=>{const n=document.createElement("canvas");return n?(n.width=t,n.height=e,n):null},ct=(t,e)=>{const n=t.getContext("2d");if(!n)return null;n.clearRect(0,0,t.width,t.height),n.fillStyle="rgba(0 0 0 / 0.5)",n.fillRect(0,0,t.width,t.height),n.fillStyle="white",n.textAlign="left",n.textBaseline="top",n.font="14px monospace";const o=e.split(`
-`);for(let r=0;r<o.length;++r)n.fillText(o[r],0,12*r)};var qt=null;const Jt=()=>{qt=new AudioContext};const Q=0,Z=1,tt=2,et=3,jt=t=>{if(t.vao=s.createVertexArray(),s.bindVertexArray(t.vao),t.b&&(t.b=j(s.ARRAY_BUFFER,V(t.b)),t.bv))for(let e=0;e<t.bv.length;e+=2)switch(t.bv[e]){case Q:I(Q,3,s.FLOAT,!1,0,t.bv[e+1]);break;case Z:I(Z,3,s.HALF_FLOAT,!1,0,t.bv[e+1]);break;case tt:I(tt,4,s.UNSIGNED_BYTE,!0,0,t.bv[e+1]);break;case et:I(et,2,s.HALF_FLOAT,!1,0,t.bv[e+1]);break}return t.i&&(t.i=j(s.ELEMENT_ARRAY_BUFFER,V(t.i))),s.bindVertexArray(null),t},Qt=t=>{if(t.vs=J(s.VERTEX_SHADER,t.vs),t.fs=J(s.FRAGMENT_SHADER,t.fs),t.prog=Ct(t.vs,t.fs),t.u){const e={};for(let n of t.u)e[n]=s.getUniformLocation(t.prog,n);t.u=e}if(t.ub){const e={};let n=0;for(let o of t.ub){const r=s.getUniformBlockIndex(t.prog,o);s.uniformBlockBinding(t.prog,r,n),e[o]=n,n+=1}t.ub=e}return t};let X=0;const Zt=t=>{if(t.cvs){const e=Wt(t.cvs.width,t.cvs.height);ct(e,t.cvs.text),t.cvs=e,t.tex=q(t.cvs,t.s)}else{t.tex=null;const e=new Image;e.onload=()=>{t.tex=q(e,t.s),X-=1},e.src="img/"+t.src,X+=1}return t},g={index:null,pack:[]},te=()=>{fetch("data/index.json").then(e=>e.json()).then(e=>{g.index=e})},ee=t=>{const e="data/pack"+t+".json";fetch(e).then(n=>n.json()).then(n=>{n.mesh&&(n.mesh=n.mesh.map(o=>jt(o))),n.texture&&(n.texture=n.texture.map(o=>Zt(o))),n.shader&&(n.shader=n.shader.map(o=>Qt(o))),g.pack[t]=n})},T=(t,e)=>{if(e<0)return null;const n=g.index[t];if(!n)return null;const o=n[e];if(!o)return null;const r=g.pack[o.p];return r?r[t][o.i]:null},it=t=>T("view",t),ne=t=>T("mesh",t),lt=t=>T("texture",t),oe=t=>T("shader",t),se=t=>T("draw",t),nt=t=>T("item",t),b=t=>T("tile",t),ut=t=>T("ui",t),re=t=>T("event",t),ce=t=>g.index.view.findIndex(e=>e.n===t),ie=t=>g.index.texture.findIndex(e=>e.n===t),le=t=>g.index.item.findIndex(e=>e.n===t),ot=t=>g.index.tile.findIndex(e=>e.n===t),ue=t=>g.index.ui.findIndex(e=>e.n===t),at=()=>!(g.index===null||g.pack.length<=0||X>0),v={},ae=t=>{const e=v[t[0]];if(!e)return;const n=t.slice(1);e(...n)},S={t:performance.now(),dt:0,n:0},fe=t=>{S.dt=(t-S.t)/1e3,S.t=t,S.n+=1},M=[],Y=t=>{const e=ue(t);if(e<0)return null;const n=M[e];return n?n.value:null},de=0,N=0,R=1,$=(t,e)=>{const n=window.innerWidth,o=window.innerHeight,r=window.devicePixelRatio,c=n/2+n/2*t.ox,i=o/2+o/2*t.oy,l=c+(t.x-t.w/2)*r,f=c+(t.x+t.w/2)*r,E=i+(t.y-t.h/2)*r,x=i+(t.y+t.h/2)*r;return At(e,l,f,E,x)},_e=(t,e)=>{const n=u.mode;if(n===0){let o=!1;const r=u.click;for(let c of r)if($(e,[c.x,c.y])){o=!0;break}o?(t.value=!0,t.state=R):(t.value=!1,t.state=N)}else n===1?u.gamepad[e.gamepad]?t.state!==R?(t.value=!0,t.state=R):t.value=!1:(t.value=!1,t.state=N):n===2&&(u.keyboard[e.keyboard]?t.state!==R?(t.value=!0,t.state=R):t.value=!1:(t.value=!1,t.state=N))},he=(t,e)=>{const n=u.mode;if(n===0){t.value=[0,0];for(const o of u.touch.values())if($(e,[o.sx,o.sy])){const r=o.x-o.sx,c=-(o.y-o.sy);t.value=D(r,c);break}}else if(n===1){const o=u.gamepad;t.value=D(o.lx,-o.ly)}else if(n===2){const o=u.keyboard,r=o.a?-1:o.d?1:0,c=o.w?1:o.s?-1:0;t.value=D(r,c)}},me=(t,e)=>{const n=u.mode;if(n===0){t.value=[0,0];for(const o of u.touch.values())if($(e,[o.sx,o.sy])){const r=o.x-o.sx,c=-(o.y-o.sy);t.value=D(r,c);break}}else if(n===1){const o=u.gamepad;t.value=D(o.rx,-o.ry)}else if(n===2){const o=u.keyboard,r=o.right?1:o.left?-1:0,c=o.up?1:o.down?-1:0;t.value=D(r,c)}},Ee=t=>{const e=window.innerWidth,n=window.innerHeight;for(const o of M)o&&(o.value=null);for(let o of t.ui){const r=ut(o);if(!r)continue;M[o]||(M[o]={m:new Float32Array(16),value:null,state:de});const c=M[o];switch(r.interact){case 1:_e(c,r);break;case 2:he(c,r);break;case 3:me(c,r);break;default:break}const i=window.devicePixelRatio,l=r.ox*e/2,f=r.oy*n/2,E=Rt(r.w/2*i,r.h/2*i,1);Mt(E,l+r.x*i,-(f+r.y*i),0),c.m.set(E)}},_={w:0,h:0,a:[],b:[]},U=(t,e)=>(t=Math.floor(t),e=Math.floor(e),t<0||_.w<=t||e<0||_.h<=e?-1:t+e*_.h),H=(t,e)=>_.a[U(t,e)],ft=(t,e)=>_.b[U(t,e)],dt=(t,e)=>{const n=H(t,e);if(!n)return 0;const o=b(n.no);return o?o.height*n.count:0},xe=(t,e)=>{const n=ft(t,e);if(!n)return 0;const o=b(n.no);return o?o.height:0},C=(t,e)=>dt(t,e)+xe(t,e),Ae=(t,e)=>H(t,e)==null,p=(t,e,n,o)=>{if(Ae(t+n,e+o))return!0;const r=C(t,e),c=C(t+n,e+o);return Math.abs(r-c)>1},we=(t,e)=>{_.w=t,_.h=e,_.a=[],_.a.length=t*e,_.b=[],_.b.length=t*e},ge=(t,e,n)=>{const o=U(t,e);o<0||(_.a[o]={no:n,count:1})},G=(t,e,n)=>{const o=U(t,e);o<0||(_.b[o]={no:n,dir:0})},ve=t=>t,Te=t=>t,pe=1.75,a={x:0,y:0,ha:0,va:0,h:0},ye=(t,e,n,o)=>{a.x=t||0,a.y=e||0,a.ha=n||0,a.va=o||0,a.h=0},m={s:[],i:0},De=t=>m.s.findIndex(e=>e&&e.no===t),Me=()=>m.s.findIndex(t=>!t),Re=t=>{const e=t??m.i;return m.s[e]},_t=t=>{const e=Et(m.i+t,m.s.length);m.i=e},Se=(t,e)=>{let n=De(t);if(n<0){if(n=Me(),n<0)return;m.s[n]={no:t,num:e};return}m.s[n].num+=e};const Pe=t=>{m.s.length=t,m.s.fill(null),m.i=0},Oe=t=>t,Ie=t=>t,Ge=t=>{for(let e of t.event){const n=re(e);if(!n)continue;let o=!1;switch(n.trigger){case 0:o=!0;break;case 1:o=Y(n.target);break}if(!!o)for(const r of n.action)ae(r)}},d={view:null,slot:null,cam:{eye:[0,0,0],vp:new Float32Array(16),ivp:new Float32Array(16),o:new Float32Array(16)},m:new Float32Array(16)},ht=()=>{d.slot=null,d.view=g.index.initial_view},ke=t=>{const e=ce(t);e<0||(d.view=e)},be=()=>{d.view===null&&ht()},Le=()=>{const t=window.innerWidth,e=window.innerHeight,n=P(30),o=.1,r=1e3,c=Tt(a.ha,a.va),i=B(a.x,a.y,a.h);i[2]+=pe;const l=gt(i,c),E=St(i,l,[0,0,1]),x=Pt(n,t/e,o,r),w=yt(E,x);d.cam.vp.set(w),d.cam.ivp.set(Dt(w)),d.cam.o.set(Ot(t,e,0,1)),d.cam.eye=i},Ue=()=>{_.w=0,_.h=0,_.a.length=0,a.x=0,a.y=0,a.ha=0,a.va=0},Ne=()=>{if(!d.slot)return!1;const t=Ft(d.slot);return t?(t.pos&&Object.assign(a,t.pos),t.item&&Object.assign(m,Ie(t.item)),t.tile&&Object.assign(_,Te(t.tile)),!0):!1},Fe=()=>{if(!d.slot)return;const t={};t.pos=a,t.item=Oe(m),t.tile=ve(_),Bt(d.slot,t)},Be=()=>{$t(),Ht()},L=(t,e,n)=>{const o=se(t);if(!o)return;Vt(o.depth,o.alpha);const r=oe(o.shader);if(!r)return;s.useProgram(r.prog);const c=ne(o.mesh);if(!c)return;s.bindVertexArray(c.vao),s.uniformMatrix4fv(r.u.vp,!1,o.ortho?d.cam.o:d.cam.vp);const i=lt(o.texture);i&&zt(i,r.u.tex0);for(let l=0;l<e;++l)n(r.u,l),Kt(c)},Xe=()=>{for(let t=0;t<_.w;++t)for(let e=0;e<_.h;++e){const n=H(t,e);if(!n)continue;const o=b(n.no);!o||L(o.draw,n.count,(r,c)=>{const i=B(t,e,c*o.height);d.m.set(F(i[0],i[1],i[2])),s.uniformMatrix4fv(r.w,!1,d.m)})}for(let t=0;t<_.w;++t)for(let e=0;e<_.h;++e){const n=ft(t,e);if(!n)continue;const o=b(n.no);if(!o)continue;const r=dt(t,e);L(o.draw,1,(c,i)=>{const l=B(t,e,r);d.m.set(F(l[0],l[1],l[2])),s.uniformMatrix4fv(c.w,!1,d.m)})}},Ye=t=>{for(let e of t.ui){const n=ut(e);if(!n)continue;const o=M[e];!o||L(n.draw,1,(r,c)=>{s.uniformMatrix4fv(r.w,!1,o.m)})}},Ce=t=>{L(t.skybox,1,(e,n)=>{d.m.set(F(...d.cam.eye)),s.uniformMatrix4fv(e.w,!1,d.m)})},$e=t=>{Ce(t),t.draw3d&&Xe(),Ye(t)},He=()=>{Xt(),Jt(),kt(),te(),ee(0)},Ve=t=>{if(fe(t),Ut(),at()){be();const e=it(d.view);if(!e)return;Ee(e),Ge(e)}Le(),Nt()},Ke=()=>{if(Be(),at()){const t=it(d.view);if(!t)return;$e(t)}};A(window,"load",()=>{He();const t=e=>{Ve(e),Ke(),requestAnimationFrame(t)};t()});v.nextview=t=>{ke(t)};v.resetview=()=>{ht()};v.newgame=t=>{d.slot=t,Ue()};v.loadgame=t=>{d.slot=t,Ne()};v.savegame=()=>{Fe()};const st=(t,e,n,o)=>{const r=Math.floor(t),c=Math.floor(e),i=.25;let l=t+n,f=e+o;return p(r,c,-1,0)&&(l=Math.max(l,r+i)),p(r,c,1,0)&&(l=Math.min(l,r-i+1)),p(r,c,0,-1)&&(f=Math.max(f,c+i)),p(r,c,0,1)&&(f=Math.min(f,c-i+1)),p(r,c,-1,-1)&&([l,f]=O([l,f],i,[r,c])),p(r,c,-1,1)&&([l,f]=O([l,f],i,[r,c+1])),p(r,c,1,-1)&&([l,f]=O([l,f],i,[r+1,c])),p(r,c,1,1)&&([l,f]=O([l,f],i,[r+1,c+1])),[l,f]},ze=(t,e)=>{const n=S.dt,o=Y(e);o&&(a.ha+=90*n*o[0],a.va+=90*n*o[1],a.va=Math.max(-60,Math.min(a.va,80)));const r=Y(t);if(r){const l=P(a.ha+90),f=P(a.ha),E=r[0],x=r[1],w=E*Math.cos(l)+x*Math.cos(f),y=E*Math.sin(l)+x*Math.sin(f),h=2*n*w,mt=2*n*y;[a.x,a.y]=st(a.x,a.y,h,mt)}else[a.x,a.y]=st(a.x,a.y,0,0);const c=C(a.x,a.y);if(Math.abs(c-a.h)<=2){const i=c-a.h;a.h+=10*n*i}else a.h=c};v.fpsmove=(t,e)=>{ze(t,e)};v.makeworld=()=>{const t=ot("tile"),e=ot("mine");we(64,64);for(let n=24;n<=40;++n)for(let o=24;o<=40;++o)ge(n,o,t);G(29,29,e),G(35,29,e),G(29,35,e),G(35,35,e),ye(_.w/2+.5,_.h/2+.5),Pe(8),Se(le("pick"),1)};v.inventory_next=()=>{_t(1)};v.inventory_prev=()=>{_t(-1)};v.inventory=t=>{const e=lt(ie(t));if(!e)return;let n="";for(let o=0;o<m.s.length;++o){if(m.i===o?n+=">":n+=" ",n+="["+o+"]",m.s[o]!=null){const r=nt(m.s[o].no);if(!r)continue;n+=r.text+":"+m.s[o].num}n+=`
-`}n+=`
-`;{const o=Re();if(o!=null){const r=nt(o.no);r!=null&&(n+=r.desc+`
-`)}}ct(e.cvs,n),Yt(e.tex,e.cvs)};})();
+(() => {
+  const base64ToArrayBuffer = (base64) => {
+    const b = window.atob(base64);
+    const a = new ArrayBuffer(b.length);
+    const v = new DataView(a);
+    for (let i = 0; i < b.length; ++i) {
+      v.setUint8(i, b.charCodeAt(i));
+    }
+    return a;
+  };
+  const mod = (v, n) => {
+    return (v % n + n) % n;
+  };
+  const deg2rad = (deg) => {
+    return deg / 180 * Math.PI;
+  };
+  const xy_length = (x, y) => {
+    return Math.sqrt(x * x + y * y);
+  };
+  const xy_normalize = (x, y) => {
+    const l = xy_length(x, y);
+    return l != 0 ? [x / l, y / l] : [0, 0];
+  };
+  const xy_mul = ([x, y], l) => {
+    return [x * l, y * l];
+  };
+  const xy_hit_rect = ([x, y], minX, maxX, minY, maxY) => {
+    return minX <= x && x <= maxX && minY <= y && y <= maxY;
+  };
+  const xy_bounds = ([x0, y0], r, [x1, y1]) => {
+    const [dx, dy] = [x1 - x0, y1 - y0];
+    const l = xy_length(dx, dy);
+    if (r <= l) {
+      return [x0, y0];
+    }
+    const [nx, ny] = xy_normalize(dx, dy);
+    const [sx, sy] = xy_mul([nx, ny], l - r);
+    return [x0 + sx, y0 + sy];
+  };
+  const vec3dot = (a, b) => {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  };
+  const vec3length = (a) => {
+    const d = vec3dot(a, a);
+    return Math.sqrt(d);
+  };
+  const vec3add = (a, b) => {
+    return [
+      a[0] + b[0],
+      a[1] + b[1],
+      a[2] + b[2]
+    ];
+  };
+  const vec3sub = (a, b) => {
+    return [
+      a[0] - b[0],
+      a[1] - b[1],
+      a[2] - b[2]
+    ];
+  };
+  const vec3normalize = (v) => {
+    const l = vec3length(v);
+    return [
+      v[0] / l,
+      v[1] / l,
+      v[2] / l
+    ];
+  };
+  const vec3cross = (a, b) => {
+    return [
+      a[1] * b[2] - a[2] * b[1],
+      a[2] * b[0] - a[0] * b[2],
+      a[0] * b[1] - a[1] * b[0]
+    ];
+  };
+  const vec3dir = (hang, vang) => {
+    const h = deg2rad(hang);
+    const v = deg2rad(vang);
+    return [
+      Math.cos(v) * Math.cos(h),
+      Math.cos(v) * Math.sin(h),
+      Math.sin(v)
+    ];
+  };
+  const mat4identity = () => {
+    return [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ];
+  };
+  const mat4multiply = (a, b) => {
+    return [
+      a[0] * b[0] + a[1] * b[4] + a[2] * b[8] + a[3] * b[12],
+      a[0] * b[1] + a[1] * b[5] + a[2] * b[9] + a[3] * b[13],
+      a[0] * b[2] + a[1] * b[6] + a[2] * b[10] + a[3] * b[14],
+      a[0] * b[3] + a[1] * b[7] + a[2] * b[11] + a[3] * b[15],
+      a[4] * b[0] + a[5] * b[4] + a[6] * b[8] + a[7] * b[12],
+      a[4] * b[1] + a[5] * b[5] + a[6] * b[9] + a[7] * b[13],
+      a[4] * b[2] + a[5] * b[6] + a[6] * b[10] + a[7] * b[14],
+      a[4] * b[3] + a[5] * b[7] + a[6] * b[11] + a[7] * b[15],
+      a[8] * b[0] + a[9] * b[4] + a[10] * b[8] + a[11] * b[12],
+      a[8] * b[1] + a[9] * b[5] + a[10] * b[9] + a[11] * b[13],
+      a[8] * b[2] + a[9] * b[6] + a[10] * b[10] + a[11] * b[14],
+      a[8] * b[3] + a[9] * b[7] + a[10] * b[11] + a[11] * b[15],
+      a[12] * b[0] + a[13] * b[4] + a[14] * b[8] + a[15] * b[12],
+      a[12] * b[1] + a[13] * b[5] + a[14] * b[9] + a[15] * b[13],
+      a[12] * b[2] + a[13] * b[6] + a[14] * b[10] + a[15] * b[14],
+      a[12] * b[3] + a[13] * b[7] + a[14] * b[11] + a[15] * b[15]
+    ];
+  };
+  const mat4invert = (a) => {
+    const b00 = a[0] * a[5] - a[1] * a[4];
+    const b01 = a[0] * a[6] - a[2] * a[4];
+    const b02 = a[0] * a[7] - a[3] * a[4];
+    const b03 = a[1] * a[6] - a[2] * a[5];
+    const b04 = a[1] * a[7] - a[3] * a[5];
+    const b05 = a[2] * a[7] - a[3] * a[6];
+    const b06 = a[8] * a[13] - a[9] * a[12];
+    const b07 = a[8] * a[14] - a[10] * a[12];
+    const b08 = a[8] * a[15] - a[11] * a[12];
+    const b09 = a[9] * a[14] - a[10] * a[13];
+    const b10 = a[9] * a[15] - a[11] * a[13];
+    const b11 = a[10] * a[15] - a[11] * a[14];
+    let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+    if (!det) {
+      return mat4identity();
+    }
+    det = 1 / det;
+    return [
+      (a[5] * b11 - a[6] * b10 + a[7] * b09) * det,
+      (a[2] * b10 - a[1] * b11 - a[3] * b09) * det,
+      (a[13] * b05 - a[14] * b04 + a[15] * b03) * det,
+      (a[10] * b04 - a[9] * b05 - a[11] * b03) * det,
+      (a[6] * b08 - a[4] * b11 - a[7] * b07) * det,
+      (a[0] * b11 - a[2] * b08 + a[3] * b07) * det,
+      (a[14] * b02 - a[12] * b05 - a[15] * b01) * det,
+      (a[8] * b05 - a[10] * b02 + a[11] * b01) * det,
+      (a[4] * b10 - a[5] * b08 + a[7] * b06) * det,
+      (a[1] * b08 - a[0] * b10 - a[3] * b06) * det,
+      (a[12] * b04 - a[13] * b02 + a[15] * b00) * det,
+      (a[9] * b02 - a[8] * b04 - a[11] * b00) * det,
+      (a[5] * b07 - a[4] * b09 - a[6] * b06) * det,
+      (a[0] * b09 - a[1] * b07 + a[2] * b06) * det,
+      (a[13] * b01 - a[12] * b03 - a[14] * b00) * det,
+      (a[8] * b03 - a[9] * b01 + a[10] * b00) * det
+    ];
+  };
+  const mat4translate = (x, y, z) => {
+    return [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      x,
+      y,
+      z,
+      1
+    ];
+  };
+  const mat4translated = (m, x, y, z) => {
+    m[12] = x;
+    m[13] = y;
+    m[14] = z;
+  };
+  const mat4scale = (x, y, z) => {
+    return [
+      x,
+      0,
+      0,
+      0,
+      0,
+      y,
+      0,
+      0,
+      0,
+      0,
+      z,
+      0,
+      0,
+      0,
+      0,
+      1
+    ];
+  };
+  const mat4lookat = (eye, at, up) => {
+    const tz = vec3normalize(vec3sub(at, eye));
+    const tx = vec3normalize(vec3cross(up, tz));
+    const ty = vec3cross(tz, tx);
+    const dx = vec3dot(eye, tx);
+    const dy = vec3dot(eye, ty);
+    const dz = vec3dot(eye, tz);
+    return [
+      tx[0],
+      ty[0],
+      tz[0],
+      0,
+      tx[1],
+      ty[1],
+      tz[1],
+      0,
+      tx[2],
+      ty[2],
+      tz[2],
+      0,
+      -dx,
+      -dy,
+      -dz,
+      1
+    ];
+  };
+  const mat4perspective = (fovy, aspect, near, far) => {
+    const sy = 1 / Math.tan(fovy);
+    const sx = sy / aspect;
+    const sz = far / (far - near);
+    const wz = -(sz * near);
+    return [
+      sx,
+      0,
+      0,
+      0,
+      0,
+      sy,
+      0,
+      0,
+      0,
+      0,
+      sz,
+      1,
+      0,
+      0,
+      wz,
+      0
+    ];
+  };
+  const mat4ortho = (w, h, zn, zf) => {
+    const sx = 2 / w;
+    const sy = 2 / h;
+    const sz = 1 / (zf - zn);
+    const wz = zn / (zn - zf);
+    return [
+      sx,
+      0,
+      0,
+      0,
+      0,
+      sy,
+      0,
+      0,
+      0,
+      0,
+      sz,
+      0,
+      0,
+      0,
+      wz,
+      1
+    ];
+  };
+  const tile_to_world = (x, y, h) => {
+    return [x * 2, y * 2, h * 0.5];
+  };
+  const GAMEPAD_MODE_POINTER = 0;
+  const GAMEPAD_MODE_GAMEPAD = 1;
+  const GAMEPAD_MODE_KEYBOARD = 2;
+  var $listen = null;
+  const listen = (target, key, func) => {
+    target.addEventListener(key, func);
+  };
+  const listen_disable_user_select = () => {
+    const body = document.body;
+    body.style.userSelect = "none";
+    body.style.webkitUserSelect = "none";
+    body.style.msUserSelect = "none";
+    body.style.mozUserSelect = "none";
+  };
+  const listen_disable_touch_action = () => {
+    const body = document.body;
+    body.style.touchAction = "none";
+  };
+  const listen_init = () => {
+    listen_disable_user_select();
+    listen_disable_touch_action();
+    $listen = {};
+    $listen.mode = GAMEPAD_MODE_POINTER;
+    $listen.gamepad = {
+      index: null,
+      lx: 0,
+      ly: 0,
+      rx: 0,
+      ry: 0,
+      b0: false,
+      b1: false,
+      b8: false,
+      b9: false,
+      lt: false,
+      rt: false
+    };
+    $listen.keyboard = {
+      w: false,
+      a: false,
+      s: false,
+      d: false,
+      up: false,
+      left: false,
+      down: false,
+      right: false,
+      z: false,
+      x: false,
+      space: false,
+      lctrl: false,
+      esc: false
+    };
+    $listen.touch = /* @__PURE__ */ new Map();
+    $listen.click = [];
+    listen(window, "focus", (ev) => {
+    });
+    listen(window, "blur", (ev) => {
+    });
+    listen(window, "resize", (ev) => {
+    });
+    listen(window, "gamepadconnected", (ev) => {
+      $listen.gamepad.index = ev.gamepad.index;
+      $listen.mode = GAMEPAD_MODE_GAMEPAD;
+    });
+    listen(window, "gamepaddisconnected", (ev) => {
+      if ($listen.gamepad.index === ev.gamepad.index) {
+        $listen.gamepad.index = null;
+      }
+    });
+    listen(document, "keydown", (ev) => {
+      if (listen_keyboard($listen.keyboard, ev.code, true)) {
+        $listen.mode = GAMEPAD_MODE_KEYBOARD;
+        ev.preventDefault();
+      }
+    });
+    listen(document, "keyup", (ev) => {
+      if (listen_keyboard($listen.keyboard, ev.code, false)) {
+        $listen.mode = GAMEPAD_MODE_KEYBOARD;
+        ev.preventDefault();
+      }
+    });
+    listen(document.body, "contextmenu", (ev) => {
+      ev.preventDefault();
+    });
+    listen(document.body, "pointerdown", (ev) => {
+      $listen.touch.set(ev.pointerId, {
+        x: ev.clientX,
+        y: ev.clientY,
+        sx: ev.clientX,
+        sy: ev.clientY,
+        time: performance.now()
+      });
+      $listen.mode = GAMEPAD_MODE_POINTER;
+    });
+    listen(document.body, "pointerup", (ev) => {
+      listen_click(ev.pointerId);
+      $listen.touch.delete(ev.pointerId);
+      $listen.mode = GAMEPAD_MODE_POINTER;
+    });
+    listen(document.body, "pointerout", (ev) => {
+      $listen.touch.delete(ev.pointerId);
+      $listen.mode = GAMEPAD_MODE_POINTER;
+    });
+    listen(document.body, "pointermove", (ev) => {
+      const touch = $listen.touch.get(ev.pointerId);
+      if (touch) {
+        touch.x = ev.clientX;
+        touch.y = ev.clientY;
+        $listen.mode = GAMEPAD_MODE_POINTER;
+      }
+    });
+  };
+  const listen_keyboard = (keyboard, code, value) => {
+    switch (code) {
+      case "KeyW":
+        keyboard.w = value;
+        break;
+      case "KeyA":
+        keyboard.a = value;
+        break;
+      case "KeyS":
+        keyboard.s = value;
+        break;
+      case "KeyD":
+        keyboard.d = value;
+        break;
+      case "ArrowUp":
+        keyboard.up = value;
+        break;
+      case "ArrowLeft":
+        keyboard.left = value;
+        break;
+      case "ArrowDown":
+        keyboard.down = value;
+        break;
+      case "ArrowRight":
+        keyboard.right = value;
+        break;
+      case "KeyZ":
+        keyboard.z = value;
+        break;
+      case "KeyX":
+        keyboard.x = value;
+        break;
+      case "Space":
+        keyboard.space = value;
+        break;
+      case "ControlLeft":
+        keyboard.lctrl = value;
+        break;
+      case "Escape":
+        keyboard.esc = value;
+        break;
+      default:
+        return false;
+    }
+    return true;
+  };
+  const listen_click = (pointerId) => {
+    const touch = $listen.touch.get(pointerId);
+    if (touch) {
+      if (performance.now() - touch.time < 250) {
+        $listen.click.push({
+          x: touch.x,
+          y: touch.y
+        });
+      }
+    }
+  };
+  const listen_tick_gamepad = (gamepad) => {
+    if (gamepad.index !== null) {
+      const gamepads = navigator.getGamepads();
+      const gp = gamepads[gamepad.index];
+      gamepad.lx = Math.trunc(gp.axes[0] * 4) / 4;
+      gamepad.ly = Math.trunc(gp.axes[1] * 4) / 4;
+      gamepad.rx = Math.trunc(gp.axes[2] * 4) / 4;
+      gamepad.ry = Math.trunc(gp.axes[3] * 4) / 4;
+      gamepad.b0 = gp.buttons[0].value >= 0.5;
+      gamepad.b1 = gp.buttons[1].value >= 0.5;
+      gamepad.b8 = gp.buttons[8].value >= 0.5;
+      gamepad.b9 = gp.buttons[9].value >= 0.5;
+      gamepad.lt = gp.buttons[6].value >= 0.5;
+      gamepad.rt = gp.buttons[7].value >= 0.5;
+      const gamepadChanged = gamepad.lx || gamepad.ly || gamepad.rx || gamepad.ry || gamepad.b0 || gamepad.b1 || gamepad.b8 || gamepad.b9 || gamepad.lt || gamepad.rt ? true : false;
+      if (gamepadChanged) {
+        $listen.mode = GAMEPAD_MODE_GAMEPAD;
+      }
+    }
+  };
+  const listen_tick = () => {
+    listen_tick_gamepad($listen.gamepad);
+  };
+  const listen_flush = () => {
+    $listen.click.length = 0;
+  };
+  const localstorage_get = (key) => {
+    const data = localStorage.getItem(key);
+    if (data == null) {
+      return null;
+    }
+    return JSON.parse(data);
+  };
+  const localstorage_set = (key, data) => {
+    const json = JSON.stringify(data);
+    localStorage.setItem(key, json);
+  };
+  var $gl = null;
+  const gl_init = () => {
+    const canvas = document.getElementById("main");
+    $gl = canvas.getContext("webgl2");
+  };
+  const gl_createGLTexture2D = (img, sampler) => {
+    let texture = $gl.createTexture();
+    $gl.bindTexture($gl.TEXTURE_2D, texture);
+    if (sampler == 0) {
+      $gl.texParameteri($gl.TEXTURE_2D, $gl.TEXTURE_MAG_FILTER, $gl.NEAREST);
+      $gl.texParameteri($gl.TEXTURE_2D, $gl.TEXTURE_MIN_FILTER, $gl.NEAREST);
+    }
+    if (sampler == 1) {
+      $gl.texParameteri($gl.TEXTURE_2D, $gl.TEXTURE_MAG_FILTER, $gl.LINEAR);
+      $gl.texParameteri($gl.TEXTURE_2D, $gl.TEXTURE_MIN_FILTER, $gl.LINEAR);
+    }
+    $gl.texParameteri($gl.TEXTURE_2D, $gl.TEXTURE_WRAP_S, $gl.CLAMP_TO_EDGE);
+    $gl.texParameteri($gl.TEXTURE_2D, $gl.TEXTURE_WRAP_T, $gl.CLAMP_TO_EDGE);
+    $gl.texImage2D($gl.TEXTURE_2D, 0, $gl.RGBA, $gl.RGBA, $gl.UNSIGNED_BYTE, img);
+    $gl.bindTexture($gl.TEXTURE_2D, null);
+    return texture;
+  };
+  const gl_updateGLTexture2D = (tex, img) => {
+    $gl.bindTexture($gl.TEXTURE_2D, tex);
+    $gl.texSubImage2D($gl.TEXTURE_2D, 0, 0, 0, $gl.RGBA, $gl.UNSIGNED_BYTE, img);
+    $gl.bindTexture($gl.TEXTURE_2D, null);
+  };
+  const gl_createGLShader = (type, source) => {
+    const shader = $gl.createShader(type);
+    $gl.shaderSource(shader, source);
+    $gl.compileShader(shader);
+    const success = $gl.getShaderParameter(shader, $gl.COMPILE_STATUS);
+    if (!success) {
+      $gl.deleteShader(shader);
+      return null;
+    }
+    return shader;
+  };
+  const gl_createGLProgram = (vs, fs) => {
+    const prog = $gl.createProgram();
+    $gl.attachShader(prog, vs);
+    $gl.attachShader(prog, fs);
+    $gl.linkProgram(prog);
+    const success = $gl.getProgramParameter(prog, $gl.LINK_STATUS);
+    if (!success) {
+      $gl.deleteProgram(prog);
+      return null;
+    }
+    return prog;
+  };
+  const gl_staticBuffer = (type, data) => {
+    let b = $gl.createBuffer();
+    $gl.bindBuffer(type, b);
+    $gl.bufferData(type, data, $gl.STATIC_DRAW);
+    return b;
+  };
+  const gl_bindVertexAttribArray = (location, size, type, normalized, stride, offset) => {
+    $gl.enableVertexAttribArray(location);
+    $gl.vertexAttribPointer(location, size, type, normalized, stride, offset);
+  };
+  const gl_resizeCanvas = () => {
+    const width = window.innerWidth;
+    if (width !== $gl.canvas.width) {
+      $gl.canvas.width = width;
+    }
+    const height = window.innerHeight;
+    if (height !== $gl.canvas.height) {
+      $gl.canvas.height = height;
+    }
+  };
+  const gl_clear = () => {
+    $gl.viewport(0, 0, $gl.canvas.width, $gl.canvas.height);
+    $gl.clearColor(0, 0, 0, 1);
+    $gl.clearDepth(1);
+    $gl.clear($gl.COLOR_BUFFER_BIT | $gl.DEPTH_BUFFER_BIT);
+  };
+  const gl_state = (depth, alpha) => {
+    $gl.enable($gl.CULL_FACE);
+    if (depth) {
+      $gl.enable($gl.DEPTH_TEST);
+      $gl.depthFunc($gl.LEQUAL);
+    } else {
+      $gl.disable($gl.DEPTH_TEST);
+    }
+    if (alpha) {
+      $gl.enable($gl.BLEND);
+      $gl.blendFunc($gl.SRC_ALPHA, $gl.ONE_MINUS_SRC_ALPHA);
+    } else {
+      $gl.disable($gl.BLEND);
+      $gl.blendFunc($gl.SRC_ALPHA, $gl.ONE_MINUS_SRC_ALPHA);
+    }
+  };
+  const gl_drawMesh = (mesh, no) => {
+    no = no || 0;
+    const mode = mesh.iv[no * 3 + 0];
+    const first = mesh.iv[no * 3 + 1];
+    const count = mesh.iv[no * 3 + 2];
+    const TYPES = [null, $gl.POINTS, $gl.LINES, $gl.TRIANGLES];
+    if (mesh.i) {
+      $gl.drawElements(TYPES[mode], count, $gl.UNSIGNED_SHORT, 2 * first);
+    } else {
+      $gl.drawArrays(TYPES[mode], first, count);
+    }
+  };
+  const gl_useTexture = (texture, location) => {
+    $gl.activeTexture($gl.TEXTURE0);
+    $gl.bindTexture($gl.TEXTURE_2D, texture.tex);
+    $gl.uniform1i(location, 0);
+  };
+  const cvs_create = (width, height) => {
+    const canvas = document.createElement("canvas");
+    if (!canvas) {
+      return null;
+    }
+    canvas.width = width;
+    canvas.height = height;
+    return canvas;
+  };
+  const cvs_text = (cvs, text) => {
+    const context = cvs.getContext("2d");
+    if (!context) {
+      return null;
+    }
+    context.clearRect(0, 0, cvs.width, cvs.height);
+    context.fillStyle = "rgba(0 0 0 / 0.5)";
+    context.fillRect(0, 0, cvs.width, cvs.height);
+    context.fillStyle = "white";
+    context.textAlign = "left";
+    context.textBaseline = "top";
+    context.font = "14px monospace";
+    const lines = text.split("\n");
+    for (let i = 0; i < lines.length; ++i) {
+      context.fillText(lines[i], 0, 12 * i);
+    }
+  };
+  var $audio = null;
+  const audio_init = () => {
+    $audio = new AudioContext();
+  };
+  const VS_LAYOUT_POSITION = 0;
+  const VS_LAYOUT_NORMAL = 1;
+  const VS_LAYOUT_COLOR = 2;
+  const VS_LAYOUT_UV = 3;
+  const decodeMesh = (data) => {
+    data.vao = $gl.createVertexArray();
+    $gl.bindVertexArray(data.vao);
+    if (data.b) {
+      data.b = gl_staticBuffer($gl.ARRAY_BUFFER, base64ToArrayBuffer(data.b));
+      if (data.bv) {
+        for (let i = 0; i < data.bv.length; i += 2) {
+          switch (data.bv[i]) {
+            case VS_LAYOUT_POSITION:
+              gl_bindVertexAttribArray(VS_LAYOUT_POSITION, 3, $gl.FLOAT, false, 0, data.bv[i + 1]);
+              break;
+            case VS_LAYOUT_NORMAL:
+              gl_bindVertexAttribArray(VS_LAYOUT_NORMAL, 3, $gl.HALF_FLOAT, false, 0, data.bv[i + 1]);
+              break;
+            case VS_LAYOUT_COLOR:
+              gl_bindVertexAttribArray(VS_LAYOUT_COLOR, 4, $gl.UNSIGNED_BYTE, true, 0, data.bv[i + 1]);
+              break;
+            case VS_LAYOUT_UV:
+              gl_bindVertexAttribArray(VS_LAYOUT_UV, 2, $gl.HALF_FLOAT, false, 0, data.bv[i + 1]);
+              break;
+          }
+        }
+      }
+    }
+    if (data.i) {
+      data.i = gl_staticBuffer($gl.ELEMENT_ARRAY_BUFFER, base64ToArrayBuffer(data.i));
+    }
+    $gl.bindVertexArray(null);
+    return data;
+  };
+  const decodeShader = (data) => {
+    data.vs = gl_createGLShader($gl.VERTEX_SHADER, data.vs);
+    data.fs = gl_createGLShader($gl.FRAGMENT_SHADER, data.fs);
+    data.prog = gl_createGLProgram(data.vs, data.fs);
+    if (data.u) {
+      const umap = {};
+      for (let u of data.u) {
+        umap[u] = $gl.getUniformLocation(data.prog, u);
+      }
+      data.u = umap;
+    }
+    if (data.ub) {
+      const umap = {};
+      let bindIndex = 0;
+      for (let u of data.ub) {
+        const index = $gl.getUniformBlockIndex(data.prog, u);
+        $gl.uniformBlockBinding(data.prog, index, bindIndex);
+        umap[u] = bindIndex;
+        bindIndex += 1;
+      }
+      data.ub = umap;
+    }
+    return data;
+  };
+  let $imageLoading = 0;
+  const decodeTexture = (data) => {
+    if (data.cvs) {
+      const cvs = cvs_create(data.cvs.width, data.cvs.height);
+      cvs_text(cvs, data.cvs.text);
+      data.cvs = cvs;
+      data.tex = gl_createGLTexture2D(data.cvs, data.s);
+    } else {
+      data.tex = null;
+      const img = new Image();
+      img.onload = () => {
+        data.tex = gl_createGLTexture2D(img, data.s);
+        $imageLoading -= 1;
+      };
+      img.src = "img/" + data.src;
+      $imageLoading += 1;
+    }
+    return data;
+  };
+  const $data = {
+    index: null,
+    pack: []
+  };
+  const data_loadIndex = () => {
+    const path = "data/index.json";
+    fetch(path).then((res) => res.json()).then((json) => {
+      $data.index = json;
+    });
+  };
+  const data_loadPack = (no) => {
+    const path = "data/pack" + no + ".json";
+    fetch(path).then((res) => res.json()).then((json) => {
+      if (json.mesh) {
+        json.mesh = json.mesh.map((data) => decodeMesh(data));
+      }
+      if (json.texture) {
+        json.texture = json.texture.map((data) => decodeTexture(data));
+      }
+      if (json.shader) {
+        json.shader = json.shader.map((data) => decodeShader(data));
+      }
+      $data.pack[no] = json;
+    });
+  };
+  const data_lookup = (type, no) => {
+    if (no < 0) {
+      return null;
+    }
+    const table = $data.index[type];
+    if (!table) {
+      return null;
+    }
+    const entry = table[no];
+    if (!entry) {
+      return null;
+    }
+    const pack = $data.pack[entry.p];
+    if (!pack) {
+      return null;
+    }
+    return pack[type][entry.i];
+  };
+  const data_view = (no) => {
+    return data_lookup("view", no);
+  };
+  const data_mesh = (no) => {
+    return data_lookup("mesh", no);
+  };
+  const data_texture = (no) => {
+    return data_lookup("texture", no);
+  };
+  const data_shader = (no) => {
+    return data_lookup("shader", no);
+  };
+  const data_draw = (no) => {
+    return data_lookup("draw", no);
+  };
+  const data_item = (no) => {
+    return data_lookup("item", no);
+  };
+  const data_tile = (no) => {
+    return data_lookup("tile", no);
+  };
+  const data_ui = (no) => {
+    return data_lookup("ui", no);
+  };
+  const data_event = (no) => {
+    return data_lookup("event", no);
+  };
+  const data_view_index = (name) => {
+    return $data.index.view.findIndex((o) => o.n === name);
+  };
+  const data_texture_index = (name) => {
+    return $data.index.texture.findIndex((o) => o.n === name);
+  };
+  const data_item_index = (name) => {
+    return $data.index.item.findIndex((o) => o.n === name);
+  };
+  const data_tile_index = (name) => {
+    return $data.index.tile.findIndex((o) => o.n === name);
+  };
+  const data_ui_index = (name) => {
+    return $data.index.ui.findIndex((o) => o.n === name);
+  };
+  const data_loaded = () => {
+    if ($data.index === null) {
+      return false;
+    }
+    if ($data.pack.length <= 0) {
+      return false;
+    }
+    if ($imageLoading > 0) {
+      return false;
+    }
+    return true;
+  };
+  const $action = {};
+  const action_invoke = (act) => {
+    const func = $action[act[0]];
+    if (!func) {
+      return;
+    }
+    const args = act.slice(1);
+    func(...args);
+  };
+  const $timer = {
+    t: performance.now(),
+    dt: 0,
+    n: 0
+  };
+  const timer_tick = (time) => {
+    $timer.dt = (time - $timer.t) / 1e3;
+    $timer.t = time;
+    $timer.n += 1;
+  };
+  const $ui = [];
+  const ui_value = (name) => {
+    const no = data_ui_index(name);
+    if (no < 0) {
+      return null;
+    }
+    const ui = $ui[no];
+    if (!ui) {
+      return null;
+    }
+    return ui.value;
+  };
+  const UI_STATE_RESET = 0;
+  const BUTTON_STATE_RELEASED = 0;
+  const BUTTON_STATE_PRESSED = 1;
+  const ui_hit_click = (ui, point) => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const ratio = window.devicePixelRatio;
+    const ox = w / 2 + w / 2 * ui.ox;
+    const oy = h / 2 + h / 2 * ui.oy;
+    const minX = ox + (ui.x - ui.w / 2) * ratio;
+    const maxX = ox + (ui.x + ui.w / 2) * ratio;
+    const minY = oy + (ui.y - ui.h / 2) * ratio;
+    const maxY = oy + (ui.y + ui.h / 2) * ratio;
+    return xy_hit_rect(point, minX, maxX, minY, maxY);
+  };
+  const ui_tick_button = (tui, ui) => {
+    const mode = $listen.mode;
+    if (mode === GAMEPAD_MODE_POINTER) {
+      let hit = false;
+      const click = $listen.click;
+      for (let c of click) {
+        if (ui_hit_click(ui, [c.x, c.y])) {
+          hit = true;
+          break;
+        }
+      }
+      if (hit) {
+        tui.value = true;
+        tui.state = BUTTON_STATE_PRESSED;
+      } else {
+        tui.value = false;
+        tui.state = BUTTON_STATE_RELEASED;
+      }
+    } else if (mode === GAMEPAD_MODE_GAMEPAD) {
+      const gamepad = $listen.gamepad;
+      if (gamepad[ui.gamepad]) {
+        if (tui.state !== BUTTON_STATE_PRESSED) {
+          tui.value = true;
+          tui.state = BUTTON_STATE_PRESSED;
+        } else {
+          tui.value = false;
+        }
+      } else {
+        tui.value = false;
+        tui.state = BUTTON_STATE_RELEASED;
+      }
+    } else if (mode === GAMEPAD_MODE_KEYBOARD) {
+      const keyboard = $listen.keyboard;
+      if (keyboard[ui.keyboard]) {
+        if (tui.state !== BUTTON_STATE_PRESSED) {
+          tui.value = true;
+          tui.state = BUTTON_STATE_PRESSED;
+        } else {
+          tui.value = false;
+        }
+      } else {
+        tui.value = false;
+        tui.state = BUTTON_STATE_RELEASED;
+      }
+    }
+  };
+  const ui_tick_left_stick = (tui, ui) => {
+    const mode = $listen.mode;
+    if (mode === GAMEPAD_MODE_POINTER) {
+      tui.value = [0, 0];
+      for (const touch of $listen.touch.values()) {
+        if (ui_hit_click(ui, [touch.sx, touch.sy])) {
+          const x = touch.x - touch.sx;
+          const y = -(touch.y - touch.sy);
+          tui.value = xy_normalize(x, y);
+          break;
+        }
+      }
+    } else if (mode === GAMEPAD_MODE_GAMEPAD) {
+      const gamepad = $listen.gamepad;
+      tui.value = xy_normalize(gamepad.lx, -gamepad.ly);
+    } else if (mode === GAMEPAD_MODE_KEYBOARD) {
+      const keyboard = $listen.keyboard;
+      const x = keyboard.a ? -1 : keyboard.d ? 1 : 0;
+      const y = keyboard.w ? 1 : keyboard.s ? -1 : 0;
+      tui.value = xy_normalize(x, y);
+    }
+  };
+  const ui_tick_right_stick = (tui, ui) => {
+    const mode = $listen.mode;
+    if (mode === GAMEPAD_MODE_POINTER) {
+      tui.value = [0, 0];
+      for (const touch of $listen.touch.values()) {
+        if (ui_hit_click(ui, [touch.sx, touch.sy])) {
+          const x = touch.x - touch.sx;
+          const y = -(touch.y - touch.sy);
+          tui.value = xy_normalize(x, y);
+          break;
+        }
+      }
+    } else if (mode === GAMEPAD_MODE_GAMEPAD) {
+      const gamepad = $listen.gamepad;
+      tui.value = xy_normalize(gamepad.rx, -gamepad.ry);
+    } else if (mode === GAMEPAD_MODE_KEYBOARD) {
+      const keyboard = $listen.keyboard;
+      const x = keyboard.right ? 1 : keyboard.left ? -1 : 0;
+      const y = keyboard.up ? 1 : keyboard.down ? -1 : 0;
+      tui.value = xy_normalize(x, y);
+    }
+  };
+  const ui_tick = (view) => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    for (const tui of $ui) {
+      if (tui) {
+        tui.value = null;
+      }
+    }
+    for (let no of view.ui) {
+      const ui = data_ui(no);
+      if (!ui) {
+        continue;
+      }
+      if (!$ui[no]) {
+        $ui[no] = {
+          m: new Float32Array(16),
+          value: null,
+          state: UI_STATE_RESET
+        };
+      }
+      const tui = $ui[no];
+      switch (ui.interact) {
+        case 1:
+          ui_tick_button(tui, ui);
+          break;
+        case 2:
+          ui_tick_left_stick(tui, ui);
+          break;
+        case 3:
+          ui_tick_right_stick(tui, ui);
+          break;
+        default:
+          break;
+      }
+      const ratio = window.devicePixelRatio;
+      const ox = ui.ox * w / 2;
+      const oy = ui.oy * h / 2;
+      const m = mat4scale(ui.w / 2 * ratio, ui.h / 2 * ratio, 1);
+      mat4translated(m, ox + ui.x * ratio, -(oy + ui.y * ratio), 0);
+      tui.m.set(m);
+    }
+  };
+  const $tile = {
+    w: 0,
+    h: 0,
+    a: [],
+    b: []
+  };
+  const tile_index = (x, y) => {
+    x = Math.floor(x);
+    y = Math.floor(y);
+    if (x < 0 || $tile.w <= x) {
+      return -1;
+    }
+    if (y < 0 || $tile.h <= y) {
+      return -1;
+    }
+    return x + y * $tile.h;
+  };
+  const tile_base = (x, y) => {
+    return $tile.a[tile_index(x, y)];
+  };
+  const tile_prop = (x, y) => {
+    return $tile.b[tile_index(x, y)];
+  };
+  const tile_base_height = (x, y) => {
+    const tile = tile_base(x, y);
+    if (!tile) {
+      return 0;
+    }
+    const data = data_tile(tile.no);
+    if (!data) {
+      return 0;
+    }
+    return data.height * tile.count;
+  };
+  const tile_prop_height = (x, y) => {
+    const tile = tile_prop(x, y);
+    if (!tile) {
+      return 0;
+    }
+    const data = data_tile(tile.no);
+    if (!data) {
+      return 0;
+    }
+    return data.height;
+  };
+  const tile_height = (x, y) => {
+    return tile_base_height(x, y) + tile_prop_height(x, y);
+  };
+  const tile_is_empty = (x, y) => {
+    return tile_base(x, y) == null;
+  };
+  const tile_is_noentry = (x, y, dx, dy) => {
+    if (tile_is_empty(x + dx, y + dy)) {
+      return true;
+    }
+    const h0 = tile_height(x, y);
+    const h1 = tile_height(x + dx, y + dy);
+    if (Math.abs(h0 - h1) > 1) {
+      return true;
+    }
+    return false;
+  };
+  const tile_init_empty = (w, h) => {
+    $tile.w = w;
+    $tile.h = h;
+    $tile.a = [];
+    $tile.a.length = w * h;
+    $tile.b = [];
+    $tile.b.length = w * h;
+  };
+  const tile_base_set = (x, y, no) => {
+    const i = tile_index(x, y);
+    if (i < 0) {
+      return;
+    }
+    $tile.a[i] = { no, count: 1 };
+  };
+  const tile_prop_set = (x, y, no) => {
+    const i = tile_index(x, y);
+    if (i < 0) {
+      return;
+    }
+    $tile.b[i] = { no, dir: 0 };
+  };
+  const tile_encode = (data) => {
+    return data;
+  };
+  const tile_decode = (data) => {
+    return data;
+  };
+  const $pos_eyeh = 1.75;
+  const $pos = {
+    x: 0,
+    y: 0,
+    ha: 0,
+    va: 0,
+    h: 0
+  };
+  const pos_init = (x, y, ha, va) => {
+    $pos.x = x || 0;
+    $pos.y = y || 0;
+    $pos.ha = ha || 0;
+    $pos.va = va || 0;
+    $pos.h = 0;
+  };
+  const $item = {
+    s: [],
+    i: 0
+  };
+  const item_index = (no) => {
+    return $item.s.findIndex((o) => o && o.no === no);
+  };
+  const item_null_index = () => {
+    return $item.s.findIndex((o) => !o);
+  };
+  const item_select = (i) => {
+    const idx = i == null ? $item.i : i;
+    return $item.s[idx];
+  };
+  const item_set_cursor = (offset) => {
+    const idx = mod($item.i + offset, $item.s.length);
+    $item.i = idx;
+  };
+  const item_gain = (no, num) => {
+    let i = item_index(no);
+    if (i < 0) {
+      i = item_null_index();
+      if (i < 0) {
+        return;
+      }
+      $item.s[i] = { no, num };
+      return;
+    }
+    $item.s[i].num += num;
+  };
+  const item_init_empty = (slot) => {
+    $item.s.length = slot;
+    $item.s.fill(null);
+    $item.i = 0;
+  };
+  const item_encode = (data) => {
+    return data;
+  };
+  const item_decode = (data) => {
+    return data;
+  };
+  const event_tick = (view) => {
+    for (let no of view.event) {
+      const ev = data_event(no);
+      if (!ev) {
+        continue;
+      }
+      let hit = false;
+      switch (ev.trigger) {
+        case 0:
+          hit = true;
+          break;
+        case 1:
+          hit = ui_value(ev.target);
+          break;
+      }
+      if (!hit) {
+        continue;
+      }
+      for (const act of ev.action) {
+        action_invoke(act);
+      }
+    }
+  };
+  const $temp = {
+    view: null,
+    slot: null,
+    cam: {
+      eye: [0, 0, 0],
+      vp: new Float32Array(16),
+      ivp: new Float32Array(16),
+      o: new Float32Array(16)
+    },
+    m: new Float32Array(16)
+  };
+  const reset_view = () => {
+    $temp.slot = null;
+    $temp.view = $data.index.initial_view;
+  };
+  const next_view = (view) => {
+    const i = data_view_index(view);
+    if (i < 0) {
+      return;
+    }
+    $temp.view = i;
+  };
+  const view_tick = () => {
+    if ($temp.view === null) {
+      reset_view();
+    }
+  };
+  const camera_tick = () => {
+    const ww = window.innerWidth;
+    const wh = window.innerHeight;
+    const fovy = deg2rad(30);
+    const zNear = 0.1;
+    const zFar = 1e3;
+    const dir = vec3dir($pos.ha, $pos.va);
+    const eye = tile_to_world($pos.x, $pos.y, $pos.h);
+    eye[2] += $pos_eyeh;
+    const at = vec3add(eye, dir);
+    const up = [0, 0, 1];
+    const view = mat4lookat(eye, at, up);
+    const proj = mat4perspective(fovy, ww / wh, zNear, zFar);
+    const vp = mat4multiply(view, proj);
+    $temp.cam.vp.set(vp);
+    $temp.cam.ivp.set(mat4invert(vp));
+    $temp.cam.o.set(mat4ortho(ww, wh, 0, 1));
+    $temp.cam.eye = eye;
+  };
+  const newgame = () => {
+    $tile.w = 0;
+    $tile.h = 0;
+    $tile.a.length = 0;
+    $pos.x = 0;
+    $pos.y = 0;
+    $pos.ha = 0;
+    $pos.va = 0;
+  };
+  const loadgame = () => {
+    if (!$temp.slot) {
+      return false;
+    }
+    const data = localstorage_get($temp.slot);
+    if (!data) {
+      return false;
+    }
+    if (data.pos) {
+      Object.assign($pos, data.pos);
+    }
+    if (data.item) {
+      Object.assign($item, item_decode(data.item));
+    }
+    if (data.tile) {
+      Object.assign($tile, tile_decode(data.tile));
+    }
+    return true;
+  };
+  const savegame = () => {
+    if (!$temp.slot) {
+      return;
+    }
+    const data = {};
+    data.pos = $pos;
+    data.item = item_encode($item);
+    data.tile = tile_encode($tile);
+    localstorage_set($temp.slot, data);
+  };
+  const draw_start_frame = () => {
+    gl_resizeCanvas();
+    gl_clear();
+  };
+  const draw_call = (no, count, func) => {
+    const data = data_draw(no);
+    if (!data) {
+      return;
+    }
+    gl_state(data.depth, data.alpha);
+    const shader = data_shader(data.shader);
+    if (!shader) {
+      return;
+    }
+    $gl.useProgram(shader.prog);
+    const mesh = data_mesh(data.mesh);
+    if (!mesh) {
+      return;
+    }
+    $gl.bindVertexArray(mesh.vao);
+    $gl.uniformMatrix4fv(shader.u.vp, false, data.ortho ? $temp.cam.o : $temp.cam.vp);
+    const tex = data_texture(data.texture);
+    if (tex) {
+      gl_useTexture(tex, shader.u.tex0);
+    }
+    for (let i = 0; i < count; ++i) {
+      func(shader.u, i);
+      gl_drawMesh(mesh);
+    }
+  };
+  const draw_tile = () => {
+    for (let x = 0; x < $tile.w; ++x) {
+      for (let y = 0; y < $tile.h; ++y) {
+        const tile = tile_base(x, y);
+        if (!tile) {
+          continue;
+        }
+        const data = data_tile(tile.no);
+        if (!data) {
+          continue;
+        }
+        draw_call(data.draw, tile.count, (u, i) => {
+          const pos = tile_to_world(x, y, i * data.height);
+          $temp.m.set(mat4translate(pos[0], pos[1], pos[2]));
+          $gl.uniformMatrix4fv(u.w, false, $temp.m);
+        });
+      }
+    }
+    for (let x = 0; x < $tile.w; ++x) {
+      for (let y = 0; y < $tile.h; ++y) {
+        const tile = tile_prop(x, y);
+        if (!tile) {
+          continue;
+        }
+        const data = data_tile(tile.no);
+        if (!data) {
+          continue;
+        }
+        const h = tile_base_height(x, y);
+        draw_call(data.draw, 1, (u, i) => {
+          const pos = tile_to_world(x, y, h);
+          $temp.m.set(mat4translate(pos[0], pos[1], pos[2]));
+          $gl.uniformMatrix4fv(u.w, false, $temp.m);
+        });
+      }
+    }
+  };
+  const draw_ui = (view) => {
+    for (let no of view.ui) {
+      const ui = data_ui(no);
+      if (!ui) {
+        continue;
+      }
+      const tui = $ui[no];
+      if (!tui) {
+        continue;
+      }
+      draw_call(ui.draw, 1, (u, i) => {
+        $gl.uniformMatrix4fv(u.w, false, tui.m);
+      });
+    }
+  };
+  const draw_skybox = (view) => {
+    draw_call(view.skybox, 1, (u, i) => {
+      $temp.m.set(mat4translate(...$temp.cam.eye));
+      $gl.uniformMatrix4fv(u.w, false, $temp.m);
+    });
+  };
+  const draw_view = (view) => {
+    draw_skybox(view);
+    if (view.draw3d) {
+      draw_tile();
+    }
+    draw_ui(view);
+  };
+  const init = () => {
+    gl_init();
+    audio_init();
+    listen_init();
+    data_loadIndex();
+    data_loadPack(0);
+  };
+  const update = (time) => {
+    timer_tick(time);
+    listen_tick();
+    if (data_loaded()) {
+      view_tick();
+      const view = data_view($temp.view);
+      if (!view) {
+        return;
+      }
+      ui_tick(view);
+      event_tick(view);
+    }
+    camera_tick();
+    listen_flush();
+  };
+  const draw = () => {
+    draw_start_frame();
+    if (data_loaded()) {
+      const view = data_view($temp.view);
+      if (!view) {
+        return;
+      }
+      draw_view(view);
+    }
+  };
+  listen(window, "load", () => {
+    init();
+    const tick = (time) => {
+      update(time);
+      draw();
+      requestAnimationFrame(tick);
+    };
+    tick();
+  });
+  $action["nextview"] = (view) => {
+    next_view(view);
+  };
+  $action["resetview"] = () => {
+    reset_view();
+  };
+  $action["newgame"] = (slot) => {
+    $temp.slot = slot;
+    newgame();
+  };
+  $action["loadgame"] = (slot) => {
+    $temp.slot = slot;
+    loadgame();
+  };
+  $action["savegame"] = () => {
+    savegame();
+  };
+  const pos_adjust = (x, y, dx, dy) => {
+    const ix = Math.floor(x);
+    const iy = Math.floor(y);
+    const r = 0.25;
+    let xx = x + dx;
+    let yy = y + dy;
+    if (tile_is_noentry(ix, iy, -1, 0)) {
+      xx = Math.max(xx, ix + r);
+    }
+    if (tile_is_noentry(ix, iy, 1, 0)) {
+      xx = Math.min(xx, ix - r + 1);
+    }
+    if (tile_is_noentry(ix, iy, 0, -1)) {
+      yy = Math.max(yy, iy + r);
+    }
+    if (tile_is_noentry(ix, iy, 0, 1)) {
+      yy = Math.min(yy, iy - r + 1);
+    }
+    if (tile_is_noentry(ix, iy, -1, -1)) {
+      [xx, yy] = xy_bounds([xx, yy], r, [ix, iy]);
+    }
+    if (tile_is_noentry(ix, iy, -1, 1)) {
+      [xx, yy] = xy_bounds([xx, yy], r, [ix, iy + 1]);
+    }
+    if (tile_is_noentry(ix, iy, 1, -1)) {
+      [xx, yy] = xy_bounds([xx, yy], r, [ix + 1, iy]);
+    }
+    if (tile_is_noentry(ix, iy, 1, 1)) {
+      [xx, yy] = xy_bounds([xx, yy], r, [ix + 1, iy + 1]);
+    }
+    return [xx, yy];
+  };
+  const pos_fps_movement = (lstick, rstick) => {
+    const dt = $timer.dt;
+    const cameraXY = ui_value(rstick);
+    if (cameraXY) {
+      const cameraSpeed = 90;
+      $pos.ha += cameraSpeed * dt * cameraXY[0];
+      $pos.va += cameraSpeed * dt * cameraXY[1];
+      $pos.va = Math.max(-60, Math.min($pos.va, 80));
+    }
+    const moveXY = ui_value(lstick);
+    if (moveXY) {
+      const moveSpeed = 2;
+      const rx = deg2rad($pos.ha + 90);
+      const ry = deg2rad($pos.ha);
+      const moveX = moveXY[0];
+      const moveY = moveXY[1];
+      const vx = moveX * Math.cos(rx) + moveY * Math.cos(ry);
+      const vy = moveX * Math.sin(rx) + moveY * Math.sin(ry);
+      const dx = moveSpeed * dt * vx;
+      const dy = moveSpeed * dt * vy;
+      [$pos.x, $pos.y] = pos_adjust($pos.x, $pos.y, dx, dy);
+    } else {
+      [$pos.x, $pos.y] = pos_adjust($pos.x, $pos.y, 0, 0);
+    }
+    const h = tile_height($pos.x, $pos.y);
+    if (Math.abs(h - $pos.h) <= 2) {
+      const vh = h - $pos.h;
+      $pos.h += 10 * dt * vh;
+    } else {
+      $pos.h = h;
+    }
+  };
+  $action["fpsmove"] = (lstick, rstick) => {
+    pos_fps_movement(lstick, rstick);
+  };
+  $action["makeworld"] = () => {
+    const b = data_tile_index("tile");
+    const m = data_tile_index("mine");
+    tile_init_empty(64, 64);
+    for (let x = 24; x <= 40; ++x) {
+      for (let y = 24; y <= 40; ++y) {
+        tile_base_set(x, y, b);
+      }
+    }
+    tile_prop_set(29, 29, m);
+    tile_prop_set(35, 29, m);
+    tile_prop_set(29, 35, m);
+    tile_prop_set(35, 35, m);
+    pos_init($tile.w / 2 + 0.5, $tile.h / 2 + 0.5);
+    item_init_empty(8);
+    item_gain(data_item_index("pick"), 1);
+  };
+  $action["inventory_next"] = () => {
+    item_set_cursor(1);
+  };
+  $action["inventory_prev"] = () => {
+    item_set_cursor(-1);
+  };
+  $action["inventory"] = (tex) => {
+    const data = data_texture(data_texture_index(tex));
+    if (!data) {
+      return;
+    }
+    let text = "";
+    for (let i = 0; i < $item.s.length; ++i) {
+      if ($item.i === i) {
+        text += ">";
+      } else {
+        text += " ";
+      }
+      text += "[" + i + "]";
+      if ($item.s[i] != null) {
+        const item = data_item($item.s[i].no);
+        if (!item) {
+          continue;
+        }
+        text += item.text + ":" + $item.s[i].num;
+      }
+      text += "\n";
+    }
+    text += "\n";
+    {
+      const slot = item_select();
+      if (slot != null) {
+        const item = data_item(slot.no);
+        if (item != null) {
+          text += item.desc + "\n";
+        }
+      }
+    }
+    cvs_text(data.cvs, text);
+    gl_updateGLTexture2D(data.tex, data.cvs);
+  };
+})();
