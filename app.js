@@ -314,6 +314,8 @@
       b1: false,
       b8: false,
       b9: false,
+      lb: false,
+      rb: false,
       lt: false,
       rt: false
     };
@@ -326,6 +328,8 @@
       left: false,
       down: false,
       right: false,
+      q: false,
+      e: false,
       z: false,
       x: false,
       space: false,
@@ -418,6 +422,12 @@
       case "ArrowRight":
         keyboard.right = value;
         break;
+      case "KeyQ":
+        keyboard.q = value;
+        break;
+      case "KeyE":
+        keyboard.e = value;
+        break;
       case "KeyZ":
         keyboard.z = value;
         break;
@@ -461,9 +471,11 @@
       gamepad.b1 = gp.buttons[1].value >= 0.5;
       gamepad.b8 = gp.buttons[8].value >= 0.5;
       gamepad.b9 = gp.buttons[9].value >= 0.5;
+      gamepad.lb = gp.buttons[4].value >= 0.5;
+      gamepad.rb = gp.buttons[5].value >= 0.5;
       gamepad.lt = gp.buttons[6].value >= 0.5;
       gamepad.rt = gp.buttons[7].value >= 0.5;
-      const gamepadChanged = gamepad.lx || gamepad.ly || gamepad.rx || gamepad.ry || gamepad.b0 || gamepad.b1 || gamepad.b8 || gamepad.b9 || gamepad.lt || gamepad.rt ? true : false;
+      const gamepadChanged = gamepad.lx || gamepad.ly || gamepad.rx || gamepad.ry || gamepad.b0 || gamepad.b1 || gamepad.b8 || gamepad.b9 || gamepad.lb || gamepad.rb || gamepad.lt || gamepad.rt ? true : false;
       if (gamepadChanged) {
         $listen.mode = GAMEPAD_MODE_GAMEPAD;
       }

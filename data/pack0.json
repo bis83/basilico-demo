@@ -283,8 +283,8 @@
             "ox": -1,
             "oy": 0,
             "interact": 1,
-            "gamepad": "b0",
-            "keyboard": "q"
+            "gamepad": "rb",
+            "keyboard": "e"
         },
         {
             "draw": 0,
@@ -295,8 +295,8 @@
             "ox": -1,
             "oy": 0,
             "interact": 1,
-            "gamepad": "b1",
-            "keyboard": "e"
+            "gamepad": "lb",
+            "keyboard": "q"
         },
         {
             "draw": 4,
@@ -344,7 +344,7 @@
             "oy": 0,
             "interact": 1,
             "gamepad": "b9",
-            "keyboard": "xx"
+            "keyboard": "x"
         },
         {
             "draw": 6,
