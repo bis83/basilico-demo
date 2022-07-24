@@ -1,7 +1,7 @@
 [[event]]
 name = "newgame"
+ui = "button-newgame"
 trigger = "button"
-target = "button-newgame"
 action = [
     ["newgame", "slot0"],
     ["makeworld"],

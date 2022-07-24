@@ -1,7 +1,7 @@
 [[event]]
 name = "loadgame"
+ui = "button-loadgame"
 trigger = "button"
-target = "button-loadgame"
 action = [
     ["loadgame", "slot0"],
     ["nextview", "main"],

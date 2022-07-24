@@ -1,7 +1,7 @@
 [[event]]
 name = "inventory-next"
+ui = "button-inventory-next"
 trigger = "button"
-target = "button-inventory-next"
 action = [
     ["inventory_next"],
 ]

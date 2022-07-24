@@ -1,7 +1,7 @@
 [[event]]
 name = "escape"
+ui = "button-escape"
 trigger = "button"
-target = "button-escape"
 action = [
     ["resetview"],
 ]
