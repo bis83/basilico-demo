@@ -7,7 +7,7 @@ width = 256
 height = 256
 interact = "button"
 gamepad = "b9"
-keyboard = "xx"
+keyboard = "x"
 
 [[draw]]
 name = "ui-loadgame"
