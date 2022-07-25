@@ -1,7 +1,7 @@
 [[draw]]
 name = "ui-rect"
 mesh = "rect"
-shader = "mesh_pt"
+shader = "mesh-pt"
 texture = "icon"
 ortho = true
 

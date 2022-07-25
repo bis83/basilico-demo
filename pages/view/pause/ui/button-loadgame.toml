@@ -12,7 +12,7 @@ keyboard = "x"
 [[draw]]
 name = "ui-loadgame"
 mesh = "rect"
-shader = "mesh_pt"
+shader = "mesh-pt"
 texture = "tex-loadgame"
 ortho = true
 

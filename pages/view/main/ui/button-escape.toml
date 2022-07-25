@@ -8,4 +8,4 @@ height = 48
 interact = "button"
 gamepad = "b9"
 keyboard = "esc"
-origin_y = 1.0
+origin-y = 1.0

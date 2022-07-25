@@ -9,7 +9,7 @@ save-id = 2
 [[draw]]
 name = "mine"
 mesh = "mine"
-shader = "mesh_pt"
+shader = "mesh-pt"
 texture = "mine"
 depth = true
 

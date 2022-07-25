@@ -6,5 +6,5 @@ y = -128
 width = 96
 height = 96
 interact = "right-stick"
-origin_x = 1.0
-origin_y = 1.0
+origin-x = 1.0
+origin-y = 1.0

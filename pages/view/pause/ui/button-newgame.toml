@@ -12,7 +12,7 @@ keyboard = "z"
 [[draw]]
 name = "ui-newgame"
 mesh = "rect"
-shader = "mesh_pt"
+shader = "mesh-pt"
 texture = "tex-newgame"
 ortho = true
 

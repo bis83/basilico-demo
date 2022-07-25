@@ -9,7 +9,7 @@ save-id = 1
 [[draw]]
 name = "tile"
 mesh = "tile"
-shader = "mesh_pt"
+shader = "mesh-pt"
 texture = "tile"
 depth = true
 

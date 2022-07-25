@@ -1,7 +1,7 @@
 [[draw]]
 name = "skybox"
 mesh = "skybox"
-shader = "mesh_pc"
+shader = "mesh-pc"
 
 [[mesh]]
 name = "skybox"
