@@ -32,7 +32,7 @@
             "i": 5
         },
         {
-            "n": "debug_grid",
+            "n": "debug-grid",
             "p": 0,
             "i": 6
         }
@@ -71,12 +71,12 @@
     ],
     "shader": [
         {
-            "n": "mesh_pc",
+            "n": "mesh-pc",
             "p": 0,
             "i": 0
         },
         {
-            "n": "mesh_pt",
+            "n": "mesh-pt",
             "p": 0,
             "i": 1
         }
