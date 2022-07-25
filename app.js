@@ -1052,6 +1052,8 @@
     return false;
   };
   const tile_init_empty = (w, h) => {
+    w = w || 0;
+    h = h || 0;
     $tile.w = w;
     $tile.h = h;
     $tile.a = [];
@@ -1125,6 +1127,7 @@
     $item.s[i].num += num;
   };
   const item_init_empty = (slot) => {
+    slot = slot || 0;
     $item.s.length = slot;
     $item.s.fill(null);
     $item.i = 0;
@@ -1147,7 +1150,7 @@
           hit = true;
           break;
         case 1:
-          hit = ui_value(ev.target);
+          hit = ui_value(ev.ui);
           break;
       }
       if (!hit) {
@@ -1158,7 +1161,7 @@
       }
     }
   };
-  const $temp = {
+  const $view = {
     view: null,
     slot: null,
     cam: {
@@ -1169,23 +1172,23 @@
     },
     m: new Float32Array(16)
   };
-  const reset_view = () => {
-    $temp.slot = null;
-    $temp.view = $data.index.initial_view;
+  const view_reset = () => {
+    $view.slot = null;
+    $view.view = $data.index.initial_view;
   };
-  const next_view = (view) => {
+  const view_next = (view) => {
     const i = data_view_index(view);
     if (i < 0) {
       return;
     }
-    $temp.view = i;
+    $view.view = i;
   };
-  const view_tick = () => {
-    if ($temp.view === null) {
-      reset_view();
+  const view_tick_before = () => {
+    if ($view.view === null) {
+      view_reset();
     }
   };
-  const camera_tick = () => {
+  const view_tick_after = () => {
     const ww = window.innerWidth;
     const wh = window.innerHeight;
     const fovy = deg2rad(30);
@@ -1199,25 +1202,21 @@
     const view = mat4lookat(eye, at, up);
     const proj = mat4perspective(fovy, ww / wh, zNear, zFar);
     const vp = mat4multiply(view, proj);
-    $temp.cam.vp.set(vp);
-    $temp.cam.ivp.set(mat4invert(vp));
-    $temp.cam.o.set(mat4ortho(ww, wh, 0, 1));
-    $temp.cam.eye = eye;
+    $view.cam.vp.set(vp);
+    $view.cam.ivp.set(mat4invert(vp));
+    $view.cam.o.set(mat4ortho(ww, wh, 0, 1));
+    $view.cam.eye = eye;
   };
   const newgame = () => {
-    $tile.w = 0;
-    $tile.h = 0;
-    $tile.a.length = 0;
-    $pos.x = 0;
-    $pos.y = 0;
-    $pos.ha = 0;
-    $pos.va = 0;
+    pos_init();
+    tile_init_empty();
+    item_init_empty();
   };
   const loadgame = () => {
-    if (!$temp.slot) {
+    if (!$view.slot) {
       return false;
     }
-    const data = localstorage_get($temp.slot);
+    const data = localstorage_get($view.slot);
     if (!data) {
       return false;
     }
@@ -1233,14 +1232,14 @@
     return true;
   };
   const savegame = () => {
-    if (!$temp.slot) {
+    if (!$view.slot) {
       return;
     }
     const data = {};
     data.pos = $pos;
     data.item = item_encode($item);
     data.tile = tile_encode($tile);
-    localstorage_set($temp.slot, data);
+    localstorage_set($view.slot, data);
   };
   const draw_start_frame = () => {
     gl_resizeCanvas();
@@ -1262,7 +1261,7 @@
       return;
     }
     $gl.bindVertexArray(mesh.vao);
-    $gl.uniformMatrix4fv(shader.u.vp, false, data.ortho ? $temp.cam.o : $temp.cam.vp);
+    $gl.uniformMatrix4fv(shader.u.vp, false, data.ortho ? $view.cam.o : $view.cam.vp);
     const tex = data_texture(data.texture);
     if (tex) {
       gl_useTexture(tex, shader.u.tex0);
@@ -1285,8 +1284,8 @@
         }
         draw_call(data.draw, tile.count, (u, i) => {
           const pos = tile_to_world(x, y, i * data.height);
-          $temp.m.set(mat4translate(pos[0], pos[1], pos[2]));
-          $gl.uniformMatrix4fv(u.w, false, $temp.m);
+          $view.m.set(mat4translate(pos[0], pos[1], pos[2]));
+          $gl.uniformMatrix4fv(u.w, false, $view.m);
         });
       }
     }
@@ -1303,8 +1302,8 @@
         const h = tile_base_height(x, y);
         draw_call(data.draw, 1, (u, i) => {
           const pos = tile_to_world(x, y, h);
-          $temp.m.set(mat4translate(pos[0], pos[1], pos[2]));
-          $gl.uniformMatrix4fv(u.w, false, $temp.m);
+          $view.m.set(mat4translate(pos[0], pos[1], pos[2]));
+          $gl.uniformMatrix4fv(u.w, false, $view.m);
         });
       }
     }
@@ -1326,8 +1325,8 @@
   };
   const draw_skybox = (view) => {
     draw_call(view.skybox, 1, (u, i) => {
-      $temp.m.set(mat4translate(...$temp.cam.eye));
-      $gl.uniformMatrix4fv(u.w, false, $temp.m);
+      $view.m.set(mat4translate(...$view.cam.eye));
+      $gl.uniformMatrix4fv(u.w, false, $view.m);
     });
   };
   const draw_view = (view) => {
@@ -1348,21 +1347,21 @@
     timer_tick(time);
     listen_tick();
     if (data_loaded()) {
-      view_tick();
-      const view = data_view($temp.view);
+      view_tick_before();
+      const view = data_view($view.view);
       if (!view) {
         return;
       }
       ui_tick(view);
       event_tick(view);
     }
-    camera_tick();
+    view_tick_after();
     listen_flush();
   };
   const draw = () => {
     draw_start_frame();
     if (data_loaded()) {
-      const view = data_view($temp.view);
+      const view = data_view($view.view);
       if (!view) {
         return;
       }
@@ -1379,17 +1378,17 @@
     tick();
   });
   $action["nextview"] = (view) => {
-    next_view(view);
+    view_next(view);
   };
   $action["resetview"] = () => {
-    reset_view();
+    view_reset();
   };
   $action["newgame"] = (slot) => {
-    $temp.slot = slot;
+    $view.slot = slot;
     newgame();
   };
   $action["loadgame"] = (slot) => {
-    $temp.slot = slot;
+    $view.slot = slot;
     loadgame();
   };
   $action["savegame"] = () => {

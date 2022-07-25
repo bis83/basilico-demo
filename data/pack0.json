@@ -361,8 +361,8 @@
     ],
     "event": [
         {
+            "ui": "button-escape",
             "trigger": 1,
-            "target": "button-escape",
             "action": [
                 [
                     "resetview"
@@ -370,8 +370,8 @@
             ]
         },
         {
+            "ui": "button-inventory-next",
             "trigger": 1,
-            "target": "button-inventory-next",
             "action": [
                 [
                     "inventory_next"
@@ -379,8 +379,8 @@
             ]
         },
         {
+            "ui": "button-inventory-prev",
             "trigger": 1,
-            "target": "button-inventory-prev",
             "action": [
                 [
                     "inventory_prev"
@@ -388,8 +388,8 @@
             ]
         },
         {
+            "ui": "",
             "trigger": 0,
-            "target": "",
             "action": [
                 [
                     "inventory",
@@ -398,8 +398,8 @@
             ]
         },
         {
+            "ui": "",
             "trigger": 0,
-            "target": "",
             "action": [
                 [
                     "fpsmove",
@@ -409,8 +409,8 @@
             ]
         },
         {
+            "ui": "button-loadgame",
             "trigger": 1,
-            "target": "button-loadgame",
             "action": [
                 [
                     "loadgame",
@@ -423,8 +423,8 @@
             ]
         },
         {
+            "ui": "button-newgame",
             "trigger": 1,
-            "target": "button-newgame",
             "action": [
                 [
                     "newgame",
