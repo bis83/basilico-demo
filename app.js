@@ -778,9 +778,6 @@
   const data_tile = (no) => {
     return data_lookup("tile", no);
   };
-  const data_ui = (no) => {
-    return data_lookup("ui", no);
-  };
   const data_event = (no) => {
     return data_lookup("event", no);
   };
@@ -796,8 +793,8 @@
   const data_tile_index = (name) => {
     return $data.index.tile.findIndex((o) => o.n === name);
   };
-  const data_ui_index = (name) => {
-    return $data.index.ui.findIndex((o) => o.n === name);
+  const data_event_index = (name) => {
+    return $data.index.event.findIndex((o) => o.n === name);
   };
   const data_loaded = () => {
     if ($data.index === null) {
@@ -829,165 +826,6 @@
     $timer.dt = (time - $timer.t) / 1e3;
     $timer.t = time;
     $timer.n += 1;
-  };
-  const $ui = [];
-  const ui_value = (name) => {
-    const no = data_ui_index(name);
-    if (no < 0) {
-      return null;
-    }
-    const ui = $ui[no];
-    if (!ui) {
-      return null;
-    }
-    return ui.value;
-  };
-  const UI_STATE_RESET = 0;
-  const BUTTON_STATE_RELEASED = 0;
-  const BUTTON_STATE_PRESSED = 1;
-  const ui_hit_click = (ui, point) => {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const ratio = window.devicePixelRatio;
-    const ox = w / 2 + w / 2 * ui.ox;
-    const oy = h / 2 + h / 2 * ui.oy;
-    const minX = ox + (ui.x - ui.w / 2) * ratio;
-    const maxX = ox + (ui.x + ui.w / 2) * ratio;
-    const minY = oy + (ui.y - ui.h / 2) * ratio;
-    const maxY = oy + (ui.y + ui.h / 2) * ratio;
-    return xy_hit_rect(point, minX, maxX, minY, maxY);
-  };
-  const ui_tick_button = (tui, ui) => {
-    const mode = $listen.mode;
-    if (mode === GAMEPAD_MODE_POINTER) {
-      let hit = false;
-      const click = $listen.click;
-      for (let c of click) {
-        if (ui_hit_click(ui, [c.x, c.y])) {
-          hit = true;
-          break;
-        }
-      }
-      if (hit) {
-        tui.value = true;
-        tui.state = BUTTON_STATE_PRESSED;
-      } else {
-        tui.value = false;
-        tui.state = BUTTON_STATE_RELEASED;
-      }
-    } else if (mode === GAMEPAD_MODE_GAMEPAD) {
-      const gamepad = $listen.gamepad;
-      if (gamepad[ui.gamepad]) {
-        if (tui.state !== BUTTON_STATE_PRESSED) {
-          tui.value = true;
-          tui.state = BUTTON_STATE_PRESSED;
-        } else {
-          tui.value = false;
-        }
-      } else {
-        tui.value = false;
-        tui.state = BUTTON_STATE_RELEASED;
-      }
-    } else if (mode === GAMEPAD_MODE_KEYBOARD) {
-      const keyboard = $listen.keyboard;
-      if (keyboard[ui.keyboard]) {
-        if (tui.state !== BUTTON_STATE_PRESSED) {
-          tui.value = true;
-          tui.state = BUTTON_STATE_PRESSED;
-        } else {
-          tui.value = false;
-        }
-      } else {
-        tui.value = false;
-        tui.state = BUTTON_STATE_RELEASED;
-      }
-    }
-  };
-  const ui_tick_left_stick = (tui, ui) => {
-    const mode = $listen.mode;
-    if (mode === GAMEPAD_MODE_POINTER) {
-      tui.value = [0, 0];
-      for (const touch of $listen.touch.values()) {
-        if (ui_hit_click(ui, [touch.sx, touch.sy])) {
-          const x = touch.x - touch.sx;
-          const y = -(touch.y - touch.sy);
-          tui.value = xy_normalize(x, y);
-          break;
-        }
-      }
-    } else if (mode === GAMEPAD_MODE_GAMEPAD) {
-      const gamepad = $listen.gamepad;
-      tui.value = xy_normalize(gamepad.lx, -gamepad.ly);
-    } else if (mode === GAMEPAD_MODE_KEYBOARD) {
-      const keyboard = $listen.keyboard;
-      const x = keyboard.a ? -1 : keyboard.d ? 1 : 0;
-      const y = keyboard.w ? 1 : keyboard.s ? -1 : 0;
-      tui.value = xy_normalize(x, y);
-    }
-  };
-  const ui_tick_right_stick = (tui, ui) => {
-    const mode = $listen.mode;
-    if (mode === GAMEPAD_MODE_POINTER) {
-      tui.value = [0, 0];
-      for (const touch of $listen.touch.values()) {
-        if (ui_hit_click(ui, [touch.sx, touch.sy])) {
-          const x = touch.x - touch.sx;
-          const y = -(touch.y - touch.sy);
-          tui.value = xy_normalize(x, y);
-          break;
-        }
-      }
-    } else if (mode === GAMEPAD_MODE_GAMEPAD) {
-      const gamepad = $listen.gamepad;
-      tui.value = xy_normalize(gamepad.rx, -gamepad.ry);
-    } else if (mode === GAMEPAD_MODE_KEYBOARD) {
-      const keyboard = $listen.keyboard;
-      const x = keyboard.right ? 1 : keyboard.left ? -1 : 0;
-      const y = keyboard.up ? 1 : keyboard.down ? -1 : 0;
-      tui.value = xy_normalize(x, y);
-    }
-  };
-  const ui_tick = (view) => {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    for (const tui of $ui) {
-      if (tui) {
-        tui.value = null;
-      }
-    }
-    for (let no of view.ui) {
-      const ui = data_ui(no);
-      if (!ui) {
-        continue;
-      }
-      if (!$ui[no]) {
-        $ui[no] = {
-          m: new Float32Array(16),
-          value: null,
-          state: UI_STATE_RESET
-        };
-      }
-      const tui = $ui[no];
-      switch (ui.interact) {
-        case 1:
-          ui_tick_button(tui, ui);
-          break;
-        case 2:
-          ui_tick_left_stick(tui, ui);
-          break;
-        case 3:
-          ui_tick_right_stick(tui, ui);
-          break;
-        default:
-          break;
-      }
-      const ratio = window.devicePixelRatio;
-      const ox = ui.ox * w / 2;
-      const oy = ui.oy * h / 2;
-      const m = mat4scale(ui.w / 2 * ratio, ui.h / 2 * ratio, 1);
-      mat4translated(m, ox + ui.x * ratio, -(oy + ui.y * ratio), 0);
-      tui.m.set(m);
-    }
   };
   const $tile = {
     w: 0,
@@ -1138,26 +976,172 @@
   const item_decode = (data) => {
     return data;
   };
-  const event_tick = (view) => {
-    for (let no of view.event) {
-      const ev = data_event(no);
-      if (!ev) {
-        continue;
-      }
+  const $ev = [];
+  const ev_value = (name) => {
+    const no = data_event_index(name);
+    if (no < 0) {
+      return null;
+    }
+    const ev = $ev[no];
+    if (!ev) {
+      return null;
+    }
+    return ev.value;
+  };
+  const STATE_RESET = 0;
+  const BUTTON_STATE_RELEASED = 0;
+  const BUTTON_STATE_PRESSED = 1;
+  const ev_hit_click = (data, point) => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const ratio = window.devicePixelRatio;
+    const ox = w / 2 + w / 2 * data.ox;
+    const oy = h / 2 + h / 2 * data.oy;
+    const minX = ox + (data.x - data.w / 2) * ratio;
+    const maxX = ox + (data.x + data.w / 2) * ratio;
+    const minY = oy + (data.y - data.h / 2) * ratio;
+    const maxY = oy + (data.y + data.h / 2) * ratio;
+    return xy_hit_rect(point, minX, maxX, minY, maxY);
+  };
+  const ev_button = (ev, data) => {
+    const mode = $listen.mode;
+    if (mode === GAMEPAD_MODE_POINTER) {
       let hit = false;
-      switch (ev.trigger) {
-        case 0:
+      const click = $listen.click;
+      for (let c of click) {
+        if (ev_hit_click(data, [c.x, c.y])) {
           hit = true;
           break;
-        case 1:
-          hit = ui_value(ev.ui);
-          break;
+        }
       }
-      if (!hit) {
+      if (hit) {
+        ev.value = true;
+        ev.state = BUTTON_STATE_PRESSED;
+      } else {
+        ev.value = false;
+        ev.state = BUTTON_STATE_RELEASED;
+      }
+    } else if (mode === GAMEPAD_MODE_GAMEPAD) {
+      const gamepad = $listen.gamepad;
+      if (gamepad[data.gamepad]) {
+        if (ev.state !== BUTTON_STATE_PRESSED) {
+          ev.value = true;
+          ev.state = BUTTON_STATE_PRESSED;
+        } else {
+          ev.value = false;
+        }
+      } else {
+        ev.value = false;
+        ev.state = BUTTON_STATE_RELEASED;
+      }
+    } else if (mode === GAMEPAD_MODE_KEYBOARD) {
+      const keyboard = $listen.keyboard;
+      if (keyboard[data.keyboard]) {
+        if (ev.state !== BUTTON_STATE_PRESSED) {
+          ev.value = true;
+          ev.state = BUTTON_STATE_PRESSED;
+        } else {
+          ev.value = false;
+        }
+      } else {
+        ev.value = false;
+        ev.state = BUTTON_STATE_RELEASED;
+      }
+    }
+  };
+  const ev_left_stick = (ev, data) => {
+    const mode = $listen.mode;
+    if (mode === GAMEPAD_MODE_POINTER) {
+      ev.value = [0, 0];
+      for (const touch of $listen.touch.values()) {
+        if (ev_hit_click(data, [touch.sx, touch.sy])) {
+          const x = touch.x - touch.sx;
+          const y = -(touch.y - touch.sy);
+          ev.value = xy_normalize(x, y);
+          break;
+        }
+      }
+    } else if (mode === GAMEPAD_MODE_GAMEPAD) {
+      const gamepad = $listen.gamepad;
+      ev.value = xy_normalize(gamepad.lx, -gamepad.ly);
+    } else if (mode === GAMEPAD_MODE_KEYBOARD) {
+      const keyboard = $listen.keyboard;
+      const x = keyboard.a ? -1 : keyboard.d ? 1 : 0;
+      const y = keyboard.w ? 1 : keyboard.s ? -1 : 0;
+      ev.value = xy_normalize(x, y);
+    }
+  };
+  const ev_right_stick = (ev, data) => {
+    const mode = $listen.mode;
+    if (mode === GAMEPAD_MODE_POINTER) {
+      ev.value = [0, 0];
+      for (const touch of $listen.touch.values()) {
+        if (ev_hit_click(data, [touch.sx, touch.sy])) {
+          const x = touch.x - touch.sx;
+          const y = -(touch.y - touch.sy);
+          ev.value = xy_normalize(x, y);
+          break;
+        }
+      }
+    } else if (mode === GAMEPAD_MODE_GAMEPAD) {
+      const gamepad = $listen.gamepad;
+      ev.value = xy_normalize(gamepad.rx, -gamepad.ry);
+    } else if (mode === GAMEPAD_MODE_KEYBOARD) {
+      const keyboard = $listen.keyboard;
+      const x = keyboard.right ? 1 : keyboard.left ? -1 : 0;
+      const y = keyboard.up ? 1 : keyboard.down ? -1 : 0;
+      ev.value = xy_normalize(x, y);
+    }
+  };
+  const event_tick = (view) => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    for (const ev of $ev) {
+      if (ev) {
+        ev.value = null;
+      }
+    }
+    for (let no of view.event) {
+      const data = data_event(no);
+      if (!data) {
         continue;
       }
-      for (const act of ev.action) {
-        action_invoke(act);
+      if (!$ev[no]) {
+        $ev[no] = {
+          m: new Float32Array(16),
+          value: null,
+          state: STATE_RESET
+        };
+      }
+      const ev = $ev[no];
+      switch (data.interact) {
+        case 1:
+          ev.value = true;
+          break;
+        case 2:
+          ev_button(ev, data);
+          break;
+        case 3:
+          ev_left_stick(ev, data);
+          break;
+        case 4:
+          ev_right_stick(ev, data);
+          break;
+        default:
+          break;
+      }
+      if (ev.value && data.action) {
+        for (const act of data.action) {
+          action_invoke(act);
+        }
+      }
+      if (data.draw >= 0) {
+        const ratio = window.devicePixelRatio;
+        const ox = data.ox * w / 2;
+        const oy = data.oy * h / 2;
+        const m = mat4scale(data.w / 2 * ratio, data.h / 2 * ratio, 1);
+        mat4translated(m, ox + data.x * ratio, -(oy + data.y * ratio), 0);
+        ev.m.set(m);
       }
     }
   };
@@ -1206,6 +1190,15 @@
     $view.cam.ivp.set(mat4invert(vp));
     $view.cam.o.set(mat4ortho(ww, wh, 0, 1));
     $view.cam.eye = eye;
+  };
+  const view_tick = () => {
+    view_tick_before();
+    const view = data_view($view.view);
+    if (!view) {
+      return;
+    }
+    event_tick(view);
+    view_tick_after();
   };
   const newgame = () => {
     pos_init();
@@ -1308,18 +1301,21 @@
       }
     }
   };
-  const draw_ui = (view) => {
-    for (let no of view.ui) {
-      const ui = data_ui(no);
-      if (!ui) {
+  const draw_event = (view) => {
+    for (let no of view.event) {
+      const data = data_event(no);
+      if (!data) {
         continue;
       }
-      const tui = $ui[no];
-      if (!tui) {
+      if (data.draw < 0) {
         continue;
       }
-      draw_call(ui.draw, 1, (u, i) => {
-        $gl.uniformMatrix4fv(u.w, false, tui.m);
+      const ev = $ev[no];
+      if (!ev) {
+        continue;
+      }
+      draw_call(data.draw, 1, (u, i) => {
+        $gl.uniformMatrix4fv(u.w, false, ev.m);
       });
     }
   };
@@ -1329,12 +1325,16 @@
       $gl.uniformMatrix4fv(u.w, false, $view.m);
     });
   };
-  const draw_view = (view) => {
+  const draw_view = () => {
+    const view = data_view($view.view);
+    if (!view) {
+      return;
+    }
     draw_skybox(view);
     if (view.draw3d) {
       draw_tile();
     }
-    draw_ui(view);
+    draw_event(view);
   };
   const init = () => {
     gl_init();
@@ -1347,25 +1347,14 @@
     timer_tick(time);
     listen_tick();
     if (data_loaded()) {
-      view_tick_before();
-      const view = data_view($view.view);
-      if (!view) {
-        return;
-      }
-      ui_tick(view);
-      event_tick(view);
+      view_tick();
     }
-    view_tick_after();
     listen_flush();
   };
   const draw = () => {
     draw_start_frame();
     if (data_loaded()) {
-      const view = data_view($view.view);
-      if (!view) {
-        return;
-      }
-      draw_view(view);
+      draw_view();
     }
   };
   listen(window, "load", () => {
@@ -1428,14 +1417,14 @@
   };
   const pos_fps_movement = (lstick, rstick) => {
     const dt = $timer.dt;
-    const cameraXY = ui_value(rstick);
+    const cameraXY = ev_value(rstick);
     if (cameraXY) {
       const cameraSpeed = 90;
       $pos.ha += cameraSpeed * dt * cameraXY[0];
       $pos.va += cameraSpeed * dt * cameraXY[1];
       $pos.va = Math.max(-60, Math.min($pos.va, 80));
     }
-    const moveXY = ui_value(lstick);
+    const moveXY = ev_value(lstick);
     if (moveXY) {
       const moveSpeed = 2;
       const rx = deg2rad($pos.ha + 90);

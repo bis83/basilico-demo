@@ -144,7 +144,7 @@
             "sid": 1
         }
     ],
-    "ui": [
+    "event": [
         {
             "n": "button-escape",
             "p": 0,
@@ -171,56 +171,24 @@
             "i": 4
         },
         {
-            "n": "right-stick",
+            "n": "movement",
             "p": 0,
             "i": 5
+        },
+        {
+            "n": "right-stick",
+            "p": 0,
+            "i": 6
         },
         {
             "n": "button-loadgame",
             "p": 0,
-            "i": 6
+            "i": 7
         },
         {
             "n": "button-newgame",
             "p": 0,
-            "i": 7
-        }
-    ],
-    "event": [
-        {
-            "n": "escape",
-            "p": 0,
-            "i": 0
-        },
-        {
-            "n": "inventory-next",
-            "p": 0,
-            "i": 1
-        },
-        {
-            "n": "inventory-prev",
-            "p": 0,
-            "i": 2
-        },
-        {
-            "n": "inventory",
-            "p": 0,
-            "i": 3
-        },
-        {
-            "n": "movement",
-            "p": 0,
-            "i": 4
-        },
-        {
-            "n": "loadgame",
-            "p": 0,
-            "i": 5
-        },
-        {
-            "n": "newgame",
-            "p": 0,
-            "i": 6
+            "i": 8
         }
     ],
     "view": [

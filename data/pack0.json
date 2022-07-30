@@ -261,7 +261,7 @@
             "height": 1
         }
     ],
-    "ui": [
+    "event": [
         {
             "draw": 0,
             "x": 0,
@@ -270,9 +270,14 @@
             "h": 48,
             "ox": 0,
             "oy": 1,
-            "interact": 1,
+            "interact": 2,
             "gamepad": "b9",
-            "keyboard": "esc"
+            "keyboard": "esc",
+            "action": [
+                [
+                    "resetview"
+                ]
+            ]
         },
         {
             "draw": 0,
@@ -282,9 +287,14 @@
             "h": 32,
             "ox": -1,
             "oy": 0,
-            "interact": 1,
+            "interact": 2,
             "gamepad": "rb",
-            "keyboard": "e"
+            "keyboard": "e",
+            "action": [
+                [
+                    "inventory_next"
+                ]
+            ]
         },
         {
             "draw": 0,
@@ -294,9 +304,14 @@
             "h": 32,
             "ox": -1,
             "oy": 0,
-            "interact": 1,
+            "interact": 2,
             "gamepad": "lb",
-            "keyboard": "q"
+            "keyboard": "q",
+            "action": [
+                [
+                    "inventory_prev"
+                ]
+            ]
         },
         {
             "draw": 4,
@@ -306,9 +321,15 @@
             "h": 256,
             "ox": -1,
             "oy": 0,
-            "interact": 0,
+            "interact": 1,
             "gamepad": "",
-            "keyboard": ""
+            "keyboard": "",
+            "action": [
+                [
+                    "inventory",
+                    "inventory"
+                ]
+            ]
         },
         {
             "draw": 0,
@@ -318,88 +339,22 @@
             "h": 96,
             "ox": -1,
             "oy": 1,
-            "interact": 2,
-            "gamepad": "",
-            "keyboard": ""
-        },
-        {
-            "draw": 0,
-            "x": -128,
-            "y": -128,
-            "w": 96,
-            "h": 96,
-            "ox": 1,
-            "oy": 1,
             "interact": 3,
             "gamepad": "",
-            "keyboard": ""
+            "keyboard": "",
+            "action": null
         },
         {
-            "draw": 5,
-            "x": 160,
+            "draw": -1,
+            "x": 0,
             "y": 0,
-            "w": 256,
-            "h": 256,
+            "w": 0,
+            "h": 0,
             "ox": 0,
             "oy": 0,
             "interact": 1,
-            "gamepad": "b9",
-            "keyboard": "x"
-        },
-        {
-            "draw": 6,
-            "x": -160,
-            "y": 0,
-            "w": 256,
-            "h": 256,
-            "ox": 0,
-            "oy": 0,
-            "interact": 1,
-            "gamepad": "b8",
-            "keyboard": "z"
-        }
-    ],
-    "event": [
-        {
-            "ui": "button-escape",
-            "trigger": 1,
-            "action": [
-                [
-                    "resetview"
-                ]
-            ]
-        },
-        {
-            "ui": "button-inventory-next",
-            "trigger": 1,
-            "action": [
-                [
-                    "inventory_next"
-                ]
-            ]
-        },
-        {
-            "ui": "button-inventory-prev",
-            "trigger": 1,
-            "action": [
-                [
-                    "inventory_prev"
-                ]
-            ]
-        },
-        {
-            "ui": "",
-            "trigger": 0,
-            "action": [
-                [
-                    "inventory",
-                    "inventory"
-                ]
-            ]
-        },
-        {
-            "ui": "",
-            "trigger": 0,
+            "gamepad": "",
+            "keyboard": "",
             "action": [
                 [
                     "fpsmove",
@@ -409,8 +364,29 @@
             ]
         },
         {
-            "ui": "button-loadgame",
-            "trigger": 1,
+            "draw": 0,
+            "x": -128,
+            "y": -128,
+            "w": 96,
+            "h": 96,
+            "ox": 1,
+            "oy": 1,
+            "interact": 4,
+            "gamepad": "",
+            "keyboard": "",
+            "action": null
+        },
+        {
+            "draw": 5,
+            "x": 160,
+            "y": 0,
+            "w": 256,
+            "h": 256,
+            "ox": 0,
+            "oy": 0,
+            "interact": 2,
+            "gamepad": "b9",
+            "keyboard": "x",
             "action": [
                 [
                     "loadgame",
@@ -423,8 +399,16 @@
             ]
         },
         {
-            "ui": "button-newgame",
-            "trigger": 1,
+            "draw": 6,
+            "x": -160,
+            "y": 0,
+            "w": 256,
+            "h": 256,
+            "ox": 0,
+            "oy": 0,
+            "interact": 2,
+            "gamepad": "b8",
+            "keyboard": "z",
             "action": [
                 [
                     "newgame",
@@ -444,32 +428,22 @@
         {
             "skybox": 1,
             "draw3d": true,
-            "ui": [
-                3,
-                2,
-                1,
-                0,
-                4,
-                5
-            ],
             "event": [
-                3,
+                4,
+                6,
+                5,
                 2,
                 1,
-                4,
+                3,
                 0
             ]
         },
         {
             "skybox": -1,
             "draw3d": false,
-            "ui": [
-                7,
-                6
-            ],
             "event": [
-                6,
-                5
+                8,
+                7
             ]
         }
     ]
