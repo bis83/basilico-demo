@@ -1,10 +1,6 @@
 [[view]]
 name = "pause"
-ui = [
-    "button-newgame",
-    "button-loadgame",    
-]
 event = [
-    "newgame",
-    "loadgame",
+    "button-newgame",
+    "button-loadgame",
 ]

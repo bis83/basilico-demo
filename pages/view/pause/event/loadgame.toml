@@ -1,8 +1,0 @@
-[[event]]
-name = "loadgame"
-ui = "button-loadgame"
-trigger = "button"
-action = [
-    ["loadgame", "slot0"],
-    ["nextview", "main"],
-]

@@ -1,10 +1,12 @@
-[[ui]]
+[[event]]
 name = "right-stick"
+
 draw = "ui-rect"
 x = -128
 y = -128
 width = 96
 height = 96
-interact = "right-stick"
 origin-x = 1.0
 origin-y = 1.0
+
+interact = "right-stick"

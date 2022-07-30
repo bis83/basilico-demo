@@ -1,7 +1,0 @@
-[[event]]
-name = "escape"
-ui = "button-escape"
-trigger = "button"
-action = [
-    ["resetview"],
-]

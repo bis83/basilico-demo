@@ -1,7 +1,0 @@
-[[event]]
-name = "inventory-next"
-ui = "button-inventory-next"
-trigger = "button"
-action = [
-    ["inventory_next"],
-]

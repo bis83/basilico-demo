@@ -1,9 +1,0 @@
-[[event]]
-name = "newgame"
-ui = "button-newgame"
-trigger = "button"
-action = [
-    ["newgame", "slot0"],
-    ["makeworld"],
-    ["nextview", "main"],
-]

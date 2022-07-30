@@ -1,13 +1,20 @@
-[[ui]]
+[[event]]
 name = "button-newgame"
+
 draw = "ui-newgame"
 x = -160
 y = 0
 width = 256
 height = 256
+
 interact = "button"
 gamepad = "b8"
 keyboard = "z"
+action = [
+    ["newgame", "slot0"],
+    ["makeworld"],
+    ["nextview", "main"],
+]
 
 [[draw]]
 name = "ui-newgame"

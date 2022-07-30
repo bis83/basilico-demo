@@ -2,18 +2,17 @@
 name = "main"
 draw3d = true
 skybox = "skybox"
-ui = [
-    "inventory",
+event = [
+    # movement
+    "left-stick",
+    "right-stick",
+    "movement",
+
+    # inventory
     "button-inventory-prev",
     "button-inventory-next",
-    "button-escape",
-    "left-stick",
-    "right-stick",    
-]
-event = [
     "inventory",
-    "inventory-prev",
-    "inventory-next",
-    "movement",
-    "escape",
+
+    # misc
+    "button-escape",
 ]

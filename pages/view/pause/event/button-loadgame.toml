@@ -1,13 +1,19 @@
-[[ui]]
+[[event]]
 name = "button-loadgame"
+
 draw = "ui-loadgame"
 x = 160
 y = 0
 width = 256
 height = 256
+
 interact = "button"
 gamepad = "b9"
 keyboard = "x"
+action = [
+    ["loadgame", "slot0"],
+    ["nextview", "main"],
+]
 
 [[draw]]
 name = "ui-loadgame"

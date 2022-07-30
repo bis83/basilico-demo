@@ -1,6 +1,7 @@
 [[event]]
 name = "movement"
-trigger = "always"
+
+interact = "always"
 action = [
     ["fpsmove", "left-stick", "right-stick"],
 ]
