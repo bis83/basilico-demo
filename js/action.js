@@ -1,5 +1,5 @@
 
-$action["makeworld"] = () => {
+define_action("makeworld", () => {
     const b = data_tile_index("tile");
     const m = data_tile_index("mine");
 
@@ -21,16 +21,16 @@ $action["makeworld"] = () => {
     // item
     item_init_empty(8);
     item_gain(data_item_index("pick"), 1);
-};
+});
 
-$action["inventory_next"] = () => {
+define_action("inventory_next", () => {
     item_set_cursor(1);
-};
-$action["inventory_prev"] = () => {
+});
+define_action("inventory_prev", () => {
     item_set_cursor(-1);
-};
+});
 
-$action["inventory"] = (tex) => {
+define_action("inventory", (tex) => {
     const data = data_texture(data_texture_index(tex));
     if(!data) {
         return;
@@ -64,4 +64,4 @@ $action["inventory"] = (tex) => {
     }
     cvs_text(data.cvs, text);
     gl_updateGLTexture2D(data.tex, data.cvs);
-};
+});

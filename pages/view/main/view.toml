@@ -13,6 +13,9 @@ event = [
     "button-inventory-next",
     "inventory",
 
+    # activate
+    "activate",
+
     # misc
     "button-escape",
 ]
