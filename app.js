@@ -637,6 +637,20 @@
   const audio_init = () => {
     $audio = new AudioContext();
   };
+  const $action = {};
+  const action_invoke = (action) => {
+    for (const act of action) {
+      const func = $action[act[0]];
+      if (!func) {
+        continue;
+      }
+      const args = act.slice(1);
+      func(...args);
+    }
+  };
+  const define_action = (label, func) => {
+    $action[label] = func;
+  };
   const VS_LAYOUT_POSITION = 0;
   const VS_LAYOUT_NORMAL = 1;
   const VS_LAYOUT_COLOR = 2;
@@ -807,15 +821,6 @@
       return false;
     }
     return true;
-  };
-  const $action = {};
-  const action_invoke = (act) => {
-    const func = $action[act[0]];
-    if (!func) {
-      return;
-    }
-    const args = act.slice(1);
-    func(...args);
   };
   const $timer = {
     t: performance.now(),
@@ -1131,9 +1136,7 @@
           break;
       }
       if (ev.value && data.action) {
-        for (const act of data.action) {
-          action_invoke(act);
-        }
+        action_invoke(data.action);
       }
       if (data.draw >= 0) {
         const ratio = window.devicePixelRatio;
@@ -1366,23 +1369,23 @@
     };
     tick();
   });
-  $action["nextview"] = (view) => {
+  define_action("nextview", (view) => {
     view_next(view);
-  };
-  $action["resetview"] = () => {
+  });
+  define_action("resetview", () => {
     view_reset();
-  };
-  $action["newgame"] = (slot) => {
+  });
+  define_action("newgame", (slot) => {
     $view.slot = slot;
     newgame();
-  };
-  $action["loadgame"] = (slot) => {
+  });
+  define_action("loadgame", (slot) => {
     $view.slot = slot;
     loadgame();
-  };
-  $action["savegame"] = () => {
+  });
+  define_action("savegame", () => {
     savegame();
-  };
+  });
   const pos_adjust = (x, y, dx, dy) => {
     const ix = Math.floor(x);
     const iy = Math.floor(y);
@@ -1447,10 +1450,10 @@
       $pos.h = h;
     }
   };
-  $action["fpsmove"] = (lstick, rstick) => {
+  define_action("fpsmove", (lstick, rstick) => {
     pos_fps_movement(lstick, rstick);
-  };
-  $action["makeworld"] = () => {
+  });
+  define_action("makeworld", () => {
     const b = data_tile_index("tile");
     const m = data_tile_index("mine");
     tile_init_empty(64, 64);
@@ -1466,14 +1469,14 @@
     pos_init($tile.w / 2 + 0.5, $tile.h / 2 + 0.5);
     item_init_empty(8);
     item_gain(data_item_index("pick"), 1);
-  };
-  $action["inventory_next"] = () => {
+  });
+  define_action("inventory_next", () => {
     item_set_cursor(1);
-  };
-  $action["inventory_prev"] = () => {
+  });
+  define_action("inventory_prev", () => {
     item_set_cursor(-1);
-  };
-  $action["inventory"] = (tex) => {
+  });
+  define_action("inventory", (tex) => {
     const data = data_texture(data_texture_index(tex));
     if (!data) {
       return;
@@ -1507,5 +1510,5 @@
     }
     cvs_text(data.cvs, text);
     gl_updateGLTexture2D(data.tex, data.cvs);
-  };
+  });
 })();

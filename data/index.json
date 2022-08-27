@@ -146,49 +146,54 @@
     ],
     "event": [
         {
-            "n": "button-escape",
+            "n": "activate",
             "p": 0,
             "i": 0
         },
         {
-            "n": "button-inventory-next",
+            "n": "button-escape",
             "p": 0,
             "i": 1
         },
         {
-            "n": "button-inventory-prev",
+            "n": "button-inventory-next",
             "p": 0,
             "i": 2
         },
         {
-            "n": "inventory",
+            "n": "button-inventory-prev",
             "p": 0,
             "i": 3
         },
         {
-            "n": "left-stick",
+            "n": "inventory",
             "p": 0,
             "i": 4
         },
         {
-            "n": "movement",
+            "n": "left-stick",
             "p": 0,
             "i": 5
         },
         {
-            "n": "right-stick",
+            "n": "movement",
             "p": 0,
             "i": 6
         },
         {
-            "n": "button-loadgame",
+            "n": "right-stick",
             "p": 0,
             "i": 7
         },
         {
-            "n": "button-newgame",
+            "n": "button-loadgame",
             "p": 0,
             "i": 8
+        },
+        {
+            "n": "button-newgame",
+            "p": 0,
+            "i": 9
         }
     ],
     "view": [
