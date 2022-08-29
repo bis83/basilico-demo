@@ -918,11 +918,28 @@
     }
     $tile.b[i] = { no, dir: 0 };
   };
+  const tile_prop_del = (x, y) => {
+    const i = tile_index(x, y);
+    if (i < 0) {
+      return;
+    }
+    $tile.b[i] = null;
+  };
   const tile_encode = (data) => {
     return data;
   };
   const tile_decode = (data) => {
     return data;
+  };
+  const tile_ranges = (x, y, ha) => {
+    let ranges = [];
+    const h = deg2rad(ha);
+    x += Math.cos(h) * 0.8;
+    y += Math.sin(h) * 0.8;
+    x = Math.floor(x);
+    y = Math.floor(y);
+    ranges.push({ x, y });
+    return ranges;
   };
   const $pos_eyeh = 1.75;
   const $pos = {
@@ -1462,6 +1479,7 @@
         tile_base_set(x, y, b);
       }
     }
+    tile_prop_set(24, 24, m);
     tile_prop_set(29, 29, m);
     tile_prop_set(35, 29, m);
     tile_prop_set(29, 35, m);
@@ -1510,5 +1528,20 @@
     }
     cvs_text(data.cvs, text);
     gl_updateGLTexture2D(data.tex, data.cvs);
+  });
+  define_action("activate", () => {
+    const ranges = tile_ranges($pos.x, $pos.y, $pos.ha);
+    for (const r of ranges) {
+      const tile = tile_prop(r.x, r.y);
+      if (!tile) {
+        continue;
+      }
+      const data = data_tile(tile.no);
+      if (!data) {
+        continue;
+      }
+      item_gain(data.item, data.item_count);
+      tile_prop_del(r.x, r.y);
+    }
   });
 })();
