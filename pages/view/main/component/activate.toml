@@ -12,4 +12,6 @@ origin-y = 1.0
 interact = "button"
 gamepad = "b0"
 keyboard = "space"
-action = []
+action = [
+    ["activate"],
+]

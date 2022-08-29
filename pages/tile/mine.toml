@@ -6,6 +6,9 @@ draw = "mine"
 height = 5
 save-id = 2
 
+item = "rock"
+item-count = 10
+
 [[draw]]
 name = "mine"
 mesh = "mine"

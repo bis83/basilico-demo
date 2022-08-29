@@ -10,6 +10,7 @@ define_action("makeworld", () => {
             tile_base_set(x, y, b);
         }
     }
+    tile_prop_set(24, 24, m);
     tile_prop_set(29, 29, m);
     tile_prop_set(35, 29, m);
     tile_prop_set(29, 35, m);
@@ -64,4 +65,20 @@ define_action("inventory", (tex) => {
     }
     cvs_text(data.cvs, text);
     gl_updateGLTexture2D(data.tex, data.cvs);
+});
+
+define_action("activate", () => {
+    const ranges = tile_ranges($pos.x, $pos.y, $pos.ha);
+    for(const r of ranges) {
+        const tile = tile_prop(r.x, r.y);
+        if(!tile) {
+            continue;
+        }
+        const data = data_tile(tile.no);
+        if(!data) {
+            continue;
+        }
+        item_gain(data.item, data.item_count);
+        tile_prop_del(r.x, r.y);
+    }
 });
