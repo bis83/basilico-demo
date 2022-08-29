@@ -144,7 +144,7 @@
             "sid": 1
         }
     ],
-    "event": [
+    "component": [
         {
             "n": "activate",
             "p": 0,

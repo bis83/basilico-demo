@@ -261,7 +261,7 @@
             "height": 1
         }
     ],
-    "event": [
+    "component": [
         {
             "draw": 0,
             "x": -256,
@@ -441,7 +441,7 @@
         {
             "skybox": 1,
             "draw3d": true,
-            "event": [
+            "component": [
                 5,
                 7,
                 6,
@@ -455,7 +455,7 @@
         {
             "skybox": -1,
             "draw3d": false,
-            "event": [
+            "component": [
                 9,
                 8
             ]
