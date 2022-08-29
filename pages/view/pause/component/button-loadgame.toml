@@ -15,16 +15,11 @@ action = [
     ["nextview", "main"],
 ]
 
+[component.text]
+contents = "Load Game"
+
 [[draw]]
 name = "ui-loadgame"
 mesh = "rect"
 shader = "mesh-pt"
-texture = "tex-loadgame"
 ortho = true
-
-[[texture]]
-name = "tex-loadgame"
-[texture.canvas]
-text = "CONTINUE"
-width = 256
-height = 256

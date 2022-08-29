@@ -2,9 +2,9 @@
 name = "ui-rect"
 mesh = "rect"
 shader = "mesh-pt"
-texture = "icon"
+image = "icon"
 ortho = true
 
-[[texture]]
+[[image]]
 name = "icon"
 src = "icon.png"

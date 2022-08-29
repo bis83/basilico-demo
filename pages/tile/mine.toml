@@ -13,7 +13,7 @@ item-count = 10
 name = "mine"
 mesh = "mine"
 shader = "mesh-pt"
-texture = "mine"
+image = "mine"
 depth = true
 
 [[mesh]]
@@ -63,6 +63,6 @@ index = [
   4, 1, 0,
 ]
 
-[[texture]]
+[[image]]
 name = "mine"
 src = "mine.png"

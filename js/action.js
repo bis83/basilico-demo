@@ -31,11 +31,7 @@ define_action("inventory_prev", () => {
     item_set_cursor(-1);
 });
 
-define_action("inventory", (tex) => {
-    const data = data_texture(data_texture_index(tex));
-    if(!data) {
-        return;
-    }
+define_action("inventory", () => {
     let text = "";
     for(let i=0; i<$item.s.length; ++i) {
         if($item.i === i) {
@@ -63,8 +59,17 @@ define_action("inventory", (tex) => {
             }
         }
     }
-    cvs_text(data.cvs, text);
-    gl_updateGLTexture2D(data.tex, data.cvs);
+
+    const no = data_component_index("inventory");
+    const co = $co[no];
+    if(!co) {
+        return;
+    }
+    if(!co.cvs) {
+        return;
+    }
+    cvs_text(co.cvs, text);
+    gl_updateGLTexture2D(co.img, co.cvs);
 });
 
 define_action("activate", () => {

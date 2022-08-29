@@ -16,16 +16,11 @@ action = [
     ["nextview", "main"],
 ]
 
+[component.text]
+contents = "New Game"
+
 [[draw]]
 name = "ui-newgame"
 mesh = "rect"
 shader = "mesh-pt"
-texture = "tex-newgame"
 ortho = true
-
-[[texture]]
-name = "tex-newgame"
-[texture.canvas]
-text = "NEW GAME"
-width = 256
-height = 256

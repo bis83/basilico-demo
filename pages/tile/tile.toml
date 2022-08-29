@@ -10,7 +10,7 @@ save-id = 1
 name = "tile"
 mesh = "tile"
 shader = "mesh-pt"
-texture = "tile"
+image = "tile"
 depth = true
 
 [[mesh]]
@@ -60,6 +60,6 @@ index = [
   4, 1, 0,
 ]
 
-[[texture]]
+[[image]]
 name = "tile"
 src = "tile.png"

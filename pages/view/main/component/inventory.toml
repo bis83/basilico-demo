@@ -11,19 +11,15 @@ origin-y = 0.0
 
 interact = "always"
 action = [
-    ["inventory", "inventory"],
+    ["inventory"],
 ]
+
+[component.text]
+contents = ""
 
 [[draw]]
 name = "inventory"
 mesh = "rect"
 shader = "mesh-pt"
-texture = "inventory"
 ortho = true
 alpha = true
-
-[[texture]]
-name = "inventory"
-[texture.canvas]
-width = 256
-height = 256
