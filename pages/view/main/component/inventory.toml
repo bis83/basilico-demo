@@ -1,4 +1,4 @@
-[[event]]
+[[component]]
 name = "inventory"
 
 draw = "inventory"

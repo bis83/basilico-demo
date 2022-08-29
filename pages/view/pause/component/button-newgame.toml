@@ -1,4 +1,4 @@
-[[event]]
+[[component]]
 name = "button-newgame"
 
 draw = "ui-newgame"

@@ -1,6 +1,6 @@
 [[view]]
 name = "pause"
-event = [
+component = [
     "button-newgame",
     "button-loadgame",
 ]

@@ -1,4 +1,4 @@
-[[event]]
+[[component]]
 name = "activate"
 
 draw = "ui-rect"

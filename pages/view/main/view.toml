@@ -2,7 +2,7 @@
 name = "main"
 draw3d = true
 skybox = "skybox"
-event = [
+component = [
     # movement
     "left-stick",
     "right-stick",

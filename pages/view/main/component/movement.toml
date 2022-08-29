@@ -1,4 +1,4 @@
-[[event]]
+[[component]]
 name = "movement"
 
 interact = "always"

@@ -1,4 +1,4 @@
-[[event]]
+[[component]]
 name = "button-inventory-next"
 
 draw = "ui-rect"

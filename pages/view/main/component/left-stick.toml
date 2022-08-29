@@ -1,4 +1,4 @@
-[[event]]
+[[component]]
 name = "left-stick"
 
 draw = "ui-rect"

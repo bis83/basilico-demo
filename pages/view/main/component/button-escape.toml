@@ -1,4 +1,4 @@
-[[event]]
+[[component]]
 name = "button-escape"
 
 draw = "ui-rect"
