@@ -37,7 +37,7 @@
             "i": 6
         }
     ],
-    "texture": [
+    "image": [
         {
             "n": "icon",
             "p": 0,
@@ -52,21 +52,6 @@
             "n": "tile",
             "p": 0,
             "i": 2
-        },
-        {
-            "n": "inventory",
-            "p": 0,
-            "i": 3
-        },
-        {
-            "n": "tex-loadgame",
-            "p": 0,
-            "i": 4
-        },
-        {
-            "n": "tex-newgame",
-            "p": 0,
-            "i": 5
         }
     ],
     "shader": [

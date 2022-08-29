@@ -112,47 +112,17 @@
             ]
         }
     ],
-    "texture": [
+    "image": [
         {
             "src": "icon.png",
-            "cvs": null,
             "s": 0
         },
         {
             "src": "mine.png",
-            "cvs": null,
             "s": 0
         },
         {
             "src": "tile.png",
-            "cvs": null,
-            "s": 0
-        },
-        {
-            "src": "",
-            "cvs": {
-                "text": "",
-                "width": 256,
-                "height": 256
-            },
-            "s": 0
-        },
-        {
-            "src": "",
-            "cvs": {
-                "text": "CONTINUE",
-                "width": 256,
-                "height": 256
-            },
-            "s": 0
-        },
-        {
-            "src": "",
-            "cvs": {
-                "text": "NEW GAME",
-                "width": 256,
-                "height": 256
-            },
             "s": 0
         }
     ],
@@ -181,7 +151,7 @@
         {
             "mesh": 3,
             "shader": 1,
-            "texture": 0,
+            "image": 0,
             "depth": false,
             "alpha": false,
             "ortho": true
@@ -189,7 +159,7 @@
         {
             "mesh": 0,
             "shader": 0,
-            "texture": -1,
+            "image": -1,
             "depth": false,
             "alpha": false,
             "ortho": false
@@ -197,7 +167,7 @@
         {
             "mesh": 1,
             "shader": 1,
-            "texture": 1,
+            "image": 1,
             "depth": true,
             "alpha": false,
             "ortho": false
@@ -205,7 +175,7 @@
         {
             "mesh": 2,
             "shader": 1,
-            "texture": 2,
+            "image": 2,
             "depth": true,
             "alpha": false,
             "ortho": false
@@ -213,7 +183,7 @@
         {
             "mesh": 3,
             "shader": 1,
-            "texture": 3,
+            "image": -1,
             "depth": false,
             "alpha": true,
             "ortho": true
@@ -221,7 +191,7 @@
         {
             "mesh": 3,
             "shader": 1,
-            "texture": 4,
+            "image": -1,
             "depth": false,
             "alpha": false,
             "ortho": true
@@ -229,7 +199,7 @@
         {
             "mesh": 3,
             "shader": 1,
-            "texture": 5,
+            "image": -1,
             "depth": false,
             "alpha": false,
             "ortho": true
@@ -347,10 +317,13 @@
             "keyboard": "",
             "action": [
                 [
-                    "inventory",
                     "inventory"
                 ]
-            ]
+            ],
+            "text": {
+                "contents": "",
+                "s": 0
+            }
         },
         {
             "draw": 0,
@@ -417,7 +390,11 @@
                     "nextview",
                     "main"
                 ]
-            ]
+            ],
+            "text": {
+                "contents": "Load Game",
+                "s": 0
+            }
         },
         {
             "draw": 6,
@@ -442,7 +419,11 @@
                     "nextview",
                     "main"
                 ]
-            ]
+            ],
+            "text": {
+                "contents": "New Game",
+                "s": 0
+            }
         }
     ],
     "view": [

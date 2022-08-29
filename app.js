@@ -602,9 +602,9 @@
       $gl.drawArrays(TYPES[mode], first, count);
     }
   };
-  const gl_useTexture = (texture, location) => {
+  const gl_useTexture = (tex, location) => {
     $gl.activeTexture($gl.TEXTURE0);
-    $gl.bindTexture($gl.TEXTURE_2D, texture.tex);
+    $gl.bindTexture($gl.TEXTURE_2D, tex);
     $gl.uniform1i(location, 0);
   };
   const cvs_create = (width, height) => {
@@ -710,22 +710,15 @@
     return data;
   };
   let $imageLoading = 0;
-  const decodeTexture = (data) => {
-    if (data.cvs) {
-      const cvs = cvs_create(data.cvs.width, data.cvs.height);
-      cvs_text(cvs, data.cvs.text);
-      data.cvs = cvs;
-      data.tex = gl_createGLTexture2D(data.cvs, data.s);
-    } else {
-      data.tex = null;
-      const img = new Image();
-      img.onload = () => {
-        data.tex = gl_createGLTexture2D(img, data.s);
-        $imageLoading -= 1;
-      };
-      img.src = "img/" + data.src;
-      $imageLoading += 1;
-    }
+  const decodeImage = (data) => {
+    data.tex = null;
+    const img = new Image();
+    img.onload = () => {
+      data.tex = gl_createGLTexture2D(img, data.s);
+      $imageLoading -= 1;
+    };
+    img.src = "img/" + data.src;
+    $imageLoading += 1;
     return data;
   };
   const $data = {
@@ -744,8 +737,8 @@
       if (json.mesh) {
         json.mesh = json.mesh.map((data) => decodeMesh(data));
       }
-      if (json.texture) {
-        json.texture = json.texture.map((data) => decodeTexture(data));
+      if (json.image) {
+        json.image = json.image.map((data) => decodeImage(data));
       }
       if (json.shader) {
         json.shader = json.shader.map((data) => decodeShader(data));
@@ -777,8 +770,8 @@
   const data_mesh = (no) => {
     return data_lookup("mesh", no);
   };
-  const data_texture = (no) => {
-    return data_lookup("texture", no);
+  const data_image = (no) => {
+    return data_lookup("image", no);
   };
   const data_shader = (no) => {
     return data_lookup("shader", no);
@@ -797,9 +790,6 @@
   };
   const data_view_index = (name) => {
     return $data.index.view.findIndex((o) => o.n === name);
-  };
-  const data_texture_index = (name) => {
-    return $data.index.texture.findIndex((o) => o.n === name);
   };
   const data_item_index = (name) => {
     return $data.index.item.findIndex((o) => o.n === name);
@@ -1132,7 +1122,9 @@
         $co[no] = {
           m: new Float32Array(16),
           value: null,
-          state: STATE_RESET
+          state: STATE_RESET,
+          img: null,
+          cvs: null
         };
       }
       const co = $co[no];
@@ -1162,6 +1154,13 @@
         const m = mat4scale(data.w / 2 * ratio, data.h / 2 * ratio, 1);
         mat4translated(m, ox + data.x * ratio, -(oy + data.y * ratio), 0);
         co.m.set(m);
+      }
+      if (data.text) {
+        if (co.img === null) {
+          co.cvs = cvs_create(data.w, data.h);
+          cvs_text(co.cvs, data.text.contents);
+          co.img = gl_createGLTexture2D(co.cvs, data.text.s);
+        }
       }
     }
   };
@@ -1275,9 +1274,11 @@
     }
     $gl.bindVertexArray(mesh.vao);
     $gl.uniformMatrix4fv(shader.u.vp, false, data.ortho ? $view.cam.o : $view.cam.vp);
-    const tex = data_texture(data.texture);
-    if (tex) {
-      gl_useTexture(tex, shader.u.tex0);
+    const img = data_image(data.image);
+    if (img) {
+      gl_useTexture(img.tex, shader.u.tex0);
+    } else {
+      gl_useTexture(null, shader.u.tex0);
     }
     for (let i = 0; i < count; ++i) {
       func(shader.u, i);
@@ -1336,6 +1337,9 @@
       }
       draw_call(data.draw, 1, (u, i) => {
         $gl.uniformMatrix4fv(u.w, false, co.m);
+        if (co.img) {
+          gl_useTexture(co.img, u.tex0);
+        }
       });
     }
   };
@@ -1494,11 +1498,7 @@
   define_action("inventory_prev", () => {
     item_set_cursor(-1);
   });
-  define_action("inventory", (tex) => {
-    const data = data_texture(data_texture_index(tex));
-    if (!data) {
-      return;
-    }
+  define_action("inventory", () => {
     let text = "";
     for (let i = 0; i < $item.s.length; ++i) {
       if ($item.i === i) {
@@ -1526,8 +1526,16 @@
         }
       }
     }
-    cvs_text(data.cvs, text);
-    gl_updateGLTexture2D(data.tex, data.cvs);
+    const no = data_component_index("inventory");
+    const co = $co[no];
+    if (!co) {
+      return;
+    }
+    if (!co.cvs) {
+      return;
+    }
+    cvs_text(co.cvs, text);
+    gl_updateGLTexture2D(co.img, co.cvs);
   });
   define_action("activate", () => {
     const ranges = tile_ranges($pos.x, $pos.y, $pos.ha);
