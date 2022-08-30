@@ -153,7 +153,7 @@
             "shader": 1,
             "image": 0,
             "depth": false,
-            "alpha": false,
+            "alpha": true,
             "ortho": true
         },
         {
@@ -179,30 +179,6 @@
             "depth": true,
             "alpha": false,
             "ortho": false
-        },
-        {
-            "mesh": 3,
-            "shader": 1,
-            "image": -1,
-            "depth": false,
-            "alpha": true,
-            "ortho": true
-        },
-        {
-            "mesh": 3,
-            "shader": 1,
-            "image": -1,
-            "depth": false,
-            "alpha": false,
-            "ortho": true
-        },
-        {
-            "mesh": 3,
-            "shader": 1,
-            "image": -1,
-            "depth": false,
-            "alpha": false,
-            "ortho": true
         }
     ],
     "item": [
@@ -236,6 +212,27 @@
         }
     ],
     "component": [
+        {
+            "draw": 0,
+            "x": 0,
+            "y": -128,
+            "w": 512,
+            "h": 20,
+            "ox": 0,
+            "oy": 1,
+            "interact": 1,
+            "gamepad": "",
+            "keyboard": "",
+            "action": [
+                [
+                    "activate-target"
+                ]
+            ],
+            "text": {
+                "contents": "",
+                "s": 0
+            }
+        },
         {
             "draw": 0,
             "x": -256,
@@ -305,7 +302,7 @@
             ]
         },
         {
-            "draw": 4,
+            "draw": 0,
             "x": 128,
             "y": 0,
             "w": 256,
@@ -371,7 +368,7 @@
             "action": null
         },
         {
-            "draw": 5,
+            "draw": 0,
             "x": 160,
             "y": 0,
             "w": 256,
@@ -397,7 +394,7 @@
             }
         },
         {
-            "draw": 6,
+            "draw": 0,
             "x": -160,
             "y": 0,
             "w": 256,
@@ -431,22 +428,23 @@
             "skybox": 1,
             "draw3d": true,
             "component": [
-                5,
-                7,
                 6,
-                3,
-                2,
+                8,
+                7,
                 4,
+                3,
+                5,
+                1,
                 0,
-                1
+                2
             ]
         },
         {
             "skybox": -1,
             "draw3d": false,
             "component": [
-                9,
-                8
+                10,
+                9
             ]
         }
     ]
