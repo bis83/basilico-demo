@@ -15,6 +15,7 @@ component = [
 
     # activate
     "activate",
+    "activate-target",
 
     # misc
     "button-escape",

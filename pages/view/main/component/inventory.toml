@@ -1,7 +1,7 @@
 [[component]]
 name = "inventory"
 
-draw = "inventory"
+draw = "ui-rect"
 x = 128
 y = 0
 width = 256
@@ -16,10 +16,3 @@ action = [
 
 [component.text]
 contents = ""
-
-[[draw]]
-name = "inventory"
-mesh = "rect"
-shader = "mesh-pt"
-ortho = true
-alpha = true

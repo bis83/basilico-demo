@@ -1,7 +1,7 @@
 [[component]]
 name = "button-newgame"
 
-draw = "ui-newgame"
+draw = "ui-rect"
 x = -160
 y = 0
 width = 256
@@ -18,9 +18,3 @@ action = [
 
 [component.text]
 contents = "New Game"
-
-[[draw]]
-name = "ui-newgame"
-mesh = "rect"
-shader = "mesh-pt"
-ortho = true

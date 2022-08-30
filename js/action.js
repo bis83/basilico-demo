@@ -87,3 +87,31 @@ define_action("activate", () => {
         tile_prop_del(r.x, r.y);
     }
 });
+
+define_action("activate-target", () => {
+    let text = "";
+    const ranges = tile_ranges($pos.x, $pos.y, $pos.ha);
+    for(const r of ranges) {
+        const tile = tile_prop(r.x, r.y);
+        if(!tile) {
+            continue;
+        }
+        const data = data_tile(tile.no);
+        if(!data) {
+            continue;
+        }
+        text += data.desc;
+        text += "\n";
+    }
+
+    const no = data_component_index("activate-target");
+    const co = $co[no];
+    if(!co) {
+        return;
+    }
+    if(!co.cvs) {
+        return;
+    }
+    cvs_text(co.cvs, text);
+    gl_updateGLTexture2D(co.img, co.cvs);
+});

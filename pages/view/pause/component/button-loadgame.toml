@@ -1,7 +1,7 @@
 [[component]]
 name = "button-loadgame"
 
-draw = "ui-loadgame"
+draw = "ui-rect"
 x = 160
 y = 0
 width = 256
@@ -17,9 +17,3 @@ action = [
 
 [component.text]
 contents = "Load Game"
-
-[[draw]]
-name = "ui-loadgame"
-mesh = "rect"
-shader = "mesh-pt"
-ortho = true

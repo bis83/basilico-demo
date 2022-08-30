@@ -1,0 +1,18 @@
+[[component]]
+name = "activate-target"
+
+draw = "ui-rect"
+x = 0
+y = -128
+width = 512
+height = 20
+origin-x = 0.0
+origin-y = 1.0
+
+interact = "always"
+action = [
+    ["activate-target"],
+]
+
+[component.text]
+contents = ""
