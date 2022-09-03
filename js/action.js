@@ -73,24 +73,13 @@ define_action("inventory", () => {
 });
 
 define_action("activate", () => {
-    const ranges = tile_ranges($pos.x, $pos.y, $pos.ha);
-    for(const r of ranges) {
-        const tile = tile_prop(r.x, r.y);
-        if(!tile) {
-            continue;
-        }
-        const data = data_tile(tile.no);
-        if(!data) {
-            continue;
-        }
-        item_gain(data.item, data.item_count);
-        tile_prop_del(r.x, r.y);
-    }
+    const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+    hit_activate(ranges);
 });
 
 define_action("activate-target", () => {
     let text = "";
-    const ranges = tile_ranges($pos.x, $pos.y, $pos.ha);
+    const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
     for(const r of ranges) {
         const tile = tile_prop(r.x, r.y);
         if(!tile) {
