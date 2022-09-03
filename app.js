@@ -921,16 +921,6 @@
   const tile_decode = (data) => {
     return data;
   };
-  const tile_ranges = (x, y, ha) => {
-    let ranges = [];
-    const h = deg2rad(ha);
-    x += Math.cos(h) * 0.8;
-    y += Math.sin(h) * 0.8;
-    x = Math.floor(x);
-    y = Math.floor(y);
-    ranges.push({ x, y });
-    return ranges;
-  };
   const $pos_eyeh = 1.75;
   const $pos = {
     x: 0,
@@ -987,6 +977,30 @@
   };
   const item_decode = (data) => {
     return data;
+  };
+  const hit_ranges = (x, y, ha) => {
+    let ranges = [];
+    const h = deg2rad(ha);
+    x += Math.cos(h) * 0.8;
+    y += Math.sin(h) * 0.8;
+    x = Math.floor(x);
+    y = Math.floor(y);
+    ranges.push({ x, y });
+    return ranges;
+  };
+  const hit_activate = (ranges) => {
+    for (const r of ranges) {
+      const tile = tile_prop(r.x, r.y);
+      if (!tile) {
+        continue;
+      }
+      const data = data_tile(tile.no);
+      if (!data) {
+        continue;
+      }
+      item_gain(data.item, data.item_count);
+      tile_prop_del(r.x, r.y);
+    }
   };
   const $co = [];
   const co_value = (name) => {
@@ -1538,23 +1552,12 @@
     gl_updateGLTexture2D(co.img, co.cvs);
   });
   define_action("activate", () => {
-    const ranges = tile_ranges($pos.x, $pos.y, $pos.ha);
-    for (const r of ranges) {
-      const tile = tile_prop(r.x, r.y);
-      if (!tile) {
-        continue;
-      }
-      const data = data_tile(tile.no);
-      if (!data) {
-        continue;
-      }
-      item_gain(data.item, data.item_count);
-      tile_prop_del(r.x, r.y);
-    }
+    const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+    hit_activate(ranges);
   });
   define_action("activate-target", () => {
     let text = "";
-    const ranges = tile_ranges($pos.x, $pos.y, $pos.ha);
+    const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
     for (const r of ranges) {
       const tile = tile_prop(r.x, r.y);
       if (!tile) {
