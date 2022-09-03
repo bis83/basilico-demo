@@ -61,15 +61,15 @@ define_action("inventory", () => {
     }
 
     const no = data_component_index("inventory");
-    const co = $co[no];
-    if(!co) {
+    const com = $com[no];
+    if(!com) {
         return;
     }
-    if(!co.cvs) {
+    if(!com.cvs) {
         return;
     }
-    cvs_text(co.cvs, text);
-    gl_updateGLTexture2D(co.img, co.cvs);
+    cvs_text(com.cvs, text);
+    gl_updateGLTexture2D(com.img, com.cvs);
 });
 
 define_action("activate", () => {
@@ -94,13 +94,13 @@ define_action("activate-target", () => {
     }
 
     const no = data_component_index("activate-target");
-    const co = $co[no];
-    if(!co) {
+    const com = $com[no];
+    if(!com) {
         return;
     }
-    if(!co.cvs) {
+    if(!com.cvs) {
         return;
     }
-    cvs_text(co.cvs, text);
-    gl_updateGLTexture2D(co.img, co.cvs);
+    cvs_text(com.cvs, text);
+    gl_updateGLTexture2D(com.img, com.cvs);
 });
