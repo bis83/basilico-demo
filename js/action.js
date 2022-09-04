@@ -1,5 +1,5 @@
 
-define_action("makeworld", () => {
+define_action("makeworld", (self) => {
     const b = data_tile_index("tile");
     const m = data_tile_index("mine");
 
@@ -24,14 +24,14 @@ define_action("makeworld", () => {
     item_gain(data_item_index("pick"), 1);
 });
 
-define_action("inventory_next", () => {
+define_action("inventory_next", (self) => {
     item_set_cursor(1);
 });
-define_action("inventory_prev", () => {
+define_action("inventory_prev", (self) => {
     item_set_cursor(-1);
 });
 
-define_action("inventory", () => {
+define_action("inventory", (self) => {
     let text = "";
     for(let i=0; i<$item.s.length; ++i) {
         if($item.i === i) {
@@ -59,25 +59,16 @@ define_action("inventory", () => {
             }
         }
     }
-
-    const no = data_component_index("inventory");
-    const com = $com[no];
-    if(!com) {
-        return;
-    }
-    if(!com.cvs) {
-        return;
-    }
-    cvs_text(com.cvs, text);
-    gl_updateGLTexture2D(com.img, com.cvs);
+    cvs_text(self.cvs, text);
+    gl_updateGLTexture2D(self.img, self.cvs);
 });
 
-define_action("activate", () => {
+define_action("activate", (self) => {
     const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
     hit_activate(ranges);
 });
 
-define_action("activate-target", () => {
+define_action("activate-target", (self) => {
     let text = "";
     const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
     for(const r of ranges) {
@@ -92,15 +83,6 @@ define_action("activate-target", () => {
         text += data.desc;
         text += "\n";
     }
-
-    const no = data_component_index("activate-target");
-    const com = $com[no];
-    if(!com) {
-        return;
-    }
-    if(!com.cvs) {
-        return;
-    }
-    cvs_text(com.cvs, text);
-    gl_updateGLTexture2D(com.img, com.cvs);
+    cvs_text(self.cvs, text);
+    gl_updateGLTexture2D(self.img, self.cvs);
 });
