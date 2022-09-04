@@ -2,11 +2,12 @@
 name = "button-escape"
 
 draw = "ui-rect"
-x = 0
-y = -64
+x = -64
+y = 64
 width = 48
 height = 48
-origin-y = 1.0
+origin-x = 1.0
+origin-y = -1.0
 
 interact = "button"
 gamepad = "b9"
