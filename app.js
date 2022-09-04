@@ -638,14 +638,14 @@
     $audio = new AudioContext();
   };
   const $action = {};
-  const action_invoke = (action) => {
+  const action_invoke = (self, action) => {
     for (const act of action) {
       const func = $action[act[0]];
       if (!func) {
         continue;
       }
       const args = act.slice(1);
-      func(...args);
+      func(self, ...args);
     }
   };
   const define_action = (label, func) => {
@@ -1142,6 +1142,21 @@
         };
       }
       const com = $com[no];
+      if (data.draw >= 0) {
+        const ratio = window.devicePixelRatio;
+        const ox = data.ox * w / 2;
+        const oy = data.oy * h / 2;
+        const m = mat4scale(data.w / 2 * ratio, data.h / 2 * ratio, 1);
+        mat4translated(m, ox + data.x * ratio, -(oy + data.y * ratio), 0);
+        com.m.set(m);
+      }
+      if (data.text) {
+        if (com.img === null) {
+          com.cvs = cvs_create(data.w, data.h);
+          cvs_text(com.cvs, data.text.contents);
+          com.img = gl_createGLTexture2D(com.cvs, data.text.s);
+        }
+      }
       switch (data.interact) {
         case 1:
           com.value = true;
@@ -1159,22 +1174,7 @@
           break;
       }
       if (com.value && data.action) {
-        action_invoke(data.action);
-      }
-      if (data.draw >= 0) {
-        const ratio = window.devicePixelRatio;
-        const ox = data.ox * w / 2;
-        const oy = data.oy * h / 2;
-        const m = mat4scale(data.w / 2 * ratio, data.h / 2 * ratio, 1);
-        mat4translated(m, ox + data.x * ratio, -(oy + data.y * ratio), 0);
-        com.m.set(m);
-      }
-      if (data.text) {
-        if (com.img === null) {
-          com.cvs = cvs_create(data.w, data.h);
-          cvs_text(com.cvs, data.text.contents);
-          com.img = gl_createGLTexture2D(com.cvs, data.text.s);
-        }
+        action_invoke(com, data.action);
       }
     }
   };
@@ -1404,21 +1404,21 @@
     };
     tick();
   });
-  define_action("nextview", (view) => {
+  define_action("nextview", (self, view) => {
     view_next(view);
   });
-  define_action("resetview", () => {
+  define_action("resetview", (self) => {
     view_reset();
   });
-  define_action("newgame", (slot) => {
+  define_action("newgame", (self, slot) => {
     $view.slot = slot;
     newgame();
   });
-  define_action("loadgame", (slot) => {
+  define_action("loadgame", (self, slot) => {
     $view.slot = slot;
     loadgame();
   });
-  define_action("savegame", () => {
+  define_action("savegame", (self) => {
     savegame();
   });
   const pos_adjust = (x, y, dx, dy) => {
@@ -1485,10 +1485,10 @@
       $pos.h = h;
     }
   };
-  define_action("fpsmove", (lstick, rstick) => {
+  define_action("fpsmove", (self, lstick, rstick) => {
     pos_fps_movement(lstick, rstick);
   });
-  define_action("makeworld", () => {
+  define_action("makeworld", (self) => {
     const b = data_tile_index("tile");
     const m = data_tile_index("mine");
     tile_init_empty(64, 64);
@@ -1506,13 +1506,13 @@
     item_init_empty(8);
     item_gain(data_item_index("pick"), 1);
   });
-  define_action("inventory_next", () => {
+  define_action("inventory_next", (self) => {
     item_set_cursor(1);
   });
-  define_action("inventory_prev", () => {
+  define_action("inventory_prev", (self) => {
     item_set_cursor(-1);
   });
-  define_action("inventory", () => {
+  define_action("inventory", (self) => {
     let text = "";
     for (let i = 0; i < $item.s.length; ++i) {
       if ($item.i === i) {
@@ -1540,22 +1540,14 @@
         }
       }
     }
-    const no = data_component_index("inventory");
-    const com = $com[no];
-    if (!com) {
-      return;
-    }
-    if (!com.cvs) {
-      return;
-    }
-    cvs_text(com.cvs, text);
-    gl_updateGLTexture2D(com.img, com.cvs);
+    cvs_text(self.cvs, text);
+    gl_updateGLTexture2D(self.img, self.cvs);
   });
-  define_action("activate", () => {
+  define_action("activate", (self) => {
     const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
     hit_activate(ranges);
   });
-  define_action("activate-target", () => {
+  define_action("activate-target", (self) => {
     let text = "";
     const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
     for (const r of ranges) {
@@ -1570,15 +1562,7 @@
       text += data.desc;
       text += "\n";
     }
-    const no = data_component_index("activate-target");
-    const com = $com[no];
-    if (!com) {
-      return;
-    }
-    if (!com.cvs) {
-      return;
-    }
-    cvs_text(com.cvs, text);
-    gl_updateGLTexture2D(com.img, com.cvs);
+    cvs_text(self.cvs, text);
+    gl_updateGLTexture2D(self.img, self.cvs);
   });
 })();
