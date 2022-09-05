@@ -114,7 +114,7 @@
             "sid": 1
         }
     ],
-    "component": [
+    "com": [
         {
             "n": "activate-target",
             "p": 0,

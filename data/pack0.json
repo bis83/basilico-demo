@@ -211,7 +211,7 @@
             "item_count": 0
         }
     ],
-    "component": [
+    "com": [
         {
             "draw": 0,
             "x": 0,
@@ -427,7 +427,7 @@
         {
             "skybox": 1,
             "draw3d": true,
-            "component": [
+            "com": [
                 6,
                 8,
                 7,
@@ -442,7 +442,7 @@
         {
             "skybox": -1,
             "draw3d": false,
-            "component": [
+            "com": [
                 10,
                 9
             ]

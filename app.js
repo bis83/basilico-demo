@@ -785,20 +785,27 @@
   const data_tile = (no) => {
     return data_lookup("tile", no);
   };
-  const data_component = (no) => {
-    return data_lookup("component", no);
+  const data_com = (no) => {
+    return data_lookup("com", no);
+  };
+  const data_lookup_index = (type, name) => {
+    const table = $data.index[type];
+    if (!table) {
+      return -1;
+    }
+    return table.findIndex((o) => o.n === name);
   };
   const data_view_index = (name) => {
-    return $data.index.view.findIndex((o) => o.n === name);
+    return data_lookup_index("view", name);
   };
   const data_item_index = (name) => {
-    return $data.index.item.findIndex((o) => o.n === name);
+    return data_lookup_index("item", name);
   };
   const data_tile_index = (name) => {
-    return $data.index.tile.findIndex((o) => o.n === name);
+    return data_lookup_index("tile", name);
   };
-  const data_component_index = (name) => {
-    return $data.index.component.findIndex((o) => o.n === name);
+  const data_com_index = (name) => {
+    return data_lookup_index("com", name);
   };
   const data_loaded = () => {
     if ($data.index === null) {
@@ -1004,7 +1011,7 @@
   };
   const $com = [];
   const com_value = (name) => {
-    const no = data_component_index(name);
+    const no = data_com_index(name);
     if (no < 0) {
       return null;
     }
@@ -1119,7 +1126,7 @@
       com.value = xy_normalize(x, y);
     }
   };
-  const component_tick = (view) => {
+  const com_tick = (view) => {
     const w = window.innerWidth;
     const h = window.innerHeight;
     for (const com of $com) {
@@ -1127,8 +1134,8 @@
         com.value = null;
       }
     }
-    for (let no of view.component) {
-      const data = data_component(no);
+    for (let no of view.com) {
+      const data = data_com(no);
       if (!data) {
         continue;
       }
@@ -1230,7 +1237,7 @@
     if (!view) {
       return;
     }
-    component_tick(view);
+    com_tick(view);
     view_tick_after();
   };
   const newgame = () => {
@@ -1336,9 +1343,9 @@
       }
     }
   };
-  const draw_component = (view) => {
-    for (let no of view.component) {
-      const data = data_component(no);
+  const draw_com = (view) => {
+    for (let no of view.com) {
+      const data = data_com(no);
       if (!data) {
         continue;
       }
@@ -1372,7 +1379,7 @@
     if (view.draw3d) {
       draw_tile();
     }
-    draw_component(view);
+    draw_com(view);
   };
   const init = () => {
     gl_init();
