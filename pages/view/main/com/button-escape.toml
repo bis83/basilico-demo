@@ -1,4 +1,4 @@
-[[component]]
+[[com]]
 name = "button-escape"
 
 draw = "ui-rect"

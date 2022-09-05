@@ -1,4 +1,4 @@
-[[component]]
+[[com]]
 name = "activate-target"
 
 draw = "ui-rect"
@@ -14,5 +14,5 @@ action = [
     ["activate-target"],
 ]
 
-[component.text]
+[com.text]
 contents = ""

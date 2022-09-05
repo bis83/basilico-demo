@@ -1,4 +1,4 @@
-[[component]]
+[[com]]
 name = "button-newgame"
 
 draw = "ui-rect"
@@ -16,5 +16,5 @@ action = [
     ["nextview", "main"],
 ]
 
-[component.text]
+[com.text]
 contents = "New Game"

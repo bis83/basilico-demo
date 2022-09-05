@@ -1,4 +1,4 @@
-[[component]]
+[[com]]
 name = "right-stick"
 
 draw = "ui-rect"

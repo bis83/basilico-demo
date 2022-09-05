@@ -1,4 +1,4 @@
-[[component]]
+[[com]]
 name = "button-inventory-next"
 
 draw = "ui-rect"

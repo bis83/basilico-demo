@@ -1,4 +1,4 @@
-[[component]]
+[[com]]
 name = "inventory"
 
 draw = "ui-rect"
@@ -14,5 +14,5 @@ action = [
     ["inventory"],
 ]
 
-[component.text]
+[com.text]
 contents = ""
