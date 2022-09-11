@@ -1005,8 +1005,10 @@
       if (!data) {
         continue;
       }
-      item_gain(data.item, data.item_count);
-      tile_prop_del(r.x, r.y);
+      if (data.mine) {
+        item_gain(data.mine.item, data.mine.count);
+        tile_prop_del(r.x, r.y);
+      }
     }
   };
   const $com = [];

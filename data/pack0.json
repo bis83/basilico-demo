@@ -199,16 +199,16 @@
             "desc": "素材が採掘できる岩場",
             "draw": 2,
             "height": 5,
-            "item": 1,
-            "item_count": 10
+            "mine": {
+                "item": 1,
+                "count": 10
+            }
         },
         {
             "text": "タイル",
             "desc": "何の変哲もない足場",
             "draw": 3,
-            "height": 1,
-            "item": -1,
-            "item_count": 0
+            "height": 1
         }
     ],
     "com": [
