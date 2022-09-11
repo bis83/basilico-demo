@@ -6,8 +6,9 @@ draw = "mine"
 height = 5
 save-id = 2
 
+[tile.mine]
 item = "rock"
-item-count = 10
+count = 10
 
 [[draw]]
 name = "mine"
