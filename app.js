@@ -995,7 +995,9 @@
     ranges.push({ x, y });
     return ranges;
   };
-  const hit_activate = (ranges) => {
+  const HIT_ACTIVATE = 1;
+  const HIT_MINING = 2;
+  const hit = (hit2, ranges) => {
     for (const r of ranges) {
       const tile = tile_prop(r.x, r.y);
       if (!tile) {
@@ -1005,9 +1007,13 @@
       if (!data) {
         continue;
       }
-      if (data.mine) {
-        item_gain(data.mine.item, data.mine.count);
-        tile_prop_del(r.x, r.y);
+      if (hit2 === HIT_ACTIVATE) {
+      }
+      if (hit2 === HIT_MINING) {
+        if (data.mine) {
+          item_gain(data.mine.item, data.mine.count);
+          tile_prop_del(r.x, r.y);
+        }
       }
     }
   };
@@ -1041,15 +1047,15 @@
   const com_button = (com, data) => {
     const mode = $listen.mode;
     if (mode === GAMEPAD_MODE_POINTER) {
-      let hit = false;
+      let hit2 = false;
       const click = $listen.click;
       for (let c of click) {
         if (com_hit_click(data, [c.x, c.y])) {
-          hit = true;
+          hit2 = true;
           break;
         }
       }
-      if (hit) {
+      if (hit2) {
         com.value = true;
         com.state = BUTTON_STATE_PRESSED;
       } else {
@@ -1552,9 +1558,26 @@
     cvs_text(self.cvs, text);
     gl_updateGLTexture2D(self.img, self.cvs);
   });
+  define_action("hand", (self) => {
+    const item = item_select();
+    if (!item) {
+      return;
+    }
+    const data = data_item(item.no);
+    if (!data) {
+      return;
+    }
+    if (!data.hand) {
+      return;
+    }
+    const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+    hit(data.hand.hit, ranges);
+  });
+  define_action("off-hand", (self) => {
+  });
   define_action("activate", (self) => {
     const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
-    hit_activate(ranges);
+    hit(HIT_ACTIVATE, ranges);
   });
   define_action("activate-target", (self) => {
     let text = "";

@@ -121,7 +121,7 @@
             "i": 0
         },
         {
-            "n": "activate",
+            "n": "button-activate",
             "p": 0,
             "i": 1
         },
@@ -131,44 +131,54 @@
             "i": 2
         },
         {
-            "n": "button-inventory-next",
+            "n": "button-hand",
             "p": 0,
             "i": 3
         },
         {
-            "n": "button-inventory-prev",
+            "n": "button-inventory-next",
             "p": 0,
             "i": 4
         },
         {
-            "n": "inventory",
+            "n": "button-inventory-prev",
             "p": 0,
             "i": 5
         },
         {
-            "n": "left-stick",
+            "n": "button-off-hand",
             "p": 0,
             "i": 6
         },
         {
-            "n": "movement",
+            "n": "inventory",
             "p": 0,
             "i": 7
         },
         {
-            "n": "right-stick",
+            "n": "left-stick",
             "p": 0,
             "i": 8
         },
         {
-            "n": "button-loadgame",
+            "n": "movement",
             "p": 0,
             "i": 9
         },
         {
-            "n": "button-newgame",
+            "n": "right-stick",
             "p": 0,
             "i": 10
+        },
+        {
+            "n": "button-loadgame",
+            "p": 0,
+            "i": 11
+        },
+        {
+            "n": "button-newgame",
+            "p": 0,
+            "i": 12
         }
     ],
     "view": [
