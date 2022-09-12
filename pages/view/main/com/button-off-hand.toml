@@ -1,0 +1,17 @@
+[[com]]
+name = "button-off-hand"
+
+draw = "ui-rect"
+x = 256
+y = -64
+width = 48
+height = 48
+origin-x = -1.0
+origin-y = 1.0
+
+interact = "button"
+gamepad = "lt"
+keyboard = "c"
+action = [
+    ["off-hand"],
+]

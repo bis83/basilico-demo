@@ -1,0 +1,17 @@
+[[com]]
+name = "button-activate"
+
+draw = "ui-rect"
+x = -256
+y = -128
+width = 48
+height = 48
+origin-x = 1.0
+origin-y = 1.0
+
+interact = "button"
+gamepad = "b0"
+keyboard = "space"
+action = [
+    ["activate"],
+]

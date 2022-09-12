@@ -13,8 +13,12 @@ com = [
     "button-inventory-next",
     "inventory",
 
+    # hand
+    "button-hand",
+    "button-off-hand",
+
     # activate
-    "activate",
+    "button-activate",
     "activate-target",
 
     # misc

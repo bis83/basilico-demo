@@ -63,9 +63,28 @@ define_action("inventory", (self) => {
     gl_updateGLTexture2D(self.img, self.cvs);
 });
 
+define_action("hand", (self) => {
+    const item = item_select();
+    if(!item) {
+        return;
+    }
+    const data = data_item(item.no);
+    if(!data) {
+        return;
+    }
+    if(!data.hand) {
+        return;        
+    }
+    const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+    hit(data.hand.hit, ranges);
+});
+
+define_action("off-hand", (self) => {
+});
+
 define_action("activate", (self) => {
     const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
-    hit_activate(ranges);
+    hit(HIT_ACTIVATE, ranges);
 });
 
 define_action("activate-target", (self) => {
