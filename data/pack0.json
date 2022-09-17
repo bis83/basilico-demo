@@ -462,8 +462,10 @@
     ],
     "view": [
         {
-            "skybox": 1,
             "draw3d": true,
+            "draw": [
+                1
+            ],
             "com": [
                 8,
                 10,
@@ -479,8 +481,8 @@
             ]
         },
         {
-            "skybox": -1,
             "draw3d": false,
+            "draw": null,
             "com": [
                 12,
                 11
