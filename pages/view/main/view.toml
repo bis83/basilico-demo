@@ -1,7 +1,9 @@
 [[view]]
 name = "main"
 draw3d = true
-skybox = "skybox"
+draw = [
+    "skybox",
+]
 com = [
     # movement
     "left-stick",
