@@ -1008,6 +1008,9 @@
         continue;
       }
       if (hit2 === HIT_ACTIVATE) {
+        if (data.device) {
+          action_invoke(tile, data.device.action);
+        }
       }
       if (hit2 === HIT_MINING) {
         if (data.mine) {
@@ -1507,6 +1510,7 @@
   define_action("makeworld", (self) => {
     const b = data_tile_index("tile");
     const m = data_tile_index("mine");
+    const s = data_tile_index("savepoint");
     tile_init_empty(64, 64);
     for (let x = 24; x <= 40; ++x) {
       for (let y = 24; y <= 40; ++y) {
@@ -1518,6 +1522,7 @@
     tile_prop_set(35, 29, m);
     tile_prop_set(29, 35, m);
     tile_prop_set(35, 35, m);
+    tile_prop_set(30, 30, s);
     pos_init($tile.w / 2 + 0.5, $tile.h / 2 + 0.5);
     item_init_empty(8);
     item_gain(data_item_index("pick"), 1);

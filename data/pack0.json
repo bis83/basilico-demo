@@ -208,6 +208,19 @@
             }
         },
         {
+            "text": "セーブポイント",
+            "desc": "状態をセーブできます",
+            "draw": 2,
+            "height": 5,
+            "device": {
+                "action": [
+                    [
+                        "savegame"
+                    ]
+                ]
+            }
+        },
+        {
             "text": "タイル",
             "desc": "何の変哲もない足場",
             "draw": 3,
@@ -418,7 +431,7 @@
             "action": [
                 [
                     "loadgame",
-                    "slot0"
+                    "data0"
                 ],
                 [
                     "nextview",
@@ -444,7 +457,7 @@
             "action": [
                 [
                     "newgame",
-                    "slot0"
+                    "data0"
                 ],
                 [
                     "makeworld"
