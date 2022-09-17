@@ -11,7 +11,7 @@ interact = "button"
 gamepad = "b9"
 keyboard = "x"
 action = [
-    ["loadgame", "slot0"],
+    ["loadgame", "data0"],
     ["nextview", "main"],
 ]
 

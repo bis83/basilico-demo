@@ -2,6 +2,7 @@
 define_action("makeworld", (self) => {
     const b = data_tile_index("tile");
     const m = data_tile_index("mine");
+    const s = data_tile_index("savepoint");
 
     // tile
     tile_init_empty(64, 64);
@@ -15,6 +16,7 @@ define_action("makeworld", (self) => {
     tile_prop_set(35, 29, m);
     tile_prop_set(29, 35, m);
     tile_prop_set(35, 35, m);
+    tile_prop_set(30, 30, s);
 
     // pos
     pos_init($tile.w/2 + 0.5, $tile.h/2 + 0.5);
