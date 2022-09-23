@@ -184,6 +184,29 @@
     m[13] = y;
     m[14] = z;
   };
+  const mat4angle = (ha, va) => {
+    const h = deg2rad(ha);
+    const sinH = Math.sin(h);
+    const cosH = Math.cos(h);
+    return [
+      cosH,
+      sinH,
+      0,
+      0,
+      -sinH,
+      cosH,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ];
+  };
   const mat4scale = (x, y, z) => {
     return [
       x,
@@ -908,12 +931,12 @@
     }
     $tile.a[i] = { no, count: 1 };
   };
-  const tile_prop_set = (x, y, no) => {
+  const tile_prop_set = (x, y, no, ha) => {
     const i = tile_index(x, y);
     if (i < 0) {
       return;
     }
-    $tile.b[i] = { no, dir: 0 };
+    $tile.b[i] = { no, ha: ha || 0 };
   };
   const tile_prop_del = (x, y) => {
     const i = tile_index(x, y);
@@ -1348,7 +1371,9 @@
         const h = tile_base_height(x, y);
         draw_call(data.draw, 1, (u, i) => {
           const pos = tile_to_world(x, y, h);
-          $view.m.set(mat4translate(pos[0], pos[1], pos[2]));
+          const m = mat4angle(tile.ha || 0, tile.va || 0);
+          mat4translated(m, pos[0] + 1, pos[1] + 1, pos[2]);
+          $view.m.set(m);
           $gl.uniformMatrix4fv(u.w, false, $view.m);
         });
       }
@@ -1522,7 +1547,7 @@
     tile_prop_set(35, 29, m);
     tile_prop_set(29, 35, m);
     tile_prop_set(35, 35, m);
-    tile_prop_set(30, 30, s);
+    tile_prop_set(30, 30, s, 45);
     pos_init($tile.w / 2 + 0.5, $tile.h / 2 + 0.5);
     item_init_empty(8);
     item_gain(data_item_index("pick"), 1);
