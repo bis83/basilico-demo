@@ -16,7 +16,7 @@ define_action("makeworld", (self) => {
     tile_prop_set(35, 29, m);
     tile_prop_set(29, 35, m);
     tile_prop_set(35, 35, m);
-    tile_prop_set(30, 30, s);
+    tile_prop_set(30, 30, s, 45);
 
     // pos
     pos_init($tile.w/2 + 0.5, $tile.h/2 + 0.5);
