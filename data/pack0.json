@@ -175,6 +175,14 @@
         {
             "mesh": 2,
             "shader": 1,
+            "image": 1,
+            "depth": true,
+            "alpha": false,
+            "ortho": false
+        },
+        {
+            "mesh": 2,
+            "shader": 1,
             "image": 2,
             "depth": true,
             "alpha": false,
@@ -193,7 +201,10 @@
         {
             "text": "石材",
             "desc": "何の変哲もない石",
-            "icon": 0
+            "icon": 0,
+            "tile": {
+                "tile": 1
+            }
         }
     ],
     "tile": [
@@ -206,6 +217,12 @@
                 "item": 1,
                 "count": 10
             }
+        },
+        {
+            "text": "タイル",
+            "desc": "石で出来た足場",
+            "draw": 3,
+            "height": 1
         },
         {
             "text": "セーブポイント",
@@ -223,7 +240,7 @@
         {
             "text": "タイル",
             "desc": "何の変哲もない足場",
-            "draw": 3,
+            "draw": 4,
             "height": 1
         }
     ],

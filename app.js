@@ -929,7 +929,11 @@
     if (i < 0) {
       return;
     }
-    $tile.a[i] = { no, count: 1 };
+    if ($tile.a[i] && $tile.a[i].no === no) {
+      $tile.a[i].count += 1;
+    } else {
+      $tile.a[i] = { no, count: 1 };
+    }
   };
   const tile_prop_set = (x, y, no, ha) => {
     const i = tile_index(x, y);
@@ -996,6 +1000,16 @@
     }
     $item.s[i].num += num;
   };
+  const item_lose = (no, num) => {
+    const i = item_index(no);
+    if (i < 0) {
+      return;
+    }
+    $item.s[i].num -= num;
+    if ($item.s[i].num <= 0) {
+      $item.s[i] = null;
+    }
+  };
   const item_init_empty = (slot) => {
     slot = slot || 0;
     $item.s.length = slot;
@@ -1020,7 +1034,9 @@
   };
   const HIT_ACTIVATE = 1;
   const HIT_MINING = 2;
-  const hit = (hit2, ranges) => {
+  const HIT_TILE_SET = 3;
+  const hit_activate = (ranges) => {
+    let result2 = 0;
     for (const r of ranges) {
       const tile = tile_prop(r.x, r.y);
       if (!tile) {
@@ -1030,18 +1046,54 @@
       if (!data) {
         continue;
       }
-      if (hit2 === HIT_ACTIVATE) {
-        if (data.device) {
-          action_invoke(tile, data.device.action);
-        }
-      }
-      if (hit2 === HIT_MINING) {
-        if (data.mine) {
-          item_gain(data.mine.item, data.mine.count);
-          tile_prop_del(r.x, r.y);
-        }
+      if (data.device) {
+        action_invoke(tile, data.device.action);
+        result2 += 1;
       }
     }
+    return result2;
+  };
+  const hit_mining = (ranges) => {
+    let result2 = 0;
+    for (const r of ranges) {
+      const tile = tile_prop(r.x, r.y);
+      if (!tile) {
+        continue;
+      }
+      const data = data_tile(tile.no);
+      if (!data) {
+        continue;
+      }
+      if (data.mine) {
+        item_gain(data.mine.item, data.mine.count);
+        tile_prop_del(r.x, r.y);
+        result2 += 1;
+      }
+    }
+    return result2;
+  };
+  const hit_tile_set = (value, ranges) => {
+    let result2 = 0;
+    for (const r of ranges) {
+      if (tile_prop(r.x, r.y) != null) {
+        continue;
+      }
+      tile_base_set(r.x, r.y, value);
+      result2 += 1;
+    }
+    return result2;
+  };
+  const hit = (hit2, value, ranges) => {
+    if (hit2 === HIT_ACTIVATE) {
+      return hit_activate(ranges);
+    }
+    if (hit2 === HIT_MINING) {
+      return hit_mining(ranges);
+    }
+    if (hit2 === HIT_TILE_SET) {
+      return hit_tile_set(value, ranges);
+    }
+    return result;
   };
   const $com = [];
   const com_value = (name) => {
@@ -1598,17 +1650,23 @@
     if (!data) {
       return;
     }
-    if (!data.hand) {
-      return;
+    if (data.hand) {
+      const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+      hit(data.hand.hit, 0, ranges);
     }
-    const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
-    hit(data.hand.hit, ranges);
+    if (data.tile) {
+      const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+      const result2 = hit(HIT_TILE_SET, data.tile.tile, ranges);
+      if (result2 > 0) {
+        item_lose(item.no, result2);
+      }
+    }
   });
   define_action("off-hand", (self) => {
   });
   define_action("activate", (self) => {
     const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
-    hit(HIT_ACTIVATE, ranges);
+    hit(HIT_ACTIVATE, 0, ranges);
   });
   define_action("activate-target", (self) => {
     let text = "";
