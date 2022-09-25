@@ -74,11 +74,17 @@ define_action("hand", (self) => {
     if(!data) {
         return;
     }
-    if(!data.hand) {
-        return;        
+    if(data.hand) {
+        const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+        hit(data.hand.hit, 0, ranges);
     }
-    const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
-    hit(data.hand.hit, ranges);
+    if(data.tile) {
+        const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+        const result = hit(HIT_TILE_SET, data.tile.tile, ranges);
+        if(result > 0) {
+            item_lose(item.no, result);
+        }
+    }
 });
 
 define_action("off-hand", (self) => {
@@ -86,7 +92,7 @@ define_action("off-hand", (self) => {
 
 define_action("activate", (self) => {
     const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
-    hit(HIT_ACTIVATE, ranges);
+    hit(HIT_ACTIVATE, 0, ranges);
 });
 
 define_action("activate-target", (self) => {
