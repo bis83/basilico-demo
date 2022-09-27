@@ -1135,13 +1135,12 @@
   const com_hit_click = (data, point) => {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    const ratio = window.devicePixelRatio;
     const ox = w / 2 + w / 2 * data.ox;
     const oy = h / 2 + h / 2 * data.oy;
-    const minX = ox + (data.x - data.w / 2) * ratio;
-    const maxX = ox + (data.x + data.w / 2) * ratio;
-    const minY = oy + (data.y - data.h / 2) * ratio;
-    const maxY = oy + (data.y + data.h / 2) * ratio;
+    const minX = ox + (data.x - data.w / 2);
+    const maxX = ox + (data.x + data.w / 2);
+    const minY = oy + (data.y - data.h / 2);
+    const maxY = oy + (data.y + data.h / 2);
     return xy_hit_rect(point, minX, maxX, minY, maxY);
   };
   const com_button = (com, data) => {
@@ -1258,11 +1257,10 @@
       }
       const com = $com[no];
       if (data.draw >= 0) {
-        const ratio = window.devicePixelRatio;
         const ox = data.ox * w / 2;
         const oy = data.oy * h / 2;
-        const m = mat4scale(data.w / 2 * ratio, data.h / 2 * ratio, 1);
-        mat4translated(m, ox + data.x * ratio, -(oy + data.y * ratio), 0);
+        const m = mat4scale(data.w / 2, data.h / 2, 1);
+        mat4translated(m, ox + data.x, -(oy + data.y), 0);
         com.m.set(m);
       }
       if (data.text) {
