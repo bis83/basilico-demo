@@ -942,6 +942,13 @@
     }
     $tile.b[i] = { no, ha: ha || 0 };
   };
+  const tile_base_del = (x, y) => {
+    const i = tile_index(x, y);
+    if (i < 0) {
+      return;
+    }
+    $tile.a[i] = null;
+  };
   const tile_prop_del = (x, y) => {
     const i = tile_index(x, y);
     if (i < 0) {
@@ -1034,9 +1041,10 @@
   };
   const HIT_ACTIVATE = 1;
   const HIT_MINING = 2;
-  const HIT_TILE_SET = 3;
+  const HIT_DIG = 3;
+  const HIT_TILE_SET = 4;
   const hit_activate = (ranges) => {
-    let result2 = 0;
+    let result = 0;
     for (const r of ranges) {
       const tile = tile_prop(r.x, r.y);
       if (!tile) {
@@ -1048,13 +1056,13 @@
       }
       if (data.device) {
         action_invoke(tile, data.device.action);
-        result2 += 1;
+        result += 1;
       }
     }
-    return result2;
+    return result;
   };
   const hit_mining = (ranges) => {
-    let result2 = 0;
+    let result = 0;
     for (const r of ranges) {
       const tile = tile_prop(r.x, r.y);
       if (!tile) {
@@ -1067,21 +1075,32 @@
       if (data.mine) {
         item_gain(data.mine.item, data.mine.count);
         tile_prop_del(r.x, r.y);
-        result2 += 1;
+        result += 1;
       }
     }
-    return result2;
+    return result;
+  };
+  const hit_dig = (ranges) => {
+    let result = 0;
+    for (const r of ranges) {
+      if (tile_prop(r.x, r.y) != null) {
+        continue;
+      }
+      tile_base_del(r.x, r.y);
+      result += 1;
+    }
+    return result;
   };
   const hit_tile_set = (value, ranges) => {
-    let result2 = 0;
+    let result = 0;
     for (const r of ranges) {
       if (tile_prop(r.x, r.y) != null) {
         continue;
       }
       tile_base_set(r.x, r.y, value);
-      result2 += 1;
+      result += 1;
     }
-    return result2;
+    return result;
   };
   const hit = (hit2, value, ranges) => {
     if (hit2 === HIT_ACTIVATE) {
@@ -1090,10 +1109,13 @@
     if (hit2 === HIT_MINING) {
       return hit_mining(ranges);
     }
+    if (hit2 === HIT_DIG) {
+      return hit_dig(ranges);
+    }
     if (hit2 === HIT_TILE_SET) {
       return hit_tile_set(value, ranges);
     }
-    return result;
+    return 0;
   };
   const $com = [];
   const com_value = (name) => {
@@ -1603,6 +1625,7 @@
     pos_init($tile.w / 2 + 0.5, $tile.h / 2 + 0.5);
     item_init_empty(8);
     item_gain(data_item_index("pick"), 1);
+    item_gain(data_item_index("shovel"), 1);
   });
   define_action("inventory_next", (self) => {
     item_set_cursor(1);
@@ -1656,9 +1679,9 @@
     }
     if (data.tile) {
       const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
-      const result2 = hit(HIT_TILE_SET, data.tile.tile, ranges);
-      if (result2 > 0) {
-        item_lose(item.no, result2);
+      const result = hit(HIT_TILE_SET, data.tile.tile, ranges);
+      if (result > 0) {
+        item_lose(item.no, result);
       }
     }
   });
