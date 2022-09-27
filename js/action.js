@@ -24,6 +24,7 @@ define_action("makeworld", (self) => {
     // item
     item_init_empty(8);
     item_gain(data_item_index("pick"), 1);
+    item_gain(data_item_index("shovel"), 1);
 });
 
 define_action("inventory_next", (self) => {
