@@ -1,0 +1,13 @@
+[[tile]]
+name = "sand-tile"
+text = "タイル"
+desc = "砂で出来た足場"
+draw = "sand-tile"
+save-id = 102
+
+[[draw]]
+name = "sand-tile"
+mesh = "tile"
+shader = "mesh-pt"
+image = "sand"
+depth = true

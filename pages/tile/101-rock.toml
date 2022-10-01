@@ -9,5 +9,5 @@ save-id = 101
 name = "rock-tile"
 mesh = "tile"
 shader = "mesh-pt"
-image = "mine"
+image = "rock"
 depth = true

@@ -1,21 +1,3 @@
-[[tile]]
-name = "mine"
-text = "鉱物"
-desc = "素材が採掘できる岩場"
-draw = "mine"
-save-id = 200
-
-[tile.mine]
-item = "rock"
-count = 10
-
-[[draw]]
-name = "mine"
-mesh = "mine"
-shader = "mesh-pt"
-image = "mine"
-depth = true
-
 [[mesh]]
 name = "mine"
 position = [
@@ -62,7 +44,3 @@ index = [
   5, 1, 4,
   4, 1, 0,
 ]
-
-[[image]]
-name = "mine"
-src = "mine.png"

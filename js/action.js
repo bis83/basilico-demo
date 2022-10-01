@@ -1,7 +1,8 @@
 
 define_action("makeworld", (self) => {
-    const b = data_tile_index("tile");
-    const m = data_tile_index("mine");
+    const b = data_tile_index("dirt-tile");
+    const m0 = data_tile_index("rock-mine");
+    const m1 = data_tile_index("sand-mine");
     const s = data_tile_index("savepoint");
 
     // tile
@@ -11,11 +12,11 @@ define_action("makeworld", (self) => {
             tile_base_push(tile_get(x, y), b);
         }
     }
-    tile_set(tile_get(24, 24), m);
-    tile_set(tile_get(29, 29), m);
-    tile_set(tile_get(35, 29), m);
-    tile_set(tile_get(29, 35), m);
-    tile_set(tile_get(35, 35), m);
+    tile_set(tile_get(24, 24), m0);
+    tile_set(tile_get(29, 29), m1);
+    tile_set(tile_get(35, 29), m0);
+    tile_set(tile_get(29, 35), m1);
+    tile_set(tile_get(35, 35), m0);
     tile_set(tile_get(30, 30), s, 45);
 
     // pos

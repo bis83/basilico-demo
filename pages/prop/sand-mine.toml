@@ -1,0 +1,21 @@
+[[tile]]
+name = "sand-mine"
+text = "砂の山"
+desc = "砂が採掘できる山場"
+draw = "sand-mine"
+save-id = 200
+
+[tile.mine]
+item = "sand"
+count = 10
+
+[[draw]]
+name = "sand-mine"
+mesh = "mine"
+shader = "mesh-pt"
+image = "sand"
+depth = true
+
+[[image]]
+name = "sand"
+src = "sand.png"
