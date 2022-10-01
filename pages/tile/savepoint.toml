@@ -3,7 +3,6 @@ name = "savepoint"
 text = "セーブポイント"
 desc = "状態をセーブできます"
 draw = "mine"
-height = 5
 save-id = 300
 
 [tile.device]

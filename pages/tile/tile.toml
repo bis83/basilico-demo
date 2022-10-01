@@ -3,7 +3,6 @@ name = "tile"
 text = "タイル"
 desc = "何の変哲もない足場"
 draw = "tile"
-height = 1
 save-id = 100
 
 [[draw]]
