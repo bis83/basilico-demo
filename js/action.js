@@ -8,15 +8,15 @@ define_action("makeworld", (self) => {
     tile_init_empty(64, 64);
     for(let x=24; x<=40; ++x) {
         for(let y=24; y<=40; ++y) {
-            tile_base_set(x, y, b);
+            tile_base_push(tile_get(x, y), b);
         }
     }
-    tile_prop_set(24, 24, m);
-    tile_prop_set(29, 29, m);
-    tile_prop_set(35, 29, m);
-    tile_prop_set(29, 35, m);
-    tile_prop_set(35, 35, m);
-    tile_prop_set(30, 30, s, 45);
+    tile_set(tile_get(24, 24), m);
+    tile_set(tile_get(29, 29), m);
+    tile_set(tile_get(35, 29), m);
+    tile_set(tile_get(29, 35), m);
+    tile_set(tile_get(35, 35), m);
+    tile_set(tile_get(30, 30), s, 45);
 
     // pos
     pos_init($tile.w/2 + 0.5, $tile.h/2 + 0.5);
@@ -81,7 +81,7 @@ define_action("hand", (self) => {
     }
     if(data.tile) {
         const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
-        const result = hit(HIT_TILE_SET, data.tile.tile, ranges);
+        const result = hit(HIT_PUT, data.tile.tile, ranges);
         if(result > 0) {
             item_lose(item.no, result);
         }
@@ -100,7 +100,7 @@ define_action("activate-target", (self) => {
     let text = "";
     const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
     for(const r of ranges) {
-        const tile = tile_prop(r.x, r.y);
+        const tile = tile_get(r.x, r.y);
         if(!tile) {
             continue;
         }
