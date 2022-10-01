@@ -855,8 +855,22 @@
   const $tile = {
     w: 0,
     h: 0,
-    a: [],
-    b: []
+    t: []
+  };
+  const tile_init_empty = (w, h) => {
+    w = w || 0;
+    h = h || 0;
+    $tile.w = w;
+    $tile.h = h;
+    $tile.t = [];
+    $tile.t.length = w * h;
+    for (let i = 0; i < $tile.t.length; ++i) {
+      $tile.t[i] = {
+        base: [],
+        no: -1,
+        ha: 0
+      };
+    }
   };
   const tile_index = (x, y) => {
     x = Math.floor(x);
@@ -869,81 +883,65 @@
     }
     return x + y * $tile.h;
   };
-  const tile_base = (x, y) => {
-    return $tile.a[tile_index(x, y)];
+  const tile_get = (x, y) => {
+    return $tile.t[tile_index(x, y)];
   };
-  const tile_prop = (x, y) => {
-    return $tile.b[tile_index(x, y)];
-  };
-  const tile_height = (x, y) => {
-    const tile = tile_base(x, y);
+  const tile_is_empty = (tile) => {
     if (!tile) {
-      return 0;
-    }
-    const data = data_tile(tile.no);
-    if (!data) {
-      return 0;
-    }
-    return tile.count;
-  };
-  const tile_is_empty = (x, y) => {
-    return tile_base(x, y) == null;
-  };
-  const tile_is_noentry = (x, y, dx, dy) => {
-    if (tile_is_empty(x + dx, y + dy)) {
       return true;
     }
-    if (tile_prop(x + dx, y + dy)) {
+    return tile.base.length <= 0 && tile.no < 0;
+  };
+  const tile_is_prop = (tile) => {
+    if (!tile) {
+      return false;
+    }
+    return tile.no >= 0;
+  };
+  const tile_is_noentry = (tile, h0) => {
+    if (tile_is_empty(tile)) {
       return true;
     }
-    const h0 = tile_height(x, y);
-    const h1 = tile_height(x + dx, y + dy);
+    if (tile_is_prop(tile)) {
+      return true;
+    }
+    const h1 = tile_height(tile);
     if (Math.abs(h0 - h1) > 1) {
       return true;
     }
     return false;
   };
-  const tile_init_empty = (w, h) => {
-    w = w || 0;
-    h = h || 0;
-    $tile.w = w;
-    $tile.h = h;
-    $tile.a = [];
-    $tile.a.length = w * h;
-    $tile.b = [];
-    $tile.b.length = w * h;
+  const tile_height = (tile) => {
+    if (!tile) {
+      return 0;
+    }
+    return tile.base.length;
   };
-  const tile_base_set = (x, y, no) => {
-    const i = tile_index(x, y);
-    if (i < 0) {
+  const tile_set = (tile, no, ha) => {
+    if (!tile) {
       return;
     }
-    if ($tile.a[i] && $tile.a[i].no === no) {
-      $tile.a[i].count += 1;
-    } else {
-      $tile.a[i] = { no, count: 1 };
-    }
+    tile.no = no;
+    tile.ha = ha || 0;
   };
-  const tile_prop_set = (x, y, no, ha) => {
-    const i = tile_index(x, y);
-    if (i < 0) {
+  const tile_del = (tile) => {
+    if (!tile) {
       return;
     }
-    $tile.b[i] = { no, ha: ha || 0 };
+    tile.no = -1;
+    tile.ha = 0;
   };
-  const tile_base_del = (x, y) => {
-    const i = tile_index(x, y);
-    if (i < 0) {
+  const tile_base_push = (tile, no) => {
+    if (!tile) {
       return;
     }
-    $tile.a[i] = null;
+    tile.base.push(no);
   };
-  const tile_prop_del = (x, y) => {
-    const i = tile_index(x, y);
-    if (i < 0) {
+  const tile_base_pop = (tile) => {
+    if (!tile) {
       return;
     }
-    $tile.b[i] = null;
+    tile.base.pop();
   };
   const tile_encode = (data) => {
     return data;
@@ -1031,11 +1029,11 @@
   const HIT_ACTIVATE = 1;
   const HIT_MINING = 2;
   const HIT_DIG = 3;
-  const HIT_TILE_SET = 4;
+  const HIT_PUT = 4;
   const hit_activate = (ranges) => {
     let result = 0;
     for (const r of ranges) {
-      const tile = tile_prop(r.x, r.y);
+      const tile = tile_get(r.x, r.y);
       if (!tile) {
         continue;
       }
@@ -1053,7 +1051,7 @@
   const hit_mining = (ranges) => {
     let result = 0;
     for (const r of ranges) {
-      const tile = tile_prop(r.x, r.y);
+      const tile = tile_get(r.x, r.y);
       if (!tile) {
         continue;
       }
@@ -1063,7 +1061,7 @@
       }
       if (data.mine) {
         item_gain(data.mine.item, data.mine.count);
-        tile_prop_del(r.x, r.y);
+        tile_del(tile);
         result += 1;
       }
     }
@@ -1072,21 +1070,26 @@
   const hit_dig = (ranges) => {
     let result = 0;
     for (const r of ranges) {
-      if (tile_prop(r.x, r.y) != null) {
+      const tile = tile_get(r.x, r.y);
+      if (tile_is_empty(tile)) {
         continue;
       }
-      tile_base_del(r.x, r.y);
+      if (tile_is_prop(tile)) {
+        continue;
+      }
+      tile_base_pop(tile);
       result += 1;
     }
     return result;
   };
-  const hit_tile_set = (value, ranges) => {
+  const hit_put = (value, ranges) => {
     let result = 0;
     for (const r of ranges) {
-      if (tile_prop(r.x, r.y) != null) {
+      const tile = tile_get(r.x, r.y);
+      if (tile_is_prop(tile)) {
         continue;
       }
-      tile_base_set(r.x, r.y, value);
+      tile_base_push(tile, value);
       result += 1;
     }
     return result;
@@ -1101,8 +1104,8 @@
     if (hit2 === HIT_DIG) {
       return hit_dig(ranges);
     }
-    if (hit2 === HIT_TILE_SET) {
-      return hit_tile_set(value, ranges);
+    if (hit2 === HIT_PUT) {
+      return hit_put(value, ranges);
     }
     return 0;
   };
@@ -1373,7 +1376,7 @@
     gl_resizeCanvas();
     gl_clear();
   };
-  const draw_call = (no, count, func) => {
+  const draw_call = (no, func) => {
     const data = data_draw(no);
     if (!data) {
       return;
@@ -1396,41 +1399,33 @@
     } else {
       gl_useTexture(null, shader.u.tex0);
     }
-    for (let i = 0; i < count; ++i) {
-      func(shader.u, i);
-      gl_drawMesh(mesh);
-    }
+    func(shader.u);
+    gl_drawMesh(mesh);
   };
   const draw_tile = () => {
     for (let x = 0; x < $tile.w; ++x) {
       for (let y = 0; y < $tile.h; ++y) {
-        const tile = tile_base(x, y);
+        const tile = tile_get(x, y);
         if (!tile) {
           continue;
+        }
+        for (let i = 0; i < tile.base.length; ++i) {
+          const data2 = data_tile(tile.base[i]);
+          if (!data2) {
+            continue;
+          }
+          draw_call(data2.draw, (u) => {
+            const pos = tile_to_world(x, y, i);
+            $view.m.set(mat4translate(pos[0], pos[1], pos[2]));
+            $gl.uniformMatrix4fv(u.w, false, $view.m);
+          });
         }
         const data = data_tile(tile.no);
         if (!data) {
           continue;
         }
-        draw_call(data.draw, tile.count, (u, i) => {
-          const pos = tile_to_world(x, y, i);
-          $view.m.set(mat4translate(pos[0], pos[1], pos[2]));
-          $gl.uniformMatrix4fv(u.w, false, $view.m);
-        });
-      }
-    }
-    for (let x = 0; x < $tile.w; ++x) {
-      for (let y = 0; y < $tile.h; ++y) {
-        const tile = tile_prop(x, y);
-        if (!tile) {
-          continue;
-        }
-        const data = data_tile(tile.no);
-        if (!data) {
-          continue;
-        }
-        const h = tile_height(x, y);
-        draw_call(data.draw, 1, (u, i) => {
+        const h = tile_height(tile);
+        draw_call(data.draw, (u) => {
           const pos = tile_to_world(x, y, h);
           const m = mat4angle(tile.ha || 0, tile.va || 0);
           mat4translated(m, pos[0] + 1, pos[1] + 1, pos[2]);
@@ -1453,7 +1448,7 @@
       if (!com) {
         continue;
       }
-      draw_call(data.draw, 1, (u, i) => {
+      draw_call(data.draw, (u) => {
         $gl.uniformMatrix4fv(u.w, false, com.m);
         if (com.img) {
           gl_useTexture(com.img, u.tex0);
@@ -1468,7 +1463,7 @@
     }
     if (data.draw) {
       for (let no of data.draw) {
-        draw_call(no, 1, (u, i) => {
+        draw_call(no, (u) => {
           $view.m.set(mat4translate(...$view.cam.eye));
           $gl.uniformMatrix4fv(u.w, false, $view.m);
         });
@@ -1530,30 +1525,31 @@
     const ix = Math.floor(x);
     const iy = Math.floor(y);
     const r = 0.25;
+    const h0 = tile_height(tile_get(ix, iy));
     let xx = x + dx;
     let yy = y + dy;
-    if (tile_is_noentry(ix, iy, -1, 0)) {
+    if (tile_is_noentry(tile_get(ix - 1, iy), h0)) {
       xx = Math.max(xx, ix + r);
     }
-    if (tile_is_noentry(ix, iy, 1, 0)) {
+    if (tile_is_noentry(tile_get(ix + 1, iy), h0)) {
       xx = Math.min(xx, ix - r + 1);
     }
-    if (tile_is_noentry(ix, iy, 0, -1)) {
+    if (tile_is_noentry(tile_get(ix, iy - 1), h0)) {
       yy = Math.max(yy, iy + r);
     }
-    if (tile_is_noentry(ix, iy, 0, 1)) {
+    if (tile_is_noentry(tile_get(ix, iy + 1), h0)) {
       yy = Math.min(yy, iy - r + 1);
     }
-    if (tile_is_noentry(ix, iy, -1, -1)) {
+    if (tile_is_noentry(tile_get(ix - 1, iy - 1), h0)) {
       [xx, yy] = xy_bounds([xx, yy], r, [ix, iy]);
     }
-    if (tile_is_noentry(ix, iy, -1, 1)) {
+    if (tile_is_noentry(tile_get(ix - 1, iy + 1), h0)) {
       [xx, yy] = xy_bounds([xx, yy], r, [ix, iy + 1]);
     }
-    if (tile_is_noentry(ix, iy, 1, -1)) {
+    if (tile_is_noentry(tile_get(ix + 1, iy - 1), h0)) {
       [xx, yy] = xy_bounds([xx, yy], r, [ix + 1, iy]);
     }
-    if (tile_is_noentry(ix, iy, 1, 1)) {
+    if (tile_is_noentry(tile_get(ix + 1, iy + 1), h0)) {
       [xx, yy] = xy_bounds([xx, yy], r, [ix + 1, iy + 1]);
     }
     return [xx, yy];
@@ -1582,7 +1578,7 @@
     } else {
       [$pos.x, $pos.y] = pos_adjust($pos.x, $pos.y, 0, 0);
     }
-    const h = tile_height($pos.x, $pos.y);
+    const h = tile_height(tile_get($pos.x, $pos.y));
     if (Math.abs(h - $pos.h) <= 2) {
       const vh = h - $pos.h;
       $pos.h += 10 * dt * vh;
@@ -1600,15 +1596,15 @@
     tile_init_empty(64, 64);
     for (let x = 24; x <= 40; ++x) {
       for (let y = 24; y <= 40; ++y) {
-        tile_base_set(x, y, b);
+        tile_base_push(tile_get(x, y), b);
       }
     }
-    tile_prop_set(24, 24, m);
-    tile_prop_set(29, 29, m);
-    tile_prop_set(35, 29, m);
-    tile_prop_set(29, 35, m);
-    tile_prop_set(35, 35, m);
-    tile_prop_set(30, 30, s, 45);
+    tile_set(tile_get(24, 24), m);
+    tile_set(tile_get(29, 29), m);
+    tile_set(tile_get(35, 29), m);
+    tile_set(tile_get(29, 35), m);
+    tile_set(tile_get(35, 35), m);
+    tile_set(tile_get(30, 30), s, 45);
     pos_init($tile.w / 2 + 0.5, $tile.h / 2 + 0.5);
     item_init_empty(8);
     item_gain(data_item_index("pick"), 1);
@@ -1666,7 +1662,7 @@
     }
     if (data.tile) {
       const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
-      const result = hit(HIT_TILE_SET, data.tile.tile, ranges);
+      const result = hit(HIT_PUT, data.tile.tile, ranges);
       if (result > 0) {
         item_lose(item.no, result);
       }
@@ -1682,7 +1678,7 @@
     let text = "";
     const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
     for (const r of ranges) {
-      const tile = tile_prop(r.x, r.y);
+      const tile = tile_get(r.x, r.y);
       if (!tile) {
         continue;
       }
