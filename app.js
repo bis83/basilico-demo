@@ -770,7 +770,7 @@
     });
   };
   const data_lookup = (type, no) => {
-    if (no < 0) {
+    if (no <= 0) {
       return null;
     }
     const table = $data.index[type];
@@ -814,9 +814,13 @@
   const data_lookup_index = (type, name) => {
     const table = $data.index[type];
     if (!table) {
-      return -1;
+      return 0;
     }
-    return table.findIndex((o) => o.n === name);
+    const i = table.findIndex((o) => o && o.n === name);
+    if (i <= 0) {
+      return 0;
+    }
+    return i;
   };
   const data_view_index = (name) => {
     return data_lookup_index("view", name);
@@ -867,7 +871,7 @@
     for (let i = 0; i < $tile.t.length; ++i) {
       $tile.t[i] = {
         base: [],
-        no: -1,
+        no: 0,
         ha: 0
       };
     }
@@ -890,13 +894,13 @@
     if (!tile) {
       return true;
     }
-    return tile.base.length <= 0 && tile.no < 0;
+    return tile.base.length <= 0 && tile.no <= 0;
   };
   const tile_is_prop = (tile) => {
     if (!tile) {
       return false;
     }
-    return tile.no >= 0;
+    return tile.no > 0;
   };
   const tile_is_noentry = (tile, h0) => {
     if (tile_is_empty(tile)) {
@@ -928,7 +932,7 @@
     if (!tile) {
       return;
     }
-    tile.no = -1;
+    tile.no = 0;
     tile.ha = 0;
   };
   const tile_base_push = (tile, no) => {
@@ -1112,7 +1116,7 @@
   const $com = [];
   const com_value = (name) => {
     const no = data_com_index(name);
-    if (no < 0) {
+    if (no <= 0) {
       return null;
     }
     const com = $com[no];
@@ -1248,7 +1252,7 @@
         };
       }
       const com = $com[no];
-      if (data.draw >= 0) {
+      if (data.draw > 0) {
         const ox = data.ox * w / 2;
         const oy = data.oy * h / 2;
         const m = mat4scale(data.w / 2, data.h / 2, 1);
@@ -1441,7 +1445,7 @@
       if (!data) {
         continue;
       }
-      if (data.draw < 0) {
+      if (data.draw <= 0) {
         continue;
       }
       const com = $com[no];
@@ -1590,8 +1594,9 @@
     pos_fps_movement(lstick, rstick);
   });
   define_action("makeworld", (self) => {
-    const b = data_tile_index("tile");
-    const m = data_tile_index("mine");
+    const b = data_tile_index("dirt-tile");
+    const m0 = data_tile_index("rock-mine");
+    const m1 = data_tile_index("sand-mine");
     const s = data_tile_index("savepoint");
     tile_init_empty(64, 64);
     for (let x = 24; x <= 40; ++x) {
@@ -1599,11 +1604,11 @@
         tile_base_push(tile_get(x, y), b);
       }
     }
-    tile_set(tile_get(24, 24), m);
-    tile_set(tile_get(29, 29), m);
-    tile_set(tile_get(35, 29), m);
-    tile_set(tile_get(29, 35), m);
-    tile_set(tile_get(35, 35), m);
+    tile_set(tile_get(24, 24), m0);
+    tile_set(tile_get(29, 29), m1);
+    tile_set(tile_get(35, 29), m0);
+    tile_set(tile_get(29, 35), m1);
+    tile_set(tile_get(35, 35), m0);
     tile_set(tile_get(30, 30), s, 45);
     pos_init($tile.w / 2 + 0.5, $tile.h / 2 + 0.5);
     item_init_empty(8);

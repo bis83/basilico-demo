@@ -1,13 +1,14 @@
 {
-    "initial_view": 1,
+    "initial_view": 2,
     "mesh": [
+        null,
         {
-            "n": "skybox",
+            "n": "mine",
             "p": 0,
             "i": 0
         },
         {
-            "n": "mine",
+            "n": "skybox",
             "p": 0,
             "i": 1
         },
@@ -38,23 +39,30 @@
         }
     ],
     "image": [
+        null,
         {
             "n": "icon",
             "p": 0,
             "i": 0
         },
         {
-            "n": "mine",
+            "n": "rock",
             "p": 0,
             "i": 1
         },
         {
-            "n": "tile",
+            "n": "sand",
             "p": 0,
             "i": 2
+        },
+        {
+            "n": "tile",
+            "p": 0,
+            "i": 3
         }
     ],
     "shader": [
+        null,
         {
             "n": "mesh-pc",
             "p": 0,
@@ -67,33 +75,45 @@
         }
     ],
     "draw": [
+        null,
         {
             "n": "ui-rect",
             "p": 0,
             "i": 0
         },
         {
-            "n": "skybox",
+            "n": "rock-mine",
             "p": 0,
             "i": 1
         },
         {
-            "n": "mine",
+            "n": "sand-mine",
             "p": 0,
             "i": 2
         },
         {
-            "n": "rock-tile",
+            "n": "skybox",
             "p": 0,
             "i": 3
         },
         {
-            "n": "tile",
+            "n": "dirt-tile",
             "p": 0,
             "i": 4
+        },
+        {
+            "n": "rock-tile",
+            "p": 0,
+            "i": 5
+        },
+        {
+            "n": "sand-tile",
+            "p": 0,
+            "i": 6
         }
     ],
     "item": [
+        null,
         {
             "n": "pick",
             "p": 0,
@@ -105,23 +125,29 @@
             "i": 1
         },
         {
-            "n": "shovel",
+            "n": "sand",
             "p": 0,
             "i": 2
+        },
+        {
+            "n": "shovel",
+            "p": 0,
+            "i": 3
         }
     ],
     "tile": [
+        null,
         {
-            "n": "mine",
+            "n": "rock-mine",
             "p": 0,
             "i": 0,
             "sid": 200
         },
         {
-            "n": "rock-tile",
+            "n": "sand-mine",
             "p": 0,
             "i": 1,
-            "sid": 101
+            "sid": 200
         },
         {
             "n": "savepoint",
@@ -130,13 +156,26 @@
             "sid": 300
         },
         {
-            "n": "tile",
+            "n": "dirt-tile",
             "p": 0,
             "i": 3,
             "sid": 100
+        },
+        {
+            "n": "rock-tile",
+            "p": 0,
+            "i": 4,
+            "sid": 101
+        },
+        {
+            "n": "sand-tile",
+            "p": 0,
+            "i": 5,
+            "sid": 102
         }
     ],
     "com": [
+        null,
         {
             "n": "activate-target",
             "p": 0,
@@ -204,6 +243,7 @@
         }
     ],
     "view": [
+        null,
         {
             "n": "main",
             "p": 0,

@@ -1,21 +1,6 @@
 {
     "mesh": [
         {
-            "b": "AACAvwAAgL8AAIC/AACAPwAAgL8AAIC/AACAvwAAgD8AAIC/AACAPwAAgD8AAIC/AACAvwAAgL8AAIA/AACAPwAAgL8AAIA/AACAvwAAgD8AAIA/AACAPwAAgD8AAIA/CAgI/wgICP8ICAj/CAgI/7TI8P+0yPD/tMjw/7TI8P8=",
-            "bv": [
-                0,
-                0,
-                2,
-                96
-            ],
-            "i": "AAACAAEAAQACAAMAAQADAAUABQADAAcABQAHAAQABAAHAAYABAAGAAAAAAAGAAIAAgAGAAMAAwAGAAcABQAEAAEAAQAEAAAA",
-            "iv": [
-                3,
-                0,
-                36
-            ]
-        },
-        {
             "b": "AACAvwAAgL8AAAAAAACAPwAAgL8AAAAAAACAvwAAgD8AAAAAAACAPwAAgD8AAAAAAACAvwAAgL8AACBAAACAPwAAgL8AACBAAACAvwAAgD8AACBAAACAPwAAgD8AACBAICAg/yAgIP8gICD/ICAg/0BAQP9AQED/QEBA/0BAQP8AAAAAADwAAAAAADwAPAA8ADQANAA6ADQANAA6ADoAOg==",
             "bv": [
                 0,
@@ -26,6 +11,21 @@
                 128
             ],
             "i": "AAABAAIAAgABAAMAAQAFAAMAAwAFAAcABQAEAAcABwAEAAYABAAAAAYABgAAAAIAAgADAAYABgADAAcABQABAAQABAABAAAA",
+            "iv": [
+                3,
+                0,
+                36
+            ]
+        },
+        {
+            "b": "AACAvwAAgL8AAIC/AACAPwAAgL8AAIC/AACAvwAAgD8AAIC/AACAPwAAgD8AAIC/AACAvwAAgL8AAIA/AACAPwAAgL8AAIA/AACAvwAAgD8AAIA/AACAPwAAgD8AAIA/CAgI/wgICP8ICAj/CAgI/7TI8P+0yPD/tMjw/7TI8P8=",
+            "bv": [
+                0,
+                0,
+                2,
+                96
+            ],
+            "i": "AAACAAEAAQACAAMAAQADAAUABQADAAcABQAHAAQABAAHAAYABAAGAAAAAAAGAAIAAgAGAAMAAwAGAAcABQAEAAEAAQAEAAAA",
             "iv": [
                 3,
                 0,
@@ -118,7 +118,11 @@
             "s": 0
         },
         {
-            "src": "mine.png",
+            "src": "rock.png",
+            "s": 0
+        },
+        {
+            "src": "sand.png",
             "s": 0
         },
         {
@@ -149,25 +153,25 @@
     ],
     "draw": [
         {
-            "mesh": 3,
-            "shader": 1,
-            "image": 0,
+            "mesh": 4,
+            "shader": 2,
+            "image": 1,
             "depth": false,
             "alpha": true,
             "ortho": true
         },
         {
-            "mesh": 0,
-            "shader": 0,
-            "image": -1,
-            "depth": false,
+            "mesh": 1,
+            "shader": 2,
+            "image": 2,
+            "depth": true,
             "alpha": false,
             "ortho": false
         },
         {
             "mesh": 1,
-            "shader": 1,
-            "image": 1,
+            "shader": 2,
+            "image": 3,
             "depth": true,
             "alpha": false,
             "ortho": false
@@ -175,15 +179,31 @@
         {
             "mesh": 2,
             "shader": 1,
-            "image": 1,
+            "image": 0,
+            "depth": false,
+            "alpha": false,
+            "ortho": false
+        },
+        {
+            "mesh": 3,
+            "shader": 2,
+            "image": 4,
             "depth": true,
             "alpha": false,
             "ortho": false
         },
         {
-            "mesh": 2,
-            "shader": 1,
+            "mesh": 3,
+            "shader": 2,
             "image": 2,
+            "depth": true,
+            "alpha": false,
+            "ortho": false
+        },
+        {
+            "mesh": 3,
+            "shader": 2,
+            "image": 3,
             "depth": true,
             "alpha": false,
             "ortho": false
@@ -203,7 +223,15 @@
             "desc": "何の変哲もない石",
             "icon": 0,
             "tile": {
-                "tile": 1
+                "tile": 5
+            }
+        },
+        {
+            "text": "砂",
+            "desc": "何の変哲もない砂",
+            "icon": 0,
+            "tile": {
+                "tile": 6
             }
         },
         {
@@ -217,18 +245,22 @@
     ],
     "tile": [
         {
-            "text": "鉱物",
-            "desc": "素材が採掘できる岩場",
+            "text": "石の山",
+            "desc": "石が採掘できる山場",
             "draw": 2,
             "mine": {
-                "item": 1,
+                "item": 2,
                 "count": 10
             }
         },
         {
-            "text": "タイル",
-            "desc": "石で出来た足場",
-            "draw": 3
+            "text": "砂の山",
+            "desc": "砂が採掘できる山場",
+            "draw": 3,
+            "mine": {
+                "item": 3,
+                "count": 10
+            }
         },
         {
             "text": "セーブポイント",
@@ -245,12 +277,22 @@
         {
             "text": "タイル",
             "desc": "何の変哲もない足場",
-            "draw": 4
+            "draw": 5
+        },
+        {
+            "text": "タイル",
+            "desc": "石で出来た足場",
+            "draw": 6
+        },
+        {
+            "text": "タイル",
+            "desc": "砂で出来た足場",
+            "draw": 7
         }
     ],
     "com": [
         {
-            "draw": 0,
+            "draw": 1,
             "x": 0,
             "y": -24,
             "w": 512,
@@ -271,7 +313,7 @@
             }
         },
         {
-            "draw": 0,
+            "draw": 1,
             "x": -256,
             "y": -128,
             "w": 48,
@@ -288,7 +330,7 @@
             ]
         },
         {
-            "draw": 0,
+            "draw": 1,
             "x": -64,
             "y": 64,
             "w": 48,
@@ -305,7 +347,7 @@
             ]
         },
         {
-            "draw": 0,
+            "draw": 1,
             "x": -256,
             "y": -64,
             "w": 48,
@@ -322,7 +364,7 @@
             ]
         },
         {
-            "draw": 0,
+            "draw": 1,
             "x": 60,
             "y": -148,
             "w": 32,
@@ -339,7 +381,7 @@
             ]
         },
         {
-            "draw": 0,
+            "draw": 1,
             "x": 24,
             "y": -148,
             "w": 32,
@@ -356,7 +398,7 @@
             ]
         },
         {
-            "draw": 0,
+            "draw": 1,
             "x": 256,
             "y": -64,
             "w": 48,
@@ -373,7 +415,7 @@
             ]
         },
         {
-            "draw": 0,
+            "draw": 1,
             "x": 128,
             "y": 0,
             "w": 256,
@@ -394,7 +436,7 @@
             }
         },
         {
-            "draw": 0,
+            "draw": 1,
             "x": 128,
             "y": -128,
             "w": 96,
@@ -407,7 +449,7 @@
             "action": null
         },
         {
-            "draw": -1,
+            "draw": 0,
             "x": 0,
             "y": 0,
             "w": 0,
@@ -426,7 +468,7 @@
             ]
         },
         {
-            "draw": 0,
+            "draw": 1,
             "x": -128,
             "y": -128,
             "w": 96,
@@ -439,7 +481,7 @@
             "action": null
         },
         {
-            "draw": 0,
+            "draw": 1,
             "x": 160,
             "y": 0,
             "w": 256,
@@ -465,7 +507,7 @@
             }
         },
         {
-            "draw": 0,
+            "draw": 1,
             "x": -160,
             "y": 0,
             "w": 256,
@@ -498,28 +540,28 @@
         {
             "draw3d": true,
             "draw": [
-                1
+                4
             ],
             "com": [
-                8,
-                10,
                 9,
+                11,
+                10,
+                6,
                 5,
+                8,
                 4,
                 7,
-                3,
-                6,
+                2,
                 1,
-                0,
-                2
+                3
             ]
         },
         {
             "draw3d": false,
             "draw": null,
             "com": [
-                12,
-                11
+                13,
+                12
             ]
         }
     ]
