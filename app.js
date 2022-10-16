@@ -301,7 +301,7 @@
       1
     ];
   };
-  const tile_to_world = (x, y, h) => {
+  const grid_to_world = (x, y, h) => {
     return [x * 2, y * 2, h * 0.5];
   };
   const GAMEPAD_MODE_POINTER = 0;
@@ -856,101 +856,101 @@
     $timer.t = time;
     $timer.n += 1;
   };
-  const $tile = {
+  const $grid = {
     w: 0,
     h: 0,
     t: []
   };
-  const tile_init_empty = (w, h) => {
+  const grid_init_empty = (w, h) => {
     w = w || 0;
     h = h || 0;
-    $tile.w = w;
-    $tile.h = h;
-    $tile.t = [];
-    $tile.t.length = w * h;
-    for (let i = 0; i < $tile.t.length; ++i) {
-      $tile.t[i] = {
+    $grid.w = w;
+    $grid.h = h;
+    $grid.t = [];
+    $grid.t.length = w * h;
+    for (let i = 0; i < $grid.t.length; ++i) {
+      $grid.t[i] = {
         base: [],
         no: 0,
         ha: 0
       };
     }
   };
-  const tile_index = (x, y) => {
+  const grid_index = (x, y) => {
     x = Math.floor(x);
     y = Math.floor(y);
-    if (x < 0 || $tile.w <= x) {
+    if (x < 0 || $grid.w <= x) {
       return -1;
     }
-    if (y < 0 || $tile.h <= y) {
+    if (y < 0 || $grid.h <= y) {
       return -1;
     }
-    return x + y * $tile.h;
+    return x + y * $grid.h;
   };
-  const tile_get = (x, y) => {
-    return $tile.t[tile_index(x, y)];
+  const grid_get = (x, y) => {
+    return $grid.t[grid_index(x, y)];
   };
-  const tile_is_empty = (tile) => {
+  const grid_is_empty = (tile) => {
     if (!tile) {
       return true;
     }
     return tile.base.length <= 0 && tile.no <= 0;
   };
-  const tile_is_prop = (tile) => {
+  const grid_is_prop = (tile) => {
     if (!tile) {
       return false;
     }
     return tile.no > 0;
   };
-  const tile_is_noentry = (tile, h0) => {
-    if (tile_is_empty(tile)) {
+  const grid_is_noentry = (tile, h0) => {
+    if (grid_is_empty(tile)) {
       return true;
     }
-    if (tile_is_prop(tile)) {
+    if (grid_is_prop(tile)) {
       return true;
     }
-    const h1 = tile_height(tile);
+    const h1 = grid_height(tile);
     if (Math.abs(h0 - h1) > 1) {
       return true;
     }
     return false;
   };
-  const tile_height = (tile) => {
+  const grid_height = (tile) => {
     if (!tile) {
       return 0;
     }
     return tile.base.length;
   };
-  const tile_set = (tile, no, ha) => {
+  const grid_set = (tile, no, ha) => {
     if (!tile) {
       return;
     }
     tile.no = no;
     tile.ha = ha || 0;
   };
-  const tile_del = (tile) => {
+  const grid_del = (tile) => {
     if (!tile) {
       return;
     }
     tile.no = 0;
     tile.ha = 0;
   };
-  const tile_base_push = (tile, no) => {
+  const grid_base_push = (tile, no) => {
     if (!tile) {
       return;
     }
     tile.base.push(no);
   };
-  const tile_base_pop = (tile) => {
+  const grid_base_pop = (tile) => {
     if (!tile) {
       return;
     }
     tile.base.pop();
   };
-  const tile_encode = (data) => {
+  const grid_encode = (data) => {
     return data;
   };
-  const tile_decode = (data) => {
+  const grid_decode = (data) => {
     return data;
   };
   const $pos_eyeh = 1.75;
@@ -1020,6 +1020,62 @@
   const item_decode = (data) => {
     return data;
   };
+  const $view = {
+    view: null,
+    slot: null,
+    com: [],
+    cam: {
+      eye: [0, 0, 0],
+      vp: new Float32Array(16),
+      ivp: new Float32Array(16),
+      o: new Float32Array(16)
+    },
+    m: new Float32Array(16)
+  };
+  const view_reset = () => {
+    $view.slot = null;
+    $view.view = $data.index.initial_view;
+  };
+  const view_next = (view) => {
+    const i = data_view_index(view);
+    if (i < 0) {
+      return;
+    }
+    $view.view = i;
+  };
+  const view_tick_before = () => {
+    if ($view.view === null) {
+      view_reset();
+    }
+  };
+  const view_tick_after = () => {
+    const ww = window.innerWidth;
+    const wh = window.innerHeight;
+    const fovy = deg2rad(30);
+    const zNear = 0.1;
+    const zFar = 1e3;
+    const dir = vec3dir($pos.ha, $pos.va);
+    const eye = grid_to_world($pos.x, $pos.y, $pos.h);
+    eye[2] += $pos_eyeh;
+    const at = vec3add(eye, dir);
+    const up = [0, 0, 1];
+    const view = mat4lookat(eye, at, up);
+    const proj = mat4perspective(fovy, ww / wh, zNear, zFar);
+    const vp = mat4multiply(view, proj);
+    $view.cam.vp.set(vp);
+    $view.cam.ivp.set(mat4invert(vp));
+    $view.cam.o.set(mat4ortho(ww, wh, 0, 1));
+    $view.cam.eye = eye;
+  };
+  const view_tick = () => {
+    view_tick_before();
+    const view = data_view($view.view);
+    if (!view) {
+      return;
+    }
+    com_tick(view);
+    view_tick_after();
+  };
   const hit_ranges = (x, y, ha) => {
     let ranges = [];
     const h = deg2rad(ha);
@@ -1037,7 +1093,7 @@
   const hit_activate = (ranges) => {
     let result = 0;
     for (const r of ranges) {
-      const tile = tile_get(r.x, r.y);
+      const tile = grid_get(r.x, r.y);
       if (!tile) {
         continue;
       }
@@ -1055,7 +1111,7 @@
   const hit_mining = (ranges) => {
     let result = 0;
     for (const r of ranges) {
-      const tile = tile_get(r.x, r.y);
+      const tile = grid_get(r.x, r.y);
       if (!tile) {
         continue;
       }
@@ -1065,7 +1121,7 @@
       }
       if (data.mine) {
         item_gain(data.mine.item, data.mine.count);
-        tile_del(tile);
+        grid_del(tile);
         result += 1;
       }
     }
@@ -1074,14 +1130,14 @@
   const hit_dig = (ranges) => {
     let result = 0;
     for (const r of ranges) {
-      const tile = tile_get(r.x, r.y);
-      if (tile_is_empty(tile)) {
+      const tile = grid_get(r.x, r.y);
+      if (grid_is_empty(tile)) {
         continue;
       }
-      if (tile_is_prop(tile)) {
+      if (grid_is_prop(tile)) {
         continue;
       }
-      tile_base_pop(tile);
+      grid_base_pop(tile);
       result += 1;
     }
     return result;
@@ -1089,11 +1145,11 @@
   const hit_put = (value, ranges) => {
     let result = 0;
     for (const r of ranges) {
-      const tile = tile_get(r.x, r.y);
-      if (tile_is_prop(tile)) {
+      const tile = grid_get(r.x, r.y);
+      if (grid_is_prop(tile)) {
         continue;
       }
-      tile_base_push(tile, value);
+      grid_base_push(tile, value);
       result += 1;
     }
     return result;
@@ -1113,13 +1169,12 @@
     }
     return 0;
   };
-  const $com = [];
   const com_value = (name) => {
     const no = data_com_index(name);
     if (no <= 0) {
       return null;
     }
-    const com = $com[no];
+    const com = $view.com[no];
     if (!com) {
       return null;
     }
@@ -1232,7 +1287,7 @@
   const com_tick = (view) => {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    for (const com of $com) {
+    for (const com of $view.com) {
       if (com) {
         com.value = null;
       }
@@ -1242,8 +1297,8 @@
       if (!data) {
         continue;
       }
-      if (!$com[no]) {
-        $com[no] = {
+      if (!$view.com[no]) {
+        $view.com[no] = {
           m: new Float32Array(16),
           value: null,
           state: STATE_RESET,
@@ -1251,7 +1306,7 @@
           cvs: null
         };
       }
-      const com = $com[no];
+      const com = $view.com[no];
       if (data.draw > 0) {
         const ox = data.ox * w / 2;
         const oy = data.oy * h / 2;
@@ -1287,64 +1342,9 @@
       }
     }
   };
-  const $view = {
-    view: null,
-    slot: null,
-    cam: {
-      eye: [0, 0, 0],
-      vp: new Float32Array(16),
-      ivp: new Float32Array(16),
-      o: new Float32Array(16)
-    },
-    m: new Float32Array(16)
-  };
-  const view_reset = () => {
-    $view.slot = null;
-    $view.view = $data.index.initial_view;
-  };
-  const view_next = (view) => {
-    const i = data_view_index(view);
-    if (i < 0) {
-      return;
-    }
-    $view.view = i;
-  };
-  const view_tick_before = () => {
-    if ($view.view === null) {
-      view_reset();
-    }
-  };
-  const view_tick_after = () => {
-    const ww = window.innerWidth;
-    const wh = window.innerHeight;
-    const fovy = deg2rad(30);
-    const zNear = 0.1;
-    const zFar = 1e3;
-    const dir = vec3dir($pos.ha, $pos.va);
-    const eye = tile_to_world($pos.x, $pos.y, $pos.h);
-    eye[2] += $pos_eyeh;
-    const at = vec3add(eye, dir);
-    const up = [0, 0, 1];
-    const view = mat4lookat(eye, at, up);
-    const proj = mat4perspective(fovy, ww / wh, zNear, zFar);
-    const vp = mat4multiply(view, proj);
-    $view.cam.vp.set(vp);
-    $view.cam.ivp.set(mat4invert(vp));
-    $view.cam.o.set(mat4ortho(ww, wh, 0, 1));
-    $view.cam.eye = eye;
-  };
-  const view_tick = () => {
-    view_tick_before();
-    const view = data_view($view.view);
-    if (!view) {
-      return;
-    }
-    com_tick(view);
-    view_tick_after();
-  };
   const newgame = () => {
     pos_init();
-    tile_init_empty();
+    grid_init_empty();
     item_init_empty();
   };
   const loadgame = () => {
@@ -1361,8 +1361,8 @@
     if (data.item) {
       Object.assign($item, item_decode(data.item));
     }
-    if (data.tile) {
-      Object.assign($tile, tile_decode(data.tile));
+    if (data.grid) {
+      Object.assign($grid, grid_decode(data.grid));
     }
     return true;
   };
@@ -1373,7 +1373,7 @@
     const data = {};
     data.pos = $pos;
     data.item = item_encode($item);
-    data.tile = tile_encode($tile);
+    data.grid = grid_encode($grid);
     localstorage_set($view.slot, data);
   };
   const draw_start_frame = () => {
@@ -1407,9 +1407,9 @@
     gl_drawMesh(mesh);
   };
   const draw_tile = () => {
-    for (let x = 0; x < $tile.w; ++x) {
-      for (let y = 0; y < $tile.h; ++y) {
-        const tile = tile_get(x, y);
+    for (let x = 0; x < $grid.w; ++x) {
+      for (let y = 0; y < $grid.h; ++y) {
+        const tile = grid_get(x, y);
         if (!tile) {
           continue;
         }
@@ -1419,7 +1419,7 @@
             continue;
           }
           draw_call(data2.draw, (u) => {
-            const pos = tile_to_world(x, y, i);
+            const pos = grid_to_world(x, y, i);
             $view.m.set(mat4translate(pos[0], pos[1], pos[2]));
             $gl.uniformMatrix4fv(u.w, false, $view.m);
           });
@@ -1428,9 +1428,9 @@
         if (!data) {
           continue;
         }
-        const h = tile_height(tile);
+        const h = grid_height(tile);
         draw_call(data.draw, (u) => {
-          const pos = tile_to_world(x, y, h);
+          const pos = grid_to_world(x, y, h);
           const m = mat4angle(tile.ha || 0, tile.va || 0);
           mat4translated(m, pos[0] + 1, pos[1] + 1, pos[2]);
           $view.m.set(m);
@@ -1448,7 +1448,7 @@
       if (data.draw <= 0) {
         continue;
       }
-      const com = $com[no];
+      const com = $view.com[no];
       if (!com) {
         continue;
       }
@@ -1529,31 +1529,31 @@
     const ix = Math.floor(x);
     const iy = Math.floor(y);
     const r = 0.25;
-    const h0 = tile_height(tile_get(ix, iy));
+    const h0 = grid_height(grid_get(ix, iy));
     let xx = x + dx;
     let yy = y + dy;
-    if (tile_is_noentry(tile_get(ix - 1, iy), h0)) {
+    if (grid_is_noentry(grid_get(ix - 1, iy), h0)) {
       xx = Math.max(xx, ix + r);
     }
-    if (tile_is_noentry(tile_get(ix + 1, iy), h0)) {
+    if (grid_is_noentry(grid_get(ix + 1, iy), h0)) {
       xx = Math.min(xx, ix - r + 1);
     }
-    if (tile_is_noentry(tile_get(ix, iy - 1), h0)) {
+    if (grid_is_noentry(grid_get(ix, iy - 1), h0)) {
       yy = Math.max(yy, iy + r);
     }
-    if (tile_is_noentry(tile_get(ix, iy + 1), h0)) {
+    if (grid_is_noentry(grid_get(ix, iy + 1), h0)) {
       yy = Math.min(yy, iy - r + 1);
     }
-    if (tile_is_noentry(tile_get(ix - 1, iy - 1), h0)) {
+    if (grid_is_noentry(grid_get(ix - 1, iy - 1), h0)) {
       [xx, yy] = xy_bounds([xx, yy], r, [ix, iy]);
     }
-    if (tile_is_noentry(tile_get(ix - 1, iy + 1), h0)) {
+    if (grid_is_noentry(grid_get(ix - 1, iy + 1), h0)) {
       [xx, yy] = xy_bounds([xx, yy], r, [ix, iy + 1]);
     }
-    if (tile_is_noentry(tile_get(ix + 1, iy - 1), h0)) {
+    if (grid_is_noentry(grid_get(ix + 1, iy - 1), h0)) {
       [xx, yy] = xy_bounds([xx, yy], r, [ix + 1, iy]);
     }
-    if (tile_is_noentry(tile_get(ix + 1, iy + 1), h0)) {
+    if (grid_is_noentry(grid_get(ix + 1, iy + 1), h0)) {
       [xx, yy] = xy_bounds([xx, yy], r, [ix + 1, iy + 1]);
     }
     return [xx, yy];
@@ -1582,7 +1582,7 @@
     } else {
       [$pos.x, $pos.y] = pos_adjust($pos.x, $pos.y, 0, 0);
     }
-    const h = tile_height(tile_get($pos.x, $pos.y));
+    const h = grid_height(grid_get($pos.x, $pos.y));
     if (Math.abs(h - $pos.h) <= 2) {
       const vh = h - $pos.h;
       $pos.h += 10 * dt * vh;
@@ -1598,19 +1598,19 @@
     const m0 = data_tile_index("rock-mine");
     const m1 = data_tile_index("sand-mine");
     const s = data_tile_index("savepoint");
-    tile_init_empty(64, 64);
+    grid_init_empty(64, 64);
     for (let x = 24; x <= 40; ++x) {
       for (let y = 24; y <= 40; ++y) {
-        tile_base_push(tile_get(x, y), b);
+        grid_base_push(grid_get(x, y), b);
       }
     }
-    tile_set(tile_get(24, 24), m0);
-    tile_set(tile_get(29, 29), m1);
-    tile_set(tile_get(35, 29), m0);
-    tile_set(tile_get(29, 35), m1);
-    tile_set(tile_get(35, 35), m0);
-    tile_set(tile_get(30, 30), s, 45);
-    pos_init($tile.w / 2 + 0.5, $tile.h / 2 + 0.5);
+    grid_set(grid_get(24, 24), m0);
+    grid_set(grid_get(29, 29), m1);
+    grid_set(grid_get(35, 29), m0);
+    grid_set(grid_get(29, 35), m1);
+    grid_set(grid_get(35, 35), m0);
+    grid_set(grid_get(30, 30), s, 45);
+    pos_init($grid.w / 2 + 0.5, $grid.h / 2 + 0.5);
     item_init_empty(8);
     item_gain(data_item_index("pick"), 1);
     item_gain(data_item_index("shovel"), 1);
@@ -1683,7 +1683,7 @@
     let text = "";
     const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
     for (const r of ranges) {
-      const tile = tile_get(r.x, r.y);
+      const tile = grid_get(r.x, r.y);
       if (!tile) {
         continue;
       }
