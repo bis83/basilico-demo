@@ -3,7 +3,7 @@
     "mesh": [
         null,
         {
-            "n": "mine",
+            "n": "base",
             "p": 0,
             "i": 0
         },
@@ -13,7 +13,7 @@
             "i": 1
         },
         {
-            "n": "tile",
+            "n": "mine",
             "p": 0,
             "i": 2
         },
@@ -41,7 +41,7 @@
     "image": [
         null,
         {
-            "n": "icon",
+            "n": "dirt",
             "p": 0,
             "i": 0
         },
@@ -56,7 +56,7 @@
             "i": 2
         },
         {
-            "n": "tile",
+            "n": "icon",
             "p": 0,
             "i": 3
         }
@@ -77,37 +77,37 @@
     "draw": [
         null,
         {
-            "n": "ui-rect",
+            "n": "base-dirt",
             "p": 0,
             "i": 0
         },
         {
-            "n": "rock-mine",
+            "n": "base-rock",
             "p": 0,
             "i": 1
         },
         {
-            "n": "sand-mine",
+            "n": "base-sand",
             "p": 0,
             "i": 2
         },
         {
-            "n": "skybox",
+            "n": "ui-rect",
             "p": 0,
             "i": 3
         },
         {
-            "n": "dirt-tile",
+            "n": "skybox",
             "p": 0,
             "i": 4
         },
         {
-            "n": "rock-tile",
+            "n": "rock-mine",
             "p": 0,
             "i": 5
         },
         {
-            "n": "sand-tile",
+            "n": "sand-mine",
             "p": 0,
             "i": 6
         }
@@ -135,6 +135,27 @@
             "i": 3
         }
     ],
+    "base": [
+        null,
+        {
+            "n": "dirt",
+            "p": 0,
+            "i": 0,
+            "sid": 100
+        },
+        {
+            "n": "rock",
+            "p": 0,
+            "i": 1,
+            "sid": 101
+        },
+        {
+            "n": "sand",
+            "p": 0,
+            "i": 2,
+            "sid": 102
+        }
+    ],
     "tile": [
         null,
         {
@@ -154,24 +175,6 @@
             "p": 0,
             "i": 2,
             "sid": 300
-        },
-        {
-            "n": "dirt-tile",
-            "p": 0,
-            "i": 3,
-            "sid": 100
-        },
-        {
-            "n": "rock-tile",
-            "p": 0,
-            "i": 4,
-            "sid": 101
-        },
-        {
-            "n": "sand-tile",
-            "p": 0,
-            "i": 5,
-            "sid": 102
         }
     ],
     "com": [
