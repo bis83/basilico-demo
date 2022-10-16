@@ -1,0 +1,15 @@
+[[base]]
+name = "dirt"
+draw = "base-dirt"
+save-id = 100
+
+[[draw]]
+name = "base-dirt"
+mesh = "base"
+shader = "mesh-pt"
+image = "dirt"
+depth = true
+
+[[image]]
+name = "dirt"
+src = "dirt.png"

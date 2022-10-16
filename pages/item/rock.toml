@@ -3,5 +3,5 @@ name = "rock"
 text = "石材"
 desc = "何の変哲もない石"
 
-[item.tile]
-tile = "rock-tile"
+[item.base]
+base = "rock"

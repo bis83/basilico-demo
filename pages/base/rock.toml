@@ -1,0 +1,16 @@
+[[base]]
+name = "rock"
+draw = "base-rock"
+save-id = 101
+item = "rock"
+
+[[draw]]
+name = "base-rock"
+mesh = "base"
+shader = "mesh-pt"
+image = "rock"
+depth = true
+
+[[image]]
+name = "rock"
+src = "rock.png"

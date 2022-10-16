@@ -1,0 +1,16 @@
+[[base]]
+name = "sand"
+draw = "base-sand"
+save-id = 102
+item = "sand"
+
+[[draw]]
+name = "base-sand"
+mesh = "base"
+shader = "mesh-pt"
+image = "sand"
+depth = true
+
+[[image]]
+name = "sand"
+src = "sand.png"

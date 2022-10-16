@@ -1,6 +1,6 @@
 
 define_action("makeworld", (self) => {
-    const b = data_tile_index("dirt-tile");
+    const b = data_base_index("dirt");
     const m0 = data_tile_index("rock-mine");
     const m1 = data_tile_index("sand-mine");
     const s = data_tile_index("savepoint");
@@ -80,9 +80,9 @@ define_action("hand", (self) => {
         const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
         hit(data.hand.hit, 0, ranges);
     }
-    if(data.tile) {
+    if(data.base) {
         const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
-        const result = hit(HIT_PUT, data.tile.tile, ranges);
+        const result = hit(HIT_PUT, data.base.base, ranges);
         if(result > 0) {
             item_lose(item.no, result);
         }
@@ -101,11 +101,11 @@ define_action("activate-target", (self) => {
     let text = "";
     const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
     for(const r of ranges) {
-        const tile = grid_get(r.x, r.y);
-        if(!tile) {
+        const grid = grid_get(r.x, r.y);
+        if(!grid) {
             continue;
         }
-        const data = data_tile(tile.no);
+        const data = data_tile(grid.no);
         if(!data) {
             continue;
         }

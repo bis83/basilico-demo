@@ -15,7 +15,3 @@ mesh = "mine"
 shader = "mesh-pt"
 image = "sand"
 depth = true
-
-[[image]]
-name = "sand"
-src = "sand.png"
