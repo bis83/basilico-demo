@@ -6,21 +6,21 @@ define_action("makeworld", (self) => {
     const s = data_tile_index("savepoint");
 
     // tile
-    tile_init_empty(64, 64);
+    grid_init_empty(64, 64);
     for(let x=24; x<=40; ++x) {
         for(let y=24; y<=40; ++y) {
-            tile_base_push(tile_get(x, y), b);
+            grid_base_push(grid_get(x, y), b);
         }
     }
-    tile_set(tile_get(24, 24), m0);
-    tile_set(tile_get(29, 29), m1);
-    tile_set(tile_get(35, 29), m0);
-    tile_set(tile_get(29, 35), m1);
-    tile_set(tile_get(35, 35), m0);
-    tile_set(tile_get(30, 30), s, 45);
+    grid_set(grid_get(24, 24), m0);
+    grid_set(grid_get(29, 29), m1);
+    grid_set(grid_get(35, 29), m0);
+    grid_set(grid_get(29, 35), m1);
+    grid_set(grid_get(35, 35), m0);
+    grid_set(grid_get(30, 30), s, 45);
 
     // pos
-    pos_init($tile.w/2 + 0.5, $tile.h/2 + 0.5);
+    pos_init($grid.w/2 + 0.5, $grid.h/2 + 0.5);
 
     // item
     item_init_empty(8);
@@ -101,7 +101,7 @@ define_action("activate-target", (self) => {
     let text = "";
     const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
     for(const r of ranges) {
-        const tile = tile_get(r.x, r.y);
+        const tile = grid_get(r.x, r.y);
         if(!tile) {
             continue;
         }
