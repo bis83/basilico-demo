@@ -1,6 +1,7 @@
 [[com]]
 name = "button-activate"
 
+[com.rect]
 draw = "ui-rect"
 x = -256
 y = -128
@@ -9,7 +10,7 @@ height = 48
 origin-x = 1.0
 origin-y = 1.0
 
-interact = "button"
+[com.touch]
 gamepad = "b0"
 keyboard = "space"
 action = [

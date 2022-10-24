@@ -1,6 +1,7 @@
 [[com]]
 name = "button-escape"
 
+[com.rect]
 draw = "ui-rect"
 x = -64
 y = 64
@@ -9,7 +10,7 @@ height = 48
 origin-x = 1.0
 origin-y = -1.0
 
-interact = "button"
+[com.touch]
 gamepad = "b9"
 keyboard = "esc"
 action = [

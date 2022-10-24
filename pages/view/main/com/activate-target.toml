@@ -1,6 +1,7 @@
 [[com]]
 name = "activate-target"
 
+[com.rect]
 draw = "ui-rect"
 x = 0
 y = -24
@@ -9,10 +10,10 @@ height = 20
 origin-x = 0.0
 origin-y = 1.0
 
-interact = "always"
+[com.text]
+contents = ""
+
+[com.tick]
 action = [
     ["activate-target"],
 ]
-
-[com.text]
-contents = ""

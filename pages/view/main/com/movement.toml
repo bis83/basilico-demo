@@ -1,7 +1,7 @@
 [[com]]
 name = "movement"
 
-interact = "always"
+[com.tick]
 action = [
     ["fpsmove", "left-stick", "right-stick"],
 ]

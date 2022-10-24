@@ -1,6 +1,7 @@
 [[com]]
 name = "inventory"
 
+[com.rect]
 draw = "ui-rect"
 x = 128
 y = 0
@@ -9,10 +10,10 @@ height = 256
 origin-x = -1.0
 origin-y = 0.0
 
-interact = "always"
+[com.text]
+contents = ""
+
+[com.tick]
 action = [
     ["inventory"],
 ]
-
-[com.text]
-contents = ""

@@ -1,6 +1,7 @@
 [[com]]
 name = "right-stick"
 
+[com.rect]
 draw = "ui-rect"
 x = -128
 y = -128
@@ -9,4 +10,6 @@ height = 96
 origin-x = 1.0
 origin-y = 1.0
 
-interact = "right-stick"
+[com.touch]
+keyboard = "arrow"
+gamepad = "right-stick"
