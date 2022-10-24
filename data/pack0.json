@@ -291,247 +291,271 @@
     ],
     "com": [
         {
-            "draw": 4,
-            "x": 0,
-            "y": -24,
-            "w": 512,
-            "h": 20,
-            "ox": 0,
-            "oy": 1,
-            "interact": 1,
-            "gamepad": "",
-            "keyboard": "",
-            "action": [
-                [
-                    "activate-target"
-                ]
-            ],
+            "rect": {
+                "draw": 4,
+                "x": 0,
+                "y": -24,
+                "w": 512,
+                "h": 20,
+                "ox": 0,
+                "oy": 1
+            },
             "text": {
                 "contents": "",
                 "s": 0
+            },
+            "tick": {
+                "action": [
+                    [
+                        "activate-target"
+                    ]
+                ]
             }
         },
         {
-            "draw": 4,
-            "x": -256,
-            "y": -128,
-            "w": 48,
-            "h": 48,
-            "ox": 1,
-            "oy": 1,
-            "interact": 2,
-            "gamepad": "b0",
-            "keyboard": "space",
-            "action": [
-                [
-                    "activate"
+            "rect": {
+                "draw": 4,
+                "x": -256,
+                "y": -128,
+                "w": 48,
+                "h": 48,
+                "ox": 1,
+                "oy": 1
+            },
+            "touch": {
+                "gamepad": "b0",
+                "keyboard": "space",
+                "action": [
+                    [
+                        "activate"
+                    ]
                 ]
-            ]
+            }
         },
         {
-            "draw": 4,
-            "x": -64,
-            "y": 64,
-            "w": 48,
-            "h": 48,
-            "ox": 1,
-            "oy": -1,
-            "interact": 2,
-            "gamepad": "b9",
-            "keyboard": "esc",
-            "action": [
-                [
-                    "resetview"
+            "rect": {
+                "draw": 4,
+                "x": -64,
+                "y": 64,
+                "w": 48,
+                "h": 48,
+                "ox": 1,
+                "oy": -1
+            },
+            "touch": {
+                "gamepad": "b9",
+                "keyboard": "esc",
+                "action": [
+                    [
+                        "resetview"
+                    ]
                 ]
-            ]
+            }
         },
         {
-            "draw": 4,
-            "x": -256,
-            "y": -64,
-            "w": 48,
-            "h": 48,
-            "ox": 1,
-            "oy": 1,
-            "interact": 2,
-            "gamepad": "rt",
-            "keyboard": "f",
-            "action": [
-                [
-                    "hand"
+            "rect": {
+                "draw": 4,
+                "x": -256,
+                "y": -64,
+                "w": 48,
+                "h": 48,
+                "ox": 1,
+                "oy": 1
+            },
+            "touch": {
+                "gamepad": "rt",
+                "keyboard": "f",
+                "action": [
+                    [
+                        "hand"
+                    ]
                 ]
-            ]
+            }
         },
         {
-            "draw": 4,
-            "x": 60,
-            "y": -148,
-            "w": 32,
-            "h": 32,
-            "ox": -1,
-            "oy": 0,
-            "interact": 2,
-            "gamepad": "rb",
-            "keyboard": "e",
-            "action": [
-                [
-                    "inventory_next"
+            "rect": {
+                "draw": 4,
+                "x": 60,
+                "y": -148,
+                "w": 32,
+                "h": 32,
+                "ox": -1,
+                "oy": 0
+            },
+            "touch": {
+                "gamepad": "rb",
+                "keyboard": "e",
+                "action": [
+                    [
+                        "inventory_next"
+                    ]
                 ]
-            ]
+            }
         },
         {
-            "draw": 4,
-            "x": 24,
-            "y": -148,
-            "w": 32,
-            "h": 32,
-            "ox": -1,
-            "oy": 0,
-            "interact": 2,
-            "gamepad": "lb",
-            "keyboard": "q",
-            "action": [
-                [
-                    "inventory_prev"
+            "rect": {
+                "draw": 4,
+                "x": 24,
+                "y": -148,
+                "w": 32,
+                "h": 32,
+                "ox": -1,
+                "oy": 0
+            },
+            "touch": {
+                "gamepad": "lb",
+                "keyboard": "q",
+                "action": [
+                    [
+                        "inventory_prev"
+                    ]
                 ]
-            ]
+            }
         },
         {
-            "draw": 4,
-            "x": 256,
-            "y": -64,
-            "w": 48,
-            "h": 48,
-            "ox": -1,
-            "oy": 1,
-            "interact": 2,
-            "gamepad": "lt",
-            "keyboard": "c",
-            "action": [
-                [
-                    "off-hand"
+            "rect": {
+                "draw": 4,
+                "x": 256,
+                "y": -64,
+                "w": 48,
+                "h": 48,
+                "ox": -1,
+                "oy": 1
+            },
+            "touch": {
+                "gamepad": "lt",
+                "keyboard": "c",
+                "action": [
+                    [
+                        "off-hand"
+                    ]
                 ]
-            ]
+            }
         },
         {
-            "draw": 4,
-            "x": 128,
-            "y": 0,
-            "w": 256,
-            "h": 256,
-            "ox": -1,
-            "oy": 0,
-            "interact": 1,
-            "gamepad": "",
-            "keyboard": "",
-            "action": [
-                [
-                    "inventory"
-                ]
-            ],
+            "rect": {
+                "draw": 4,
+                "x": 128,
+                "y": 0,
+                "w": 256,
+                "h": 256,
+                "ox": -1,
+                "oy": 0
+            },
             "text": {
                 "contents": "",
                 "s": 0
+            },
+            "tick": {
+                "action": [
+                    [
+                        "inventory"
+                    ]
+                ]
             }
         },
         {
-            "draw": 4,
-            "x": 128,
-            "y": -128,
-            "w": 96,
-            "h": 96,
-            "ox": -1,
-            "oy": 1,
-            "interact": 3,
-            "gamepad": "",
-            "keyboard": "",
-            "action": null
+            "rect": {
+                "draw": 4,
+                "x": 128,
+                "y": -128,
+                "w": 96,
+                "h": 96,
+                "ox": -1,
+                "oy": 1
+            },
+            "touch": {
+                "gamepad": "left-stick",
+                "keyboard": "wasd",
+                "action": null
+            }
         },
         {
-            "draw": 0,
-            "x": 0,
-            "y": 0,
-            "w": 0,
-            "h": 0,
-            "ox": 0,
-            "oy": 0,
-            "interact": 1,
-            "gamepad": "",
-            "keyboard": "",
-            "action": [
-                [
-                    "fpsmove",
-                    "left-stick",
-                    "right-stick"
+            "tick": {
+                "action": [
+                    [
+                        "fpsmove",
+                        "left-stick",
+                        "right-stick"
+                    ]
                 ]
-            ]
+            }
         },
         {
-            "draw": 4,
-            "x": -128,
-            "y": -128,
-            "w": 96,
-            "h": 96,
-            "ox": 1,
-            "oy": 1,
-            "interact": 4,
-            "gamepad": "",
-            "keyboard": "",
-            "action": null
+            "rect": {
+                "draw": 4,
+                "x": -128,
+                "y": -128,
+                "w": 96,
+                "h": 96,
+                "ox": 1,
+                "oy": 1
+            },
+            "touch": {
+                "gamepad": "right-stick",
+                "keyboard": "arrow",
+                "action": null
+            }
         },
         {
-            "draw": 4,
-            "x": 160,
-            "y": 0,
-            "w": 256,
-            "h": 256,
-            "ox": 0,
-            "oy": 0,
-            "interact": 2,
-            "gamepad": "b9",
-            "keyboard": "x",
-            "action": [
-                [
-                    "loadgame",
-                    "data0"
-                ],
-                [
-                    "nextview",
-                    "main"
-                ]
-            ],
+            "rect": {
+                "draw": 4,
+                "x": 160,
+                "y": 0,
+                "w": 256,
+                "h": 256,
+                "ox": 0,
+                "oy": 0
+            },
             "text": {
                 "contents": "Load Game",
                 "s": 0
+            },
+            "touch": {
+                "gamepad": "b9",
+                "keyboard": "x",
+                "action": [
+                    [
+                        "loadgame",
+                        "data0"
+                    ],
+                    [
+                        "nextview",
+                        "main"
+                    ]
+                ]
             }
         },
         {
-            "draw": 4,
-            "x": -160,
-            "y": 0,
-            "w": 256,
-            "h": 256,
-            "ox": 0,
-            "oy": 0,
-            "interact": 2,
-            "gamepad": "b8",
-            "keyboard": "z",
-            "action": [
-                [
-                    "newgame",
-                    "data0"
-                ],
-                [
-                    "makeworld"
-                ],
-                [
-                    "nextview",
-                    "main"
-                ]
-            ],
+            "rect": {
+                "draw": 4,
+                "x": -160,
+                "y": 0,
+                "w": 256,
+                "h": 256,
+                "ox": 0,
+                "oy": 0
+            },
             "text": {
                 "contents": "New Game",
                 "s": 0
+            },
+            "touch": {
+                "gamepad": "b8",
+                "keyboard": "z",
+                "action": [
+                    [
+                        "newgame",
+                        "data0"
+                    ],
+                    [
+                        "makeworld"
+                    ],
+                    [
+                        "nextview",
+                        "main"
+                    ]
+                ]
             }
         }
     ],

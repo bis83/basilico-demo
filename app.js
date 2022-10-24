@@ -304,9 +304,6 @@
   const grid_to_world = (x, y, h) => {
     return [x * 2, y * 2, h * 0.5];
   };
-  const GAMEPAD_MODE_POINTER = 0;
-  const GAMEPAD_MODE_GAMEPAD = 1;
-  const GAMEPAD_MODE_KEYBOARD = 2;
   var $listen = null;
   const listen = (target, key, func) => {
     target.addEventListener(key, func);
@@ -326,7 +323,6 @@
     listen_disable_user_select();
     listen_disable_touch_action();
     $listen = {};
-    $listen.mode = GAMEPAD_MODE_POINTER;
     $listen.gamepad = {
       index: null,
       lx: 0,
@@ -360,7 +356,6 @@
       esc: false
     };
     $listen.touch = /* @__PURE__ */ new Map();
-    $listen.click = [];
     listen(window, "focus", (ev) => {
     });
     listen(window, "blur", (ev) => {
@@ -369,7 +364,6 @@
     });
     listen(window, "gamepadconnected", (ev) => {
       $listen.gamepad.index = ev.gamepad.index;
-      $listen.mode = GAMEPAD_MODE_GAMEPAD;
     });
     listen(window, "gamepaddisconnected", (ev) => {
       if ($listen.gamepad.index === ev.gamepad.index) {
@@ -378,13 +372,11 @@
     });
     listen(document, "keydown", (ev) => {
       if (listen_keyboard($listen.keyboard, ev.code, true)) {
-        $listen.mode = GAMEPAD_MODE_KEYBOARD;
         ev.preventDefault();
       }
     });
     listen(document, "keyup", (ev) => {
       if (listen_keyboard($listen.keyboard, ev.code, false)) {
-        $listen.mode = GAMEPAD_MODE_KEYBOARD;
         ev.preventDefault();
       }
     });
@@ -399,23 +391,18 @@
         sy: ev.clientY,
         time: performance.now()
       });
-      $listen.mode = GAMEPAD_MODE_POINTER;
     });
     listen(document.body, "pointerup", (ev) => {
-      listen_click(ev.pointerId);
       $listen.touch.delete(ev.pointerId);
-      $listen.mode = GAMEPAD_MODE_POINTER;
     });
     listen(document.body, "pointerout", (ev) => {
       $listen.touch.delete(ev.pointerId);
-      $listen.mode = GAMEPAD_MODE_POINTER;
     });
     listen(document.body, "pointermove", (ev) => {
       const touch = $listen.touch.get(ev.pointerId);
       if (touch) {
         touch.x = ev.clientX;
         touch.y = ev.clientY;
-        $listen.mode = GAMEPAD_MODE_POINTER;
       }
     });
   };
@@ -471,17 +458,6 @@
     }
     return true;
   };
-  const listen_click = (pointerId) => {
-    const touch = $listen.touch.get(pointerId);
-    if (touch) {
-      if (performance.now() - touch.time < 250) {
-        $listen.click.push({
-          x: touch.x,
-          y: touch.y
-        });
-      }
-    }
-  };
   const listen_tick_gamepad = (gamepad) => {
     if (gamepad.index !== null) {
       const gamepads = navigator.getGamepads();
@@ -498,17 +474,54 @@
       gamepad.rb = gp.buttons[5].value >= 0.5;
       gamepad.lt = gp.buttons[6].value >= 0.5;
       gamepad.rt = gp.buttons[7].value >= 0.5;
-      const gamepadChanged = gamepad.lx || gamepad.ly || gamepad.rx || gamepad.ry || gamepad.b0 || gamepad.b1 || gamepad.b8 || gamepad.b9 || gamepad.lb || gamepad.rb || gamepad.lt || gamepad.rt ? true : false;
-      if (gamepadChanged) {
-        $listen.mode = GAMEPAD_MODE_GAMEPAD;
-      }
     }
   };
   const listen_tick = () => {
     listen_tick_gamepad($listen.gamepad);
   };
-  const listen_flush = () => {
-    $listen.click.length = 0;
+  const listen_touch = (rect, keyboard, gamepad) => {
+    for (const touch of $listen.touch.values()) {
+      if (xy_hit_rect([touch.sx, touch.sy], ...rect)) {
+        const x = touch.x - touch.sx;
+        const y = -(touch.y - touch.sy);
+        return xy_normalize(x, y);
+      }
+    }
+    if (keyboard) {
+      if (keyboard === "wasd") {
+        const keyboard2 = $listen.keyboard;
+        const x = keyboard2.a ? -1 : keyboard2.d ? 1 : 0;
+        const y = keyboard2.w ? 1 : keyboard2.s ? -1 : 0;
+        if (x !== 0 || y !== 0) {
+          return xy_normalize(x, y);
+        }
+      } else if (keyboard === "arrow") {
+        const keyboard2 = $listen.keyboard;
+        const x = keyboard2.right ? 1 : keyboard2.left ? -1 : 0;
+        const y = keyboard2.up ? 1 : keyboard2.down ? -1 : 0;
+        if (x !== 0 || y !== 0) {
+          return xy_normalize(x, y);
+        }
+      } else {
+        if ($listen.keyboard[keyboard]) {
+          return [1, 0];
+        }
+      }
+    }
+    if (gamepad) {
+      if (gamepad === "left-stick") {
+        const gamepad2 = $listen.gamepad;
+        return xy_normalize(gamepad2.lx, -gamepad2.ly);
+      } else if (gamepad === "right-stick") {
+        const gamepad2 = $listen.gamepad;
+        return xy_normalize(gamepad2.rx, -gamepad2.ry);
+      } else {
+        if ($listen.gamepad[gamepad]) {
+          return [1, 0];
+        }
+      }
+    }
+    return null;
   };
   const localstorage_get = (key) => {
     const data = localStorage.getItem(key);
@@ -662,6 +675,9 @@
   };
   const $action = {};
   const action_invoke = (self, action) => {
+    if (!action) {
+      return;
+    }
     for (const act of action) {
       const func = $action[act[0]];
       if (!func) {
@@ -1189,106 +1205,14 @@
   const STATE_RESET = 0;
   const BUTTON_STATE_RELEASED = 0;
   const BUTTON_STATE_PRESSED = 1;
-  const com_hit_click = (data, point) => {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const ox = w / 2 + w / 2 * data.ox;
-    const oy = h / 2 + h / 2 * data.oy;
-    const minX = ox + (data.x - data.w / 2);
-    const maxX = ox + (data.x + data.w / 2);
-    const minY = oy + (data.y - data.h / 2);
-    const maxY = oy + (data.y + data.h / 2);
-    return xy_hit_rect(point, minX, maxX, minY, maxY);
-  };
-  const com_button = (com, data) => {
-    const mode = $listen.mode;
-    if (mode === GAMEPAD_MODE_POINTER) {
-      let hit2 = false;
-      const click = $listen.click;
-      for (let c of click) {
-        if (com_hit_click(data, [c.x, c.y])) {
-          hit2 = true;
-          break;
-        }
-      }
-      if (hit2) {
-        com.value = true;
-        com.state = BUTTON_STATE_PRESSED;
-      } else {
-        com.value = false;
-        com.state = BUTTON_STATE_RELEASED;
-      }
-    } else if (mode === GAMEPAD_MODE_GAMEPAD) {
-      const gamepad = $listen.gamepad;
-      if (gamepad[data.gamepad]) {
-        if (com.state !== BUTTON_STATE_PRESSED) {
-          com.value = true;
-          com.state = BUTTON_STATE_PRESSED;
-        } else {
-          com.value = false;
-        }
-      } else {
-        com.value = false;
-        com.state = BUTTON_STATE_RELEASED;
-      }
-    } else if (mode === GAMEPAD_MODE_KEYBOARD) {
-      const keyboard = $listen.keyboard;
-      if (keyboard[data.keyboard]) {
-        if (com.state !== BUTTON_STATE_PRESSED) {
-          com.value = true;
-          com.state = BUTTON_STATE_PRESSED;
-        } else {
-          com.value = false;
-        }
-      } else {
-        com.value = false;
-        com.state = BUTTON_STATE_RELEASED;
-      }
-    }
-  };
-  const com_left_stick = (com, data) => {
-    const mode = $listen.mode;
-    if (mode === GAMEPAD_MODE_POINTER) {
-      com.value = [0, 0];
-      for (const touch of $listen.touch.values()) {
-        if (com_hit_click(data, [touch.sx, touch.sy])) {
-          const x = touch.x - touch.sx;
-          const y = -(touch.y - touch.sy);
-          com.value = xy_normalize(x, y);
-          break;
-        }
-      }
-    } else if (mode === GAMEPAD_MODE_GAMEPAD) {
-      const gamepad = $listen.gamepad;
-      com.value = xy_normalize(gamepad.lx, -gamepad.ly);
-    } else if (mode === GAMEPAD_MODE_KEYBOARD) {
-      const keyboard = $listen.keyboard;
-      const x = keyboard.a ? -1 : keyboard.d ? 1 : 0;
-      const y = keyboard.w ? 1 : keyboard.s ? -1 : 0;
-      com.value = xy_normalize(x, y);
-    }
-  };
-  const com_right_stick = (com, data) => {
-    const mode = $listen.mode;
-    if (mode === GAMEPAD_MODE_POINTER) {
-      com.value = [0, 0];
-      for (const touch of $listen.touch.values()) {
-        if (com_hit_click(data, [touch.sx, touch.sy])) {
-          const x = touch.x - touch.sx;
-          const y = -(touch.y - touch.sy);
-          com.value = xy_normalize(x, y);
-          break;
-        }
-      }
-    } else if (mode === GAMEPAD_MODE_GAMEPAD) {
-      const gamepad = $listen.gamepad;
-      com.value = xy_normalize(gamepad.rx, -gamepad.ry);
-    } else if (mode === GAMEPAD_MODE_KEYBOARD) {
-      const keyboard = $listen.keyboard;
-      const x = keyboard.right ? 1 : keyboard.left ? -1 : 0;
-      const y = keyboard.up ? 1 : keyboard.down ? -1 : 0;
-      com.value = xy_normalize(x, y);
-    }
+  const com_rect = (data, w, h) => {
+    const ox = w / 2 + w / 2 * data.rect.ox;
+    const oy = h / 2 + h / 2 * data.rect.oy;
+    const minX = ox + (data.rect.x - data.rect.w / 2);
+    const maxX = ox + (data.rect.x + data.rect.w / 2);
+    const minY = oy + (data.rect.y - data.rect.h / 2);
+    const maxY = oy + (data.rect.y + data.rect.h / 2);
+    return [minX, maxX, minY, maxY];
   };
   const com_tick = (view) => {
     const w = window.innerWidth;
@@ -1297,6 +1221,9 @@
       if (com) {
         com.value = null;
       }
+    }
+    if (!view.com) {
+      return;
     }
     for (let no of view.com) {
       const data = data_com(no);
@@ -1313,38 +1240,38 @@
         };
       }
       const com = $view.com[no];
-      if (data.draw > 0) {
-        const ox = data.ox * w / 2;
-        const oy = data.oy * h / 2;
-        const m = mat4scale(data.w / 2, data.h / 2, 1);
-        mat4translated(m, ox + data.x, -(oy + data.y), 0);
+      if (data.rect) {
+        const ox = data.rect.ox * w / 2;
+        const oy = data.rect.oy * h / 2;
+        const m = mat4scale(data.rect.w / 2, data.rect.h / 2, 1);
+        mat4translated(m, ox + data.rect.x, -(oy + data.rect.y), 0);
         com.m.set(m);
       }
       if (data.text) {
         if (com.img === null) {
-          com.cvs = cvs_create(data.w, data.h);
+          com.cvs = cvs_create(data.rect.w, data.rect.h);
           cvs_text(com.cvs, data.text.contents);
           com.img = gl_createGLTexture2D(com.cvs, data.text.s);
         }
       }
-      switch (data.interact) {
-        case 1:
-          com.value = true;
-          break;
-        case 2:
-          com_button(com, data);
-          break;
-        case 3:
-          com_left_stick(com, data);
-          break;
-        case 4:
-          com_right_stick(com, data);
-          break;
-        default:
-          break;
+      if (data.touch) {
+        const rect = com_rect(data, w, h);
+        com.value = listen_touch(rect, data.touch.keyboard, data.touch.gamepad);
+        let press = false;
+        if (com.value !== null) {
+          if (com.state !== BUTTON_STATE_PRESSED) {
+            com.state = BUTTON_STATE_PRESSED;
+            press = true;
+          }
+        } else {
+          com.state = BUTTON_STATE_RELEASED;
+        }
+        if (press) {
+          action_invoke(com, data.touch.action);
+        }
       }
-      if (com.value && data.action) {
-        action_invoke(com, data.action);
+      if (data.tick) {
+        action_invoke(com, data.tick.action);
       }
     }
   };
@@ -1449,19 +1376,25 @@
     }
   };
   const draw_com = (view) => {
+    if (!view.com) {
+      return;
+    }
     for (let no of view.com) {
       const data = data_com(no);
       if (!data) {
         continue;
       }
-      if (data.draw <= 0) {
+      if (!data.rect) {
+        continue;
+      }
+      if (data.rect.draw <= 0) {
         continue;
       }
       const com = $view.com[no];
       if (!com) {
         continue;
       }
-      draw_call(data.draw, (u) => {
+      draw_call(data.rect.draw, (u) => {
         $gl.uniformMatrix4fv(u.w, false, com.m);
         if (com.img) {
           gl_useTexture(com.img, u.tex0);
@@ -1500,7 +1433,6 @@
     if (data_loaded()) {
       view_tick();
     }
-    listen_flush();
   };
   const draw = () => {
     draw_start_frame();
