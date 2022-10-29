@@ -846,6 +846,9 @@
   const data_tile = (no) => {
     return data_lookup("tile", no);
   };
+  const data_grid = (no) => {
+    return data_lookup("grid", no);
+  };
   const data_com = (no) => {
     return data_lookup("com", no);
   };
@@ -866,11 +869,8 @@
   const data_item_index = (name) => {
     return data_lookup_index("item", name);
   };
-  const data_base_index = (name) => {
-    return data_lookup_index("base", name);
-  };
-  const data_tile_index = (name) => {
-    return data_lookup_index("tile", name);
+  const data_grid_index = (name) => {
+    return data_lookup_index("grid", name);
   };
   const data_com_index = (name) => {
     return data_lookup_index("com", name);
@@ -892,6 +892,27 @@
     $grid.t.length = w * h;
     for (let i = 0; i < $grid.t.length; ++i) {
       $grid.t[i] = tile_make();
+    }
+  };
+  const grid_load = (no) => {
+    const data = data_grid(no);
+    if (!data) {
+      return;
+    }
+    grid_init_empty(data.w, data.h);
+    if (data.b) {
+      for (const a of data.b) {
+        for (let x = a.x; x < a.x + a.w; ++x) {
+          for (let y = a.y; y < a.y + a.h; ++y) {
+            tile_base_push(grid_tile(x, y), a.no);
+          }
+        }
+      }
+    }
+    if (data.t) {
+      for (const a of data.t) {
+        tile_set(grid_tile(a.x, a.y), a.no, a.ha);
+      }
     }
   };
   const grid_index = (x, y) => {
@@ -1474,6 +1495,13 @@
   define_action("savegame", (self) => {
     savegame();
   });
+  define_action("newgrid", (self, name) => {
+    const no = data_grid_index(name);
+    if (no <= 0) {
+      return;
+    }
+    grid_load(no);
+  });
   const pos_adjust = (x, y, dx, dy) => {
     const ix = Math.floor(x);
     const iy = Math.floor(y);
@@ -1542,23 +1570,7 @@
     const cameraXY = com_value(rstick);
     pos_fps_movement(moveXY, cameraXY);
   });
-  define_action("makeworld", (self) => {
-    const b = data_base_index("dirt");
-    const m0 = data_tile_index("rock-mine");
-    const m1 = data_tile_index("sand-mine");
-    const s = data_tile_index("savepoint");
-    grid_init_empty(64, 64);
-    for (let x = 24; x <= 40; ++x) {
-      for (let y = 24; y <= 40; ++y) {
-        tile_base_push(grid_tile(x, y), b);
-      }
-    }
-    tile_set(grid_tile(24, 24), m0);
-    tile_set(grid_tile(29, 29), m1);
-    tile_set(grid_tile(35, 29), m0);
-    tile_set(grid_tile(29, 35), m1);
-    tile_set(grid_tile(35, 35), m0);
-    tile_set(grid_tile(30, 30), s, 45);
+  define_action("newplayer", (self) => {
     pos_init($grid.w / 2 + 0.5, $grid.h / 2 + 0.5);
     item_init_empty(8);
     item_gain(data_item_index("pick"), 1);

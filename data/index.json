@@ -180,6 +180,14 @@
     "mob": [
         null
     ],
+    "grid": [
+        null,
+        {
+            "n": "world",
+            "p": 0,
+            "i": 0
+        }
+    ],
     "com": [
         null,
         {
