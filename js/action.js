@@ -1,27 +1,7 @@
 
-define_action("makeworld", (self) => {
-    const b = data_base_index("dirt");
-    const m0 = data_tile_index("rock-mine");
-    const m1 = data_tile_index("sand-mine");
-    const s = data_tile_index("savepoint");
-
-    // tile
-    grid_init_empty(64, 64);
-    for(let x=24; x<=40; ++x) {
-        for(let y=24; y<=40; ++y) {
-            tile_base_push(grid_tile(x, y), b);
-        }
-    }
-    tile_set(grid_tile(24, 24), m0);
-    tile_set(grid_tile(29, 29), m1);
-    tile_set(grid_tile(35, 29), m0);
-    tile_set(grid_tile(29, 35), m1);
-    tile_set(grid_tile(35, 35), m0);
-    tile_set(grid_tile(30, 30), s, 45);
-
+define_action("newplayer", (self) => {
     // pos
     pos_init($grid.w/2 + 0.5, $grid.h/2 + 0.5);
-
     // item
     item_init_empty(8);
     item_gain(data_item_index("pick"), 1);

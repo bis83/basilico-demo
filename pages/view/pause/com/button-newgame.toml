@@ -16,6 +16,7 @@ gamepad = "b8"
 keyboard = "z"
 action = [
     ["newgame", "data0"],
-    ["makeworld"],
+    ["newgrid", "world"],
+    ["newplayer"],
     ["nextview", "main"],
 ]

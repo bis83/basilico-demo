@@ -1,0 +1,17 @@
+[[grid]]
+name = "world"
+width = 64
+height = 64
+
+base = [
+    { base = "dirt", x = 24, y = 24, width = 16, height = 16 }
+]
+
+tile = [
+    { tile = "rock-mine", x = 24, y = 24 },
+    { tile = "sand-mine", x = 29, y = 29 },
+    { tile = "rock-mine", x = 35, y = 29 },
+    { tile = "sand-mine", x = 29, y = 35 },
+    { tile = "rock-mine", x = 35, y = 35 },
+    { tile = "savepoint", x = 30, y = 30, h-angle = 45 },
+]
