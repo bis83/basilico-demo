@@ -1,7 +1,5 @@
 
 define_action("newplayer", (self) => {
-    // pos
-    pos_init($grid.w/2 + 0.5, $grid.h/2 + 0.5);
     // item
     item_init_empty(8);
     item_gain(data_item_index("pick"), 1);
@@ -57,11 +55,19 @@ define_action("hand", (self) => {
         return;
     }
     if(data.hand) {
-        const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+        const mob = view_camera_mob();
+        if(!mob) {
+            return;
+        }
+        const ranges = hit_ranges(mob.x, mob.y, mob.ha);
         hit(data.hand.hit, 0, ranges);
     }
     if(data.base) {
-        const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+        const mob = view_camera_mob();
+        if(!mob) {
+            return;
+        }
+        const ranges = hit_ranges(mob.x, mob.y, mob.ha);
         const result = hit(HIT_PUT, data.base.base, ranges);
         if(result > 0) {
             item_lose(item.no, result);
@@ -73,13 +79,22 @@ define_action("off-hand", (self) => {
 });
 
 define_action("activate", (self) => {
-    const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+    const mob = view_camera_mob();
+    if(!mob) {
+        return;
+    }
+    const ranges = hit_ranges(mob.x, mob.y, mob.ha);
     hit(HIT_ACTIVATE, 0, ranges);
 });
 
 define_action("activate-target", (self) => {
+    const mob = view_camera_mob();
+    if(!mob) {
+        return;
+    }
+
     let text = "";
-    const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+    const ranges = hit_ranges(mob.x, mob.y, mob.ha);
     for(const r of ranges) {
         const tile = grid_tile(r.x, r.y);
         if(!tile) {

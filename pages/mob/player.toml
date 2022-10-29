@@ -1,7 +1,5 @@
-[[com]]
-name = "movement"
-
-[com.tick]
+[[mob]]
+name = "player"
 action = [
     ["fpsmove", "left-stick", "right-stick"],
 ]

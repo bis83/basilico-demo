@@ -15,3 +15,7 @@ tile = [
     { tile = "rock-mine", x = 35, y = 35 },
     { tile = "savepoint", x = 30, y = 30, h-angle = 45 },
 ]
+
+mob = [
+    { mob = "player", x = 30, y = 30, h-angle = 90 },
+]

@@ -1,6 +1,7 @@
 [[view]]
 name = "main"
 draw3d = true
+camera-mob = "player"
 draw = [
     "skybox",
 ]
@@ -8,7 +9,6 @@ com = [
     # movement
     "left-stick",
     "right-stick",
-    "movement",
 
     # inventory
     "button-inventory-prev",
