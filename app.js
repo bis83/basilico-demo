@@ -846,6 +846,9 @@
   const data_tile = (no) => {
     return data_lookup("tile", no);
   };
+  const data_mob = (no) => {
+    return data_lookup("mob", no);
+  };
   const data_grid = (no) => {
     return data_lookup("grid", no);
   };
@@ -881,7 +884,8 @@
   const $grid = {
     w: 0,
     h: 0,
-    t: []
+    t: [],
+    m: []
   };
   const grid_init_empty = (w, h) => {
     w = w || 0;
@@ -893,6 +897,7 @@
     for (let i = 0; i < $grid.t.length; ++i) {
       $grid.t[i] = tile_make();
     }
+    $grid.m = [];
   };
   const grid_load = (no) => {
     const data = data_grid(no);
@@ -914,6 +919,11 @@
         tile_set(grid_tile(a.x, a.y), a.no, a.ha);
       }
     }
+    if (data.m) {
+      for (const a of data.m) {
+        grid_add_mob(a.no, a.x + 0.5, a.y + 0.5, a.ha);
+      }
+    }
   };
   const grid_index = (x, y) => {
     x = Math.floor(x);
@@ -929,26 +939,23 @@
   const grid_tile = (x, y) => {
     return $grid.t[grid_index(x, y)];
   };
+  const grid_mob = (no) => {
+    return $grid.m.find((o) => o.no === no);
+  };
+  const grid_add_mob = (no, x, y, ha) => {
+    const h = tile_height(grid_tile(x, y));
+    $grid.m.push(mob_make(no, x, y, h, ha, 0));
+  };
+  const grid_tick = () => {
+    for (const mob of $grid.m) {
+      mob_tick(mob);
+    }
+  };
   const grid_encode = (data) => {
     return data;
   };
   const grid_decode = (data) => {
     return data;
-  };
-  const $pos_eyeh = 1.75;
-  const $pos = {
-    x: 0,
-    y: 0,
-    ha: 0,
-    va: 0,
-    h: 0
-  };
-  const pos_init = (x, y, ha, va) => {
-    $pos.x = x || 0;
-    $pos.y = y || 0;
-    $pos.ha = ha || 0;
-    $pos.va = va || 0;
-    $pos.h = 0;
   };
   const $item = {
     s: [],
@@ -1020,6 +1027,16 @@
     $view.slot = null;
     $view.view = $data.index.initial_view;
   };
+  const view_camera_mob = () => {
+    const data = data_view($view.view);
+    if (!data) {
+      return null;
+    }
+    if (data.cam <= 0) {
+      return null;
+    }
+    return grid_mob(data.cam);
+  };
   const view_next = (view) => {
     const i = data_view_index(view);
     if (i < 0) {
@@ -1038,9 +1055,15 @@
     const fovy = deg2rad(30);
     const zNear = 0.1;
     const zFar = 1e3;
-    const dir = vec3dir($pos.ha, $pos.va);
-    const eye = grid_to_world($pos.x, $pos.y, $pos.h);
-    eye[2] += $pos_eyeh;
+    let dir = [1, 0, 0];
+    let eye = [0, 0, 0];
+    const mob = view_camera_mob();
+    if (mob) {
+      const EYE_HEIGHT = 1.75;
+      dir = vec3dir(mob.ha, mob.va);
+      eye = grid_to_world(mob.x, mob.y, mob.h);
+      eye[2] += EYE_HEIGHT;
+    }
     const at = vec3add(eye, dir);
     const up = [0, 0, 1];
     const view = mat4lookat(eye, at, up);
@@ -1048,8 +1071,8 @@
     const vp = mat4multiply(view, proj);
     $view.cam.vp.set(vp);
     $view.cam.ivp.set(mat4invert(vp));
-    $view.cam.o.set(mat4ortho($view.w, $view.h, 0, 1));
     $view.cam.eye = eye;
+    $view.cam.o.set(mat4ortho($view.w, $view.h, 0, 1));
   };
   const view_tick = () => {
     view_tick_before();
@@ -1073,6 +1096,9 @@
           com_tick(com, data2);
         }
       }
+    }
+    if (data.draw3d) {
+      grid_tick();
     }
     view_tick_after();
   };
@@ -1139,6 +1165,25 @@
       return;
     }
     tile.base.pop();
+  };
+  const mob_make = (no, x, y, h, ha, va) => {
+    return {
+      no,
+      x,
+      y,
+      h,
+      ha: ha || 0,
+      va: va || 0
+    };
+  };
+  const mob_tick = (mob) => {
+    const data = data_mob(mob.no);
+    if (!data) {
+      return;
+    }
+    if (data.action) {
+      action_invoke(mob, data.action);
+    }
   };
   const STATE_RESET = 0;
   const BUTTON_STATE_RELEASED = 0;
@@ -1305,7 +1350,6 @@
     return 0;
   };
   const newgame = () => {
-    pos_init();
     grid_init_empty();
     item_init_empty();
   };
@@ -1316,9 +1360,6 @@
     const data = localstorage_get($view.slot);
     if (!data) {
       return false;
-    }
-    if (data.pos) {
-      Object.assign($pos, data.pos);
     }
     if (data.item) {
       Object.assign($item, item_decode(data.item));
@@ -1333,7 +1374,6 @@
       return;
     }
     const data = {};
-    data.pos = $pos;
     data.item = item_encode($item);
     data.grid = grid_encode($grid);
     localstorage_set($view.slot, data);
@@ -1535,43 +1575,42 @@
     }
     return [xx, yy];
   };
-  const pos_fps_movement = (moveXY, cameraXY) => {
+  const mob_fps_movement = (mob, moveXY, cameraXY) => {
     const dt = $timer.dt;
     if (cameraXY) {
       const cameraSpeed = 90;
-      $pos.ha += cameraSpeed * dt * cameraXY[0];
-      $pos.va += cameraSpeed * dt * cameraXY[1];
-      $pos.va = Math.max(-60, Math.min($pos.va, 80));
+      mob.ha += cameraSpeed * dt * cameraXY[0];
+      mob.va += cameraSpeed * dt * cameraXY[1];
+      mob.va = Math.max(-60, Math.min(mob.va, 80));
     }
     if (moveXY) {
       const moveSpeed = 2;
-      const rx = deg2rad($pos.ha + 90);
-      const ry = deg2rad($pos.ha);
+      const rx = deg2rad(mob.ha + 90);
+      const ry = deg2rad(mob.ha);
       const moveX = moveXY[0];
       const moveY = moveXY[1];
       const vx = moveX * Math.cos(rx) + moveY * Math.cos(ry);
       const vy = moveX * Math.sin(rx) + moveY * Math.sin(ry);
       const dx = moveSpeed * dt * vx;
       const dy = moveSpeed * dt * vy;
-      [$pos.x, $pos.y] = pos_adjust($pos.x, $pos.y, dx, dy);
+      [mob.x, mob.y] = pos_adjust(mob.x, mob.y, dx, dy);
     } else {
-      [$pos.x, $pos.y] = pos_adjust($pos.x, $pos.y, 0, 0);
+      [mob.x, mob.y] = pos_adjust(mob.x, mob.y, 0, 0);
     }
-    const h = tile_height(grid_tile($pos.x, $pos.y));
-    if (Math.abs(h - $pos.h) <= 2) {
-      const vh = h - $pos.h;
-      $pos.h += 10 * dt * vh;
+    const h = tile_height(grid_tile(mob.x, mob.y));
+    if (Math.abs(h - mob.h) <= 2) {
+      const vh = h - mob.h;
+      mob.h += 10 * dt * vh;
     } else {
-      $pos.h = h;
+      mob.h = h;
     }
   };
   define_action("fpsmove", (self, lstick, rstick) => {
     const moveXY = com_value(lstick);
     const cameraXY = com_value(rstick);
-    pos_fps_movement(moveXY, cameraXY);
+    mob_fps_movement(self, moveXY, cameraXY);
   });
   define_action("newplayer", (self) => {
-    pos_init($grid.w / 2 + 0.5, $grid.h / 2 + 0.5);
     item_init_empty(8);
     item_gain(data_item_index("pick"), 1);
     item_gain(data_item_index("shovel"), 1);
@@ -1623,11 +1662,19 @@
       return;
     }
     if (data.hand) {
-      const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+      const mob = view_camera_mob();
+      if (!mob) {
+        return;
+      }
+      const ranges = hit_ranges(mob.x, mob.y, mob.ha);
       hit(data.hand.hit, 0, ranges);
     }
     if (data.base) {
-      const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+      const mob = view_camera_mob();
+      if (!mob) {
+        return;
+      }
+      const ranges = hit_ranges(mob.x, mob.y, mob.ha);
       const result = hit(HIT_PUT, data.base.base, ranges);
       if (result > 0) {
         item_lose(item.no, result);
@@ -1637,12 +1684,20 @@
   define_action("off-hand", (self) => {
   });
   define_action("activate", (self) => {
-    const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+    const mob = view_camera_mob();
+    if (!mob) {
+      return;
+    }
+    const ranges = hit_ranges(mob.x, mob.y, mob.ha);
     hit(HIT_ACTIVATE, 0, ranges);
   });
   define_action("activate-target", (self) => {
+    const mob = view_camera_mob();
+    if (!mob) {
+      return;
+    }
     let text = "";
-    const ranges = hit_ranges($pos.x, $pos.y, $pos.ha);
+    const ranges = hit_ranges(mob.x, mob.y, mob.ha);
     for (const r of ranges) {
       const tile = grid_tile(r.x, r.y);
       if (!tile) {

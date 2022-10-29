@@ -178,7 +178,17 @@
         }
     ],
     "mob": [
-        null
+        null,
+        {
+            "n": "player",
+            "p": 0,
+            "i": 0
+        },
+        {
+            "n": "slug",
+            "p": 0,
+            "i": 1
+        }
     ],
     "grid": [
         null,
@@ -236,24 +246,19 @@
             "i": 8
         },
         {
-            "n": "movement",
+            "n": "right-stick",
             "p": 0,
             "i": 9
         },
         {
-            "n": "right-stick",
+            "n": "button-loadgame",
             "p": 0,
             "i": 10
         },
         {
-            "n": "button-loadgame",
-            "p": 0,
-            "i": 11
-        },
-        {
             "n": "button-newgame",
             "p": 0,
-            "i": 12
+            "i": 11
         }
     ],
     "view": [

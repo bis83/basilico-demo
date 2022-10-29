@@ -289,7 +289,22 @@
             }
         }
     ],
-    "mob": null,
+    "mob": [
+        {
+            "draw": 0,
+            "action": [
+                [
+                    "fpsmove",
+                    "left-stick",
+                    "right-stick"
+                ]
+            ]
+        },
+        {
+            "draw": 0,
+            "action": null
+        }
+    ],
     "grid": [
         {
             "w": 64,
@@ -339,6 +354,15 @@
                     "x": 30,
                     "y": 30,
                     "ha": 45
+                }
+            ],
+            "m": [
+                {
+                    "no": 1,
+                    "x": 30,
+                    "y": 30,
+                    "ha": 90,
+                    "va": 0
                 }
             ]
         }
@@ -525,17 +549,6 @@
             }
         },
         {
-            "tick": {
-                "action": [
-                    [
-                        "fpsmove",
-                        "left-stick",
-                        "right-stick"
-                    ]
-                ]
-            }
-        },
-        {
             "rect": {
                 "draw": 4,
                 "x": -128,
@@ -619,13 +632,8 @@
     ],
     "view": [
         {
-            "draw3d": true,
-            "draw": [
-                5
-            ],
             "com": [
                 9,
-                11,
                 10,
                 6,
                 5,
@@ -635,15 +643,21 @@
                 2,
                 1,
                 3
+            ],
+            "draw3d": true,
+            "cam": 1,
+            "draw": [
+                5
             ]
         },
         {
-            "draw3d": false,
-            "draw": null,
             "com": [
-                13,
-                12
-            ]
+                12,
+                11
+            ],
+            "draw3d": false,
+            "cam": 0,
+            "draw": null
         }
     ]
 }
