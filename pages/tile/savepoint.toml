@@ -18,6 +18,8 @@ depth = true
 
 [[mesh]]
 name = "savepoint"
+
+[mesh.buffer]
 position = [
   -0.6, -0.6, 1.4,
   +0.6, -0.6, 1.4,
@@ -43,4 +45,7 @@ index = [
   0, 5, 1,
   1, 5, 3,
   3, 5, 2,
+]
+view = [
+  { mode = 3, start = 0, count = 24 },
 ]

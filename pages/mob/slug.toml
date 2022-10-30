@@ -10,6 +10,8 @@ depth = true
 
 [[mesh]]
 name = "slug"
+
+[mesh.buffer]
 position = [
   -0.8, -0.4, 0.0,
   +0.8, -0.4, 0.0,
@@ -28,4 +30,7 @@ index = [
   0, 4, 1,
   1, 4, 3,
   3, 4, 2,
+]
+view = [
+  { mode = 3, start = 0, count = 12 },
 ]

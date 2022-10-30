@@ -1,5 +1,7 @@
 [[mesh]]
 name = "mine"
+
+[mesh.buffer]
 position = [
   -1.0, -1.0, 0.0,
   1.0, -1.0, 0.0,
@@ -43,4 +45,7 @@ index = [
   6, 3, 7,
   5, 1, 4,
   4, 1, 0,
+]
+view = [
+  { mode = 3, start = 0, count = 36 },
 ]

@@ -5,6 +5,8 @@ shader = "mesh-pc"
 
 [[mesh]]
 name = "skybox"
+
+[mesh.buffer]
 position = [
   -1.0, -1.0, -1.0,
   +1.0, -1.0, -1.0,
@@ -38,4 +40,7 @@ index = [
   3, 6, 7,
   5, 4, 1,
   1, 4, 0,
+]
+view = [
+  { mode = 3, start = 0, count = 36 },
 ]
