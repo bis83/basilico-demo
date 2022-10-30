@@ -1,6 +1,6 @@
 [[view]]
 name = "pause"
 com = [
-    "button-newgame",
-    "button-loadgame",
+  "button-newgame",
+  "button-loadgame",
 ]

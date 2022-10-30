@@ -2,10 +2,45 @@
 name = "savepoint"
 text = "セーブポイント"
 desc = "状態をセーブできます"
-draw = "rock-mine"
+draw = "savepoint"
 save-id = 300
 
 [tile.device]
 action = [
-    ["savegame"],
+  ["savegame"],
+]
+
+[[draw]]
+name = "savepoint"
+mesh = "savepoint"
+shader = "mesh-pc"
+depth = true
+
+[[mesh]]
+name = "savepoint"
+position = [
+  -0.6, -0.6, 1.4,
+  +0.6, -0.6, 1.4,
+  -0.6, +0.6, 1.4,
+  +0.6, +0.6, 1.4,
+  0.0, 0.0, 2.6,
+  0.0, 0.0, 0.2,
+]
+color = [
+  132, 162, 212, 255,
+  132, 162, 212, 255,
+  132, 162, 212, 255,
+  132, 162, 212, 255,
+  158, 194, 255, 255,
+  95, 116, 153, 255,
+]
+index = [
+  0, 4, 2,
+  1, 4, 0,
+  3, 4, 1,
+  2, 4, 3,
+  2, 5, 0,
+  0, 5, 1,
+  1, 5, 3,
+  3, 5, 2,
 ]

@@ -14,5 +14,5 @@ origin-y = 0.0
 gamepad = "lb"
 keyboard = "q"
 action = [
-    ["inventory_prev"],
+  ["inventory_prev"],
 ]

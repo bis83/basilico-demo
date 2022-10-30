@@ -15,5 +15,5 @@ contents = ""
 
 [com.tick]
 action = [
-    ["activate-target"],
+  ["activate-target"],
 ]

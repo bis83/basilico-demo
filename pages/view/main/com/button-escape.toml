@@ -14,5 +14,5 @@ origin-y = -1.0
 gamepad = "b9"
 keyboard = "esc"
 action = [
-    ["resetview"],
+  ["resetview"],
 ]

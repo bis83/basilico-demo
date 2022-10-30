@@ -14,5 +14,5 @@ origin-y = 1.0
 gamepad = "lt"
 keyboard = "c"
 action = [
-    ["off-hand"],
+  ["off-hand"],
 ]

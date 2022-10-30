@@ -15,5 +15,5 @@ contents = ""
 
 [com.tick]
 action = [
-    ["inventory"],
+  ["inventory"],
 ]

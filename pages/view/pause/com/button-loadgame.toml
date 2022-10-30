@@ -15,6 +15,6 @@ contents = "Load Game"
 gamepad = "b9"
 keyboard = "x"
 action = [
-    ["loadgame", "data0"],
-    ["nextview", "main"],
+  ["loadgame", "data0"],
+  ["nextview", "main"],
 ]

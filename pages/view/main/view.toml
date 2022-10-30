@@ -3,26 +3,26 @@ name = "main"
 draw3d = true
 camera-mob = "player"
 draw = [
-    "skybox",
+  "skybox",
 ]
 com = [
-    # movement
-    "left-stick",
-    "right-stick",
+  # movement
+  "left-stick",
+  "right-stick",
 
-    # inventory
-    "button-inventory-prev",
-    "button-inventory-next",
-    "inventory",
+  # inventory
+  "button-inventory-prev",
+  "button-inventory-next",
+  "inventory",
 
-    # hand
-    "button-hand",
-    "button-off-hand",
+  # hand
+  "button-hand",
+  "button-off-hand",
 
-    # activate
-    "button-activate",
-    "activate-target",
+  # activate
+  "button-activate",
+  "activate-target",
 
-    # misc
-    "button-escape",
+  # misc
+  "button-escape",
 ]

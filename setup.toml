@@ -6,5 +6,5 @@ minify = false
 initial-view = "pause"
 
 script = [
-    "js/action.js",
+  "js/action.js",
 ]

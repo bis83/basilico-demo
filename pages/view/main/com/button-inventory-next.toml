@@ -14,5 +14,5 @@ origin-y = 0.0
 gamepad = "rb"
 keyboard = "e"
 action = [
-    ["inventory_next"],
+  ["inventory_next"],
 ]
