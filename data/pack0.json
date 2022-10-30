@@ -18,6 +18,21 @@
             ]
         },
         {
+            "b": "zcxMv83MzL4AAAAAzcxMP83MzL4AAAAAzcxMv83MzD4AAAAAzcxMP83MzD4AAAAAmpkZPwAAAADNzEw/0rSM/9K0jP/StIz/0rSM/w==",
+            "bv": [
+                0,
+                0,
+                2,
+                60
+            ],
+            "i": "AgAEAAAAAAAEAAEAAQAEAAMAAwAEAAIA",
+            "iv": [
+                3,
+                0,
+                12
+            ]
+        },
+        {
             "b": "AACAvwAAgL8AAIC/AACAPwAAgL8AAIC/AACAvwAAgD8AAIC/AACAPwAAgD8AAIC/AACAvwAAgL8AAIA/AACAPwAAgL8AAIA/AACAvwAAgD8AAIA/AACAPwAAgD8AAIA/CAgI/wgICP8ICAj/CAgI/7TI8P+0yPD/tMjw/7TI8P8=",
             "bv": [
                 0,
@@ -47,6 +62,21 @@
                 3,
                 0,
                 36
+            ]
+        },
+        {
+            "b": "mpkZv5qZGb8zM7M/mpkZP5qZGb8zM7M/mpkZv5qZGT8zM7M/mpkZP5qZGT8zM7M/AAAAAAAAAABmZiZAAAAAAAAAAADNzEw+hKLU/4Si1P+EotT/hKLU/57C//9fdJn/",
+            "bv": [
+                0,
+                0,
+                2,
+                72
+            ],
+            "i": "AAAEAAIAAQAEAAAAAwAEAAEAAgAEAAMAAgAFAAAAAAAFAAEAAQAFAAMAAwAFAAIA",
+            "iv": [
+                3,
+                0,
+                24
             ]
         },
         {
@@ -177,7 +207,7 @@
             "ortho": false
         },
         {
-            "mesh": 4,
+            "mesh": 6,
             "shader": 2,
             "image": 4,
             "depth": false,
@@ -188,12 +218,20 @@
             "mesh": 2,
             "shader": 1,
             "image": 0,
-            "depth": false,
+            "depth": true,
             "alpha": false,
             "ortho": false
         },
         {
             "mesh": 3,
+            "shader": 1,
+            "image": 0,
+            "depth": false,
+            "alpha": false,
+            "ortho": false
+        },
+        {
+            "mesh": 4,
             "shader": 2,
             "image": 2,
             "depth": true,
@@ -201,9 +239,17 @@
             "ortho": false
         },
         {
-            "mesh": 3,
+            "mesh": 4,
             "shader": 2,
             "image": 3,
+            "depth": true,
+            "alpha": false,
+            "ortho": false
+        },
+        {
+            "mesh": 5,
+            "shader": 1,
+            "image": 0,
             "depth": true,
             "alpha": false,
             "ortho": false
@@ -261,7 +307,7 @@
         {
             "text": "石の山",
             "desc": "石が採掘できる山場",
-            "draw": 6,
+            "draw": 7,
             "mine": {
                 "item": 2,
                 "count": 10
@@ -270,7 +316,7 @@
         {
             "text": "砂の山",
             "desc": "砂が採掘できる山場",
-            "draw": 7,
+            "draw": 8,
             "mine": {
                 "item": 3,
                 "count": 10
@@ -279,7 +325,7 @@
         {
             "text": "セーブポイント",
             "desc": "状態をセーブできます",
-            "draw": 6,
+            "draw": 9,
             "device": {
                 "action": [
                     [
@@ -301,7 +347,7 @@
             ]
         },
         {
-            "draw": 0,
+            "draw": 5,
             "action": null
         }
     ],
@@ -332,28 +378,10 @@
                     "ha": 0
                 },
                 {
-                    "no": 1,
-                    "x": 35,
-                    "y": 29,
-                    "ha": 0
-                },
-                {
-                    "no": 2,
-                    "x": 29,
-                    "y": 35,
-                    "ha": 0
-                },
-                {
-                    "no": 1,
-                    "x": 35,
-                    "y": 35,
-                    "ha": 0
-                },
-                {
                     "no": 3,
-                    "x": 30,
-                    "y": 30,
-                    "ha": 45
+                    "x": 33,
+                    "y": 33,
+                    "ha": 0
                 }
             ],
             "m": [
@@ -361,6 +389,13 @@
                     "no": 1,
                     "x": 30,
                     "y": 30,
+                    "ha": 90,
+                    "va": 0
+                },
+                {
+                    "no": 2,
+                    "x": 35,
+                    "y": 35,
                     "ha": 90,
                     "va": 0
                 }
@@ -647,7 +682,7 @@
             "draw3d": true,
             "cam": 1,
             "draw": [
-                5
+                6
             ]
         },
         {

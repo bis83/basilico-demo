@@ -8,34 +8,44 @@
             "i": 0
         },
         {
-            "n": "skybox",
+            "n": "slug",
             "p": 0,
             "i": 1
         },
         {
-            "n": "mine",
+            "n": "skybox",
             "p": 0,
             "i": 2
         },
         {
-            "n": "rect",
+            "n": "mine",
             "p": 0,
             "i": 3
         },
         {
-            "n": "box",
+            "n": "savepoint",
             "p": 0,
             "i": 4
         },
         {
-            "n": "reticle",
+            "n": "rect",
             "p": 0,
             "i": 5
         },
         {
-            "n": "debug-grid",
+            "n": "box",
             "p": 0,
             "i": 6
+        },
+        {
+            "n": "reticle",
+            "p": 0,
+            "i": 7
+        },
+        {
+            "n": "debug-grid",
+            "p": 0,
+            "i": 8
         }
     ],
     "image": [
@@ -97,19 +107,29 @@
             "i": 3
         },
         {
-            "n": "skybox",
+            "n": "slug",
             "p": 0,
             "i": 4
         },
         {
-            "n": "rock-mine",
+            "n": "skybox",
             "p": 0,
             "i": 5
         },
         {
-            "n": "sand-mine",
+            "n": "rock-mine",
             "p": 0,
             "i": 6
+        },
+        {
+            "n": "sand-mine",
+            "p": 0,
+            "i": 7
+        },
+        {
+            "n": "savepoint",
+            "p": 0,
+            "i": 8
         }
     ],
     "item": [

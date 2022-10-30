@@ -1349,35 +1349,6 @@
     }
     return 0;
   };
-  const newgame = () => {
-    grid_init_empty();
-    item_init_empty();
-  };
-  const loadgame = () => {
-    if (!$view.slot) {
-      return false;
-    }
-    const data = localstorage_get($view.slot);
-    if (!data) {
-      return false;
-    }
-    if (data.item) {
-      Object.assign($item, item_decode(data.item));
-    }
-    if (data.grid) {
-      Object.assign($grid, grid_decode(data.grid));
-    }
-    return true;
-  };
-  const savegame = () => {
-    if (!$view.slot) {
-      return;
-    }
-    const data = {};
-    data.item = item_encode($item);
-    data.grid = grid_encode($grid);
-    localstorage_set($view.slot, data);
-  };
   const draw_start_frame = () => {
     gl_resizeCanvas();
     gl_clear();
@@ -1408,68 +1379,78 @@
     func(shader.u);
     gl_drawMesh(mesh);
   };
-  const draw_grid = () => {
-    const draw_one = (x, y) => {
-      const tile = grid_tile(x, y);
-      if (!tile) {
-        return;
-      }
-      for (let i = 0; i < tile.base.length; ++i) {
-        const data2 = data_base(tile.base[i]);
-        if (!data2) {
-          continue;
-        }
-        draw_call(data2.draw, (u) => {
-          const pos = grid_to_world(x, y, i);
-          $view.m.set(mat4translate(pos[0], pos[1], pos[2]));
-          $gl.uniformMatrix4fv(u.w, false, $view.m);
-        });
-      }
-      const data = data_tile(tile.no);
-      if (!data) {
-        return;
-      }
-      const h = tile_height(tile);
-      draw_call(data.draw, (u) => {
-        const pos = grid_to_world(x, y, h);
-        const m = mat4angle(tile.ha || 0, tile.va || 0);
-        mat4translated(m, pos[0] + 1, pos[1] + 1, pos[2]);
-        $view.m.set(m);
-        $gl.uniformMatrix4fv(u.w, false, $view.m);
-      });
-    };
-    for (let x = 0; x < $grid.w; ++x) {
-      for (let y = 0; y < $grid.h; ++y) {
-        draw_one(x, y);
-      }
-    }
-  };
-  const draw_com = (view) => {
-    if (!view.com) {
+  const draw_tile = (x, y) => {
+    const tile = grid_tile(x, y);
+    if (!tile) {
       return;
     }
-    for (let no of view.com) {
-      const data = data_com(no);
-      if (!data) {
+    for (let i = 0; i < tile.base.length; ++i) {
+      const data2 = data_base(tile.base[i]);
+      if (!data2) {
         continue;
       }
-      if (!data.rect) {
-        continue;
-      }
-      if (data.rect.draw <= 0) {
-        continue;
-      }
-      const com = $view.com[no];
-      if (!com) {
-        continue;
-      }
-      draw_call(data.rect.draw, (u) => {
-        $gl.uniformMatrix4fv(u.w, false, com.m);
-        if (com.img) {
-          gl_useTexture(com.img, u.tex0);
-        }
+      draw_call(data2.draw, (u) => {
+        const pos = grid_to_world(x, y, i);
+        $view.m.set(mat4translate(pos[0], pos[1], pos[2]));
+        $gl.uniformMatrix4fv(u.w, false, $view.m);
       });
     }
+    const data = data_tile(tile.no);
+    if (!data) {
+      return;
+    }
+    const h = tile_height(tile);
+    draw_call(data.draw, (u) => {
+      const pos = grid_to_world(x, y, h);
+      const m = mat4angle(tile.ha || 0, tile.va || 0);
+      mat4translated(m, pos[0] + 1, pos[1] + 1, pos[2]);
+      $view.m.set(m);
+      $gl.uniformMatrix4fv(u.w, false, $view.m);
+    });
+  };
+  const draw_mob = (mob) => {
+    const data = data_mob(mob.no);
+    if (!data) {
+      return;
+    }
+    if (data.draw <= 0) {
+      return;
+    }
+    draw_call(data.draw, (u) => {
+      const pos = grid_to_world(mob.x, mob.y, mob.h);
+      const m = mat4angle(mob.ha || 0, mob.va || 0);
+      mat4translated(m, pos[0] + 1, pos[1] + 1, pos[2]);
+      $view.m.set(m);
+      $gl.uniformMatrix4fv(u.w, false, $view.m);
+    });
+  };
+  const draw_grid = () => {
+    for (let x = 0; x < $grid.w; ++x) {
+      for (let y = 0; y < $grid.h; ++y) {
+        draw_tile(x, y);
+      }
+    }
+    for (const mob of $grid.m) {
+      draw_mob(mob);
+    }
+  };
+  const draw_com = (com, no) => {
+    const data = data_com(no);
+    if (!data) {
+      return;
+    }
+    if (!data.rect) {
+      return;
+    }
+    if (data.rect.draw <= 0) {
+      return;
+    }
+    draw_call(data.rect.draw, (u) => {
+      $gl.uniformMatrix4fv(u.w, false, com.m);
+      if (com.img) {
+        gl_useTexture(com.img, u.tex0);
+      }
+    });
   };
   const draw_view = () => {
     const data = data_view($view.view);
@@ -1487,7 +1468,43 @@
     if (data.draw3d) {
       draw_grid();
     }
-    draw_com(data);
+    if (data.com) {
+      for (let no of data.com) {
+        const com = $view.com[no];
+        if (com) {
+          draw_com(com, no);
+        }
+      }
+    }
+  };
+  const newgame = () => {
+    grid_init_empty();
+    item_init_empty();
+  };
+  const loadgame = () => {
+    if (!$view.slot) {
+      return false;
+    }
+    const data = localstorage_get($view.slot);
+    if (!data) {
+      return false;
+    }
+    if (data.item) {
+      Object.assign($item, item_decode(data.item));
+    }
+    if (data.grid) {
+      Object.assign($grid, grid_decode(data.grid));
+    }
+    return true;
+  };
+  const savegame = () => {
+    if (!$view.slot) {
+      return;
+    }
+    const data = {};
+    data.item = item_encode($item);
+    data.grid = grid_encode($grid);
+    localstorage_set($view.slot, data);
   };
   const init = () => {
     gl_init();
