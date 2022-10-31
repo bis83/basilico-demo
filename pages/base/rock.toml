@@ -13,4 +13,4 @@ depth = true
 
 [[image]]
 name = "rock"
-src = "rock.png"
+src = "img/rock.png"

@@ -8,4 +8,4 @@ alpha = true
 
 [[image]]
 name = "icon"
-src = "icon.png"
+src = "img/icon.png"

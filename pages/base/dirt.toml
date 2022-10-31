@@ -12,4 +12,4 @@ depth = true
 
 [[image]]
 name = "dirt"
-src = "dirt.png"
+src = "img/dirt.png"
