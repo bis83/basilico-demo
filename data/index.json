@@ -1,5 +1,8 @@
 {
-    "initial_view": 2,
+    "init": 2,
+    "pack": [
+        0
+    ],
     "mesh": [
         null,
         {

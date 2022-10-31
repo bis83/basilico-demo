@@ -766,7 +766,7 @@
       data.tex = gl_createGLTexture2D(img, data.s);
       $imageLoading -= 1;
     };
-    img.src = "img/" + data.src;
+    img.src = "data:image/png;base64," + data.src;
     $imageLoading += 1;
     return data;
   };
@@ -778,6 +778,9 @@
     const path = "data/index.json";
     fetch(path).then((res) => res.json()).then((json) => {
       $data.index = json;
+      for (const no of $data.index.pack) {
+        data_loadPack(no);
+      }
     });
   };
   const data_loadPack = (no) => {
@@ -1025,7 +1028,7 @@
   };
   const view_reset = () => {
     $view.slot = null;
-    $view.view = $data.index.initial_view;
+    $view.view = $data.index.init;
   };
   const view_camera_mob = () => {
     const data = data_view($view.view);
@@ -1575,7 +1578,6 @@
     audio_init();
     listen_init();
     data_loadIndex();
-    data_loadPack(0);
   };
   const update = (time) => {
     timer_tick(time);
