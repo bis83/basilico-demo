@@ -26,29 +26,34 @@
             "i": 3
         },
         {
-            "n": "savepoint",
+            "n": "pillar",
             "p": 0,
             "i": 4
         },
         {
-            "n": "rect",
+            "n": "savepoint",
             "p": 0,
             "i": 5
         },
         {
-            "n": "box",
+            "n": "rect",
             "p": 0,
             "i": 6
         },
         {
-            "n": "reticle",
+            "n": "box",
             "p": 0,
             "i": 7
         },
         {
-            "n": "debug-grid",
+            "n": "reticle",
             "p": 0,
             "i": 8
+        },
+        {
+            "n": "debug-grid",
+            "p": 0,
+            "i": 9
         }
     ],
     "image": [
@@ -77,14 +82,19 @@
     "shader": [
         null,
         {
-            "n": "mesh-pc",
+            "n": "mesh-p",
             "p": 0,
             "i": 0
         },
         {
-            "n": "mesh-pt",
+            "n": "mesh-pc",
             "p": 0,
             "i": 1
+        },
+        {
+            "n": "mesh-pt",
+            "p": 0,
+            "i": 2
         }
     ],
     "draw": [
@@ -120,19 +130,24 @@
             "i": 5
         },
         {
-            "n": "rock-mine",
+            "n": "pillar",
             "p": 0,
             "i": 6
         },
         {
-            "n": "sand-mine",
+            "n": "rock-mine",
             "p": 0,
             "i": 7
         },
         {
-            "n": "savepoint",
+            "n": "sand-mine",
             "p": 0,
             "i": 8
+        },
+        {
+            "n": "savepoint",
+            "p": 0,
+            "i": 9
         }
     ],
     "item": [
@@ -182,21 +197,27 @@
     "tile": [
         null,
         {
-            "n": "rock-mine",
+            "n": "pillar",
             "p": 0,
             "i": 0,
-            "sid": 200
+            "sid": 400
         },
         {
-            "n": "sand-mine",
+            "n": "rock-mine",
             "p": 0,
             "i": 1,
             "sid": 200
         },
         {
-            "n": "savepoint",
+            "n": "sand-mine",
             "p": 0,
             "i": 2,
+            "sid": 200
+        },
+        {
+            "n": "savepoint",
+            "p": 0,
+            "i": 3,
             "sid": 300
         }
     ],

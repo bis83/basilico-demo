@@ -620,8 +620,9 @@
     $gl.clearDepth(1);
     $gl.clear($gl.COLOR_BUFFER_BIT | $gl.DEPTH_BUFFER_BIT);
   };
-  const gl_state = (depth, alpha) => {
+  const gl_state = (depth, alpha, cw) => {
     $gl.enable($gl.CULL_FACE);
+    $gl.frontFace(cw ? $gl.CW : $gl.CCW);
     if (depth) {
       $gl.enable($gl.DEPTH_TEST);
       $gl.depthFunc($gl.LEQUAL);
@@ -1425,7 +1426,7 @@
     if (!data) {
       return;
     }
-    gl_state(data.depth, data.alpha);
+    gl_state(data.depth, data.alpha, data.cw);
     const shader = data_shader(data.shader);
     if (!shader) {
       return;
