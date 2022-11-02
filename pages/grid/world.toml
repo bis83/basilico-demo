@@ -11,6 +11,7 @@ tile = [
   { tile = "rock-mine", x = 24, y = 24 },
   { tile = "sand-mine", x = 29, y = 29 },
   { tile = "savepoint", x = 33, y = 33, h-angle = 0 },
+  { tile = "pillar", x = 34, y = 30, h-angle = 45 },
 ]
 
 mob = [

@@ -1,0 +1,17 @@
+[[tile]]
+name = "pillar"
+text = "柱"
+desc = "何でもない柱"
+draw = "pillar"
+save-id = 400
+
+[[draw]]
+name = "pillar"
+mesh = "pillar"
+shader = "mesh-p"
+depth = true
+cw = true
+
+[[mesh]]
+name = "pillar"
+src = "pillar-a"

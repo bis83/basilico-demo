@@ -8,3 +8,7 @@ initial-view = "pause"
 script = [
   "js/action.js",
 ]
+
+gltf = [
+  "gltf/pillar_a.gltf",
+]
