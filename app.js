@@ -21,6 +21,9 @@
     const l = xy_length(x, y);
     return l != 0 ? [x / l, y / l] : [0, 0];
   };
+  const xy_reverse = ([x, y]) => {
+    return [-x, -y];
+  };
   const xy_mul = ([x, y], l) => {
     return [x * l, y * l];
   };
@@ -705,11 +708,11 @@
   const VS_LAYOUT_NORMAL = 1;
   const VS_LAYOUT_COLOR = 2;
   const VS_LAYOUT_UV = 3;
-  const decodeMesh = (data) => {
+  const decodeMesh = (data, base64) => {
     data.vao = $gl.createVertexArray();
     $gl.bindVertexArray(data.vao);
-    if (data.b) {
-      data.b = gl_staticBuffer($gl.ARRAY_BUFFER, base64ToArrayBuffer(data.b));
+    if (data.b >= 0) {
+      data.b = gl_staticBuffer($gl.ARRAY_BUFFER, base64ToArrayBuffer(base64[data.b]));
       if (data.bv) {
         for (let i = 0; i < data.bv.length; i += 2) {
           switch (data.bv[i]) {
@@ -729,8 +732,8 @@
         }
       }
     }
-    if (data.i) {
-      data.i = gl_staticBuffer($gl.ELEMENT_ARRAY_BUFFER, base64ToArrayBuffer(data.i));
+    if (data.i >= 0) {
+      data.i = gl_staticBuffer($gl.ELEMENT_ARRAY_BUFFER, base64ToArrayBuffer(base64[data.i]));
     }
     $gl.bindVertexArray(null);
     return data;
@@ -760,14 +763,14 @@
     return data;
   };
   let $imageLoading = 0;
-  const decodeImage = (data) => {
+  const decodeImage = (data, base64) => {
     data.tex = null;
     const img = new Image();
     img.onload = () => {
       data.tex = gl_createGLTexture2D(img, data.s);
       $imageLoading -= 1;
     };
-    img.src = "data:image/png;base64," + data.src;
+    img.src = "data:image/png;base64," + base64[data.b];
     $imageLoading += 1;
     return data;
   };
@@ -788,10 +791,10 @@
     const path = "data/pack" + no + ".json";
     fetch(path).then((res) => res.json()).then((json) => {
       if (json.mesh) {
-        json.mesh = json.mesh.map((data) => decodeMesh(data));
+        json.mesh = json.mesh.map((data) => decodeMesh(data, json.base64));
       }
       if (json.image) {
-        json.image = json.image.map((data) => decodeImage(data));
+        json.image = json.image.map((data) => decodeImage(data, json.base64));
       }
       if (json.shader) {
         json.shader = json.shader.map((data) => decodeShader(data));
@@ -954,6 +957,7 @@
     for (const mob of $grid.m) {
       mob_tick(mob);
     }
+    mob_resolve_overlaps($grid.m);
   };
   const grid_encode = (data) => {
     return data;
@@ -1188,11 +1192,21 @@
     if (data.action) {
       action_invoke(mob, data.action);
     }
+    mob_fall(mob);
   };
-  const mob_adjust_position = (x, y, dx, dy) => {
+  const mob_fall = (mob) => {
+    const h = tile_height(grid_tile(mob.x, mob.y));
+    if (Math.abs(h - mob.h) <= 2) {
+      const dt = $timer.dt;
+      const vh = h - mob.h;
+      mob.h += 10 * dt * vh;
+    } else {
+      mob.h = h;
+    }
+  };
+  const mob_adjust_position = (r, x, y, dx, dy) => {
     const ix = Math.floor(x);
     const iy = Math.floor(y);
-    const r = 0.25;
     const h0 = tile_height(grid_tile(ix, iy));
     let xx = x + dx;
     let yy = y + dy;
@@ -1223,6 +1237,10 @@
     return [xx, yy];
   };
   const mob_fps_movement = (mob, moveXY, cameraXY) => {
+    const data = data_mob(mob.no);
+    if (!data) {
+      return;
+    }
     const dt = $timer.dt;
     if (cameraXY) {
       const cameraSpeed = 90;
@@ -1240,16 +1258,37 @@
       const vy = moveX * Math.sin(rx) + moveY * Math.sin(ry);
       const dx = moveSpeed * dt * vx;
       const dy = moveSpeed * dt * vy;
-      [mob.x, mob.y] = mob_adjust_position(mob.x, mob.y, dx, dy);
+      [mob.x, mob.y] = mob_adjust_position(data.r, mob.x, mob.y, dx, dy);
     } else {
-      [mob.x, mob.y] = mob_adjust_position(mob.x, mob.y, 0, 0);
+      [mob.x, mob.y] = mob_adjust_position(data.r, mob.x, mob.y, 0, 0);
     }
-    const h = tile_height(grid_tile(mob.x, mob.y));
-    if (Math.abs(h - mob.h) <= 2) {
-      const vh = h - mob.h;
-      mob.h += 10 * dt * vh;
-    } else {
-      mob.h = h;
+  };
+  const mob_resolve_overlaps = (mobs) => {
+    for (let i = 0; i < mobs.length; ++i) {
+      for (let j = i + 1; j < mobs.length; ++j) {
+        const a = mobs[i];
+        const b = mobs[j];
+        const adata = data_mob(a.no);
+        if (!adata) {
+          continue;
+        }
+        const bdata = data_mob(b.no);
+        if (!bdata) {
+          continue;
+        }
+        const [dx, dy] = [b.x - a.x, b.y - a.y];
+        const l = xy_length(dx, dy);
+        const d = adata.r + bdata.r - l;
+        if (d <= 0) {
+          continue;
+        }
+        const ab = xy_normalize(dx, dy);
+        const ba = xy_reverse(ab);
+        const wa = adata.w == 0 && bdata.w == 0 ? 0.5 : adata.w / (adata.w + bdata.w);
+        const wb = 1 - wa;
+        [a.x, a.y] = mob_adjust_position(adata.r, a.x, a.y, ba[0] * wa * d, ba[1] * wa * d);
+        [b.x, b.y] = mob_adjust_position(bdata.r, b.x, b.y, ab[0] * wb * d, ab[1] * wb * d);
+      }
     }
   };
   const STATE_RESET = 0;
@@ -1487,7 +1526,7 @@
     draw_call(data.draw, (u) => {
       const pos = grid_to_world(mob.x, mob.y, mob.h);
       const m = mat4angle(mob.ha || 0, mob.va || 0);
-      mat4translated(m, pos[0] + 1, pos[1] + 1, pos[2]);
+      mat4translated(m, pos[0], pos[1], pos[2]);
       $view.m.set(m);
       $gl.uniformMatrix4fv(u.w, false, $view.m);
     });
