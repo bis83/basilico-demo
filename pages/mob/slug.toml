@@ -1,6 +1,8 @@
 [[mob]]
 name = "slug"
 draw = "slug"
+radius = 0.4
+weight = 0.5
 
 [[draw]]
 name = "slug"

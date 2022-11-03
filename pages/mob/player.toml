@@ -1,5 +1,8 @@
 [[mob]]
 name = "player"
+radius = 0.25
+weight = 1.0
+
 action = [
   ["fpsmove", "left-stick", "right-stick"],
 ]
