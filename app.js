@@ -856,6 +856,9 @@
   const data_mob = (no) => {
     return data_lookup("mob", no);
   };
+  const data_hit = (no) => {
+    return data_lookup("hit", no);
+  };
   const data_grid = (no) => {
     return data_lookup("grid", no);
   };
@@ -878,6 +881,12 @@
   };
   const data_item_index = (name) => {
     return data_lookup_index("item", name);
+  };
+  const data_base_index = (name) => {
+    return data_lookup_index("base", name);
+  };
+  const data_hit_index = (name) => {
+    return data_lookup_index("hit", name);
   };
   const data_grid_index = (name) => {
     return data_lookup_index("grid", name);
@@ -955,9 +964,12 @@
   };
   const grid_tick = () => {
     for (const mob of $grid.m) {
-      mob_tick(mob);
+      mob_tick_before(mob);
     }
     mob_resolve_overlaps($grid.m);
+    for (const mob of $grid.m) {
+      mob_tick_after(mob);
+    }
   };
   const grid_encode = (data) => {
     return data;
@@ -1181,10 +1193,11 @@
       y,
       h,
       ha: ha || 0,
-      va: va || 0
+      va: va || 0,
+      hit: null
     };
   };
-  const mob_tick = (mob) => {
+  const mob_tick_before = (mob) => {
     const data = data_mob(mob.no);
     if (!data) {
       return;
@@ -1193,6 +1206,18 @@
       action_invoke(mob, data.action);
     }
     mob_fall(mob);
+  };
+  const mob_tick_after = (mob) => {
+    if (mob.hit) {
+      const data = data_hit(mob.hit.no);
+      if (!data) {
+        return;
+      }
+      if (data.action) {
+        action_invoke(mob, data.action);
+      }
+      mob.hit = null;
+    }
   };
   const mob_fall = (mob) => {
     const h = tile_height(grid_tile(mob.x, mob.y));
@@ -1291,6 +1316,9 @@
       }
     }
   };
+  const mob_set_hit = (mob, no, item) => {
+    mob.hit = hit_make(no, item);
+  };
   const STATE_RESET = 0;
   const BUTTON_STATE_RELEASED = 0;
   const BUTTON_STATE_PRESSED = 1;
@@ -1331,7 +1359,7 @@
     const maxY = oy + (data.rect.y + data.rect.h / 2);
     return [minX, maxX, minY, maxY];
   };
-  com_tick = (com, data) => {
+  const com_tick = (com, data) => {
     if (data.rect) {
       com.m.set(com_matrix(data, $view.w, $view.h));
       com.rect = com_rect(data, $view.w, $view.h);
@@ -1362,7 +1390,12 @@
       action_invoke(com, data.tick.action);
     }
   };
-  $hit = [];
+  const hit_make = (no, item) => {
+    return {
+      no: no || 0,
+      item: item || 0
+    };
+  };
   const hit_ranges = (x, y, ha) => {
     let ranges = [];
     const h = deg2rad(ha);
@@ -1372,89 +1405,6 @@
     y = Math.floor(y);
     ranges.push({ x, y });
     return ranges;
-  };
-  const HIT_ACTIVATE = 1;
-  const HIT_MINING = 2;
-  const HIT_DIG = 3;
-  const HIT_PUT = 4;
-  const hit_activate = (ranges) => {
-    let result = 0;
-    for (const r of ranges) {
-      const tile = grid_tile(r.x, r.y);
-      if (!tile) {
-        continue;
-      }
-      const data = data_tile(tile.no);
-      if (!data) {
-        continue;
-      }
-      if (data.device) {
-        action_invoke(tile, data.device.action);
-        result += 1;
-      }
-    }
-    return result;
-  };
-  const hit_mining = (ranges) => {
-    let result = 0;
-    for (const r of ranges) {
-      const tile = grid_tile(r.x, r.y);
-      if (!tile) {
-        continue;
-      }
-      const data = data_tile(tile.no);
-      if (!data) {
-        continue;
-      }
-      if (data.mine) {
-        item_gain(data.mine.item, data.mine.count);
-        tile_del(tile);
-        result += 1;
-      }
-    }
-    return result;
-  };
-  const hit_dig = (ranges) => {
-    let result = 0;
-    for (const r of ranges) {
-      const tile = grid_tile(r.x, r.y);
-      if (tile_is_empty(tile)) {
-        continue;
-      }
-      if (tile_is_full(tile)) {
-        continue;
-      }
-      tile_base_pop(tile);
-      result += 1;
-    }
-    return result;
-  };
-  const hit_put = (value, ranges) => {
-    let result = 0;
-    for (const r of ranges) {
-      const tile = grid_tile(r.x, r.y);
-      if (tile_is_full(tile)) {
-        continue;
-      }
-      tile_base_push(tile, value);
-      result += 1;
-    }
-    return result;
-  };
-  const hit = (hit2, value, ranges) => {
-    if (hit2 === HIT_ACTIVATE) {
-      return hit_activate(ranges);
-    }
-    if (hit2 === HIT_MINING) {
-      return hit_mining(ranges);
-    }
-    if (hit2 === HIT_DIG) {
-      return hit_dig(ranges);
-    }
-    if (hit2 === HIT_PUT) {
-      return hit_put(value, ranges);
-    }
-    return 0;
   };
   const draw_start_frame = () => {
     gl_resizeCanvas();
@@ -1713,6 +1663,10 @@
     gl_updateGLTexture2D(self.img, self.cvs);
   });
   define_action("hand", (self) => {
+    const mob = view_camera_mob();
+    if (!mob) {
+      return;
+    }
     const item = item_select();
     if (!item) {
       return;
@@ -1721,35 +1675,18 @@
     if (!data) {
       return;
     }
-    if (data.hand) {
-      const mob = view_camera_mob();
-      if (!mob) {
-        return;
-      }
-      const ranges = hit_ranges(mob.x, mob.y, mob.ha);
-      hit(data.hand.hit, 0, ranges);
-    }
-    if (data.base) {
-      const mob = view_camera_mob();
-      if (!mob) {
-        return;
-      }
-      const ranges = hit_ranges(mob.x, mob.y, mob.ha);
-      const result = hit(HIT_PUT, data.base.base, ranges);
-      if (result > 0) {
-        item_lose(item.no, result);
-      }
-    }
-  });
-  define_action("off-hand", (self) => {
+    mob_set_hit(mob, data.hit, item.no);
   });
   define_action("activate", (self) => {
     const mob = view_camera_mob();
     if (!mob) {
       return;
     }
-    const ranges = hit_ranges(mob.x, mob.y, mob.ha);
-    hit(HIT_ACTIVATE, 0, ranges);
+    const hit = data_hit_index("activate");
+    if (hit <= 0) {
+      return;
+    }
+    mob_set_hit(mob, hit);
   });
   define_action("activate-target", (self) => {
     const mob = view_camera_mob();
@@ -1772,5 +1709,70 @@
     }
     cvs_text(self.cvs, text);
     gl_updateGLTexture2D(self.img, self.cvs);
+  });
+  define_action("hit-activate", (self) => {
+    const ranges = hit_ranges(self.x, self.y, self.ha);
+    for (const r of ranges) {
+      const tile = grid_tile(r.x, r.y);
+      if (!tile) {
+        continue;
+      }
+      const data = data_tile(tile.no);
+      if (!data) {
+        continue;
+      }
+      if (data.device) {
+        action_invoke(tile, data.device.action);
+      }
+    }
+  });
+  define_action("hit-mining", (self) => {
+    const ranges = hit_ranges(self.x, self.y, self.ha);
+    for (const r of ranges) {
+      const tile = grid_tile(r.x, r.y);
+      if (!tile) {
+        continue;
+      }
+      const data = data_tile(tile.no);
+      if (!data) {
+        continue;
+      }
+      if (data.mine) {
+        item_gain(data.mine.item, data.mine.count);
+        tile_del(tile);
+      }
+    }
+  });
+  define_action("hit-dig", (self) => {
+    const ranges = hit_ranges(self.x, self.y, self.ha);
+    for (const r of ranges) {
+      const tile = grid_tile(r.x, r.y);
+      if (tile_is_empty(tile)) {
+        continue;
+      }
+      if (tile_is_full(tile)) {
+        continue;
+      }
+      tile_base_pop(tile);
+    }
+  });
+  define_action("hit-put", (self, base) => {
+    const value = data_base_index(base);
+    if (value <= 0) {
+      return;
+    }
+    const ranges = hit_ranges(self.x, self.y, self.ha);
+    let count = 0;
+    for (const r of ranges) {
+      const tile = grid_tile(r.x, r.y);
+      if (tile_is_full(tile)) {
+        continue;
+      }
+      tile_base_push(tile, value);
+      count += 1;
+    }
+    if (self.hit.item > 0 && count > 0) {
+      item_lose(self.hit.item, count);
+    }
   });
 })();
