@@ -2,6 +2,4 @@
 name = "shovel"
 text = "シャベル"
 desc = "床を掘って穴を作る"
-
-[item.hand]
 hit = "dig"

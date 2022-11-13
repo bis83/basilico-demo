@@ -2,6 +2,4 @@
 name = "pick"
 text = "マイニングツール"
 desc = "鉱物を破壊して素材を採集出来る"
-
-[item.hand]
 hit = "mining"

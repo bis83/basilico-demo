@@ -1,0 +1,5 @@
+[[hit]]
+name = "dig"
+action = [
+  ["hit-dig"],
+]

@@ -17,7 +17,6 @@ com = [
 
   # hand
   "button-hand",
-  "button-off-hand",
 
   # activate
   "button-activate",

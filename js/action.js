@@ -12,7 +12,6 @@ define_action("inventory_next", (self) => {
 define_action("inventory_prev", (self) => {
   item_set_cursor(-1);
 });
-
 define_action("inventory", (self) => {
   let text = "";
   for (let i = 0; i < $item.s.length; ++i) {
@@ -46,6 +45,10 @@ define_action("inventory", (self) => {
 });
 
 define_action("hand", (self) => {
+  const mob = view_camera_mob();
+  if (!mob) {
+    return;
+  }
   const item = item_select();
   if (!item) {
     return;
@@ -54,28 +57,7 @@ define_action("hand", (self) => {
   if (!data) {
     return;
   }
-  if (data.hand) {
-    const mob = view_camera_mob();
-    if (!mob) {
-      return;
-    }
-    const ranges = hit_ranges(mob.x, mob.y, mob.ha);
-    hit(data.hand.hit, 0, ranges);
-  }
-  if (data.base) {
-    const mob = view_camera_mob();
-    if (!mob) {
-      return;
-    }
-    const ranges = hit_ranges(mob.x, mob.y, mob.ha);
-    const result = hit(HIT_PUT, data.base.base, ranges);
-    if (result > 0) {
-      item_lose(item.no, result);
-    }
-  }
-});
-
-define_action("off-hand", (self) => {
+  mob_set_hit(mob, data.hit, item.no);
 });
 
 define_action("activate", (self) => {
@@ -83,8 +65,11 @@ define_action("activate", (self) => {
   if (!mob) {
     return;
   }
-  const ranges = hit_ranges(mob.x, mob.y, mob.ha);
-  hit(HIT_ACTIVATE, 0, ranges);
+  const hit = data_hit_index("activate");
+  if (hit <= 0) {
+    return;
+  }
+  mob_set_hit(mob, hit);
 });
 
 define_action("activate-target", (self) => {
@@ -109,4 +94,73 @@ define_action("activate-target", (self) => {
   }
   cvs_text(self.cvs, text);
   gl_updateGLTexture2D(self.img, self.cvs);
+});
+
+define_action("hit-activate", (self) => {
+  const ranges = hit_ranges(self.x, self.y, self.ha);
+  for (const r of ranges) {
+    const tile = grid_tile(r.x, r.y);
+    if (!tile) {
+      continue;
+    }
+    const data = data_tile(tile.no);
+    if (!data) {
+      continue;
+    }
+    if (data.device) {
+      action_invoke(tile, data.device.action);
+    }
+  }
+});
+
+define_action("hit-mining", (self) => {
+  const ranges = hit_ranges(self.x, self.y, self.ha);
+  for (const r of ranges) {
+    const tile = grid_tile(r.x, r.y);
+    if (!tile) {
+      continue;
+    }
+    const data = data_tile(tile.no);
+    if (!data) {
+      continue;
+    }
+    if (data.mine) {
+      item_gain(data.mine.item, data.mine.count);
+      tile_del(tile);
+    }
+  }
+});
+
+define_action("hit-dig", (self) => {
+  const ranges = hit_ranges(self.x, self.y, self.ha);
+  for (const r of ranges) {
+    const tile = grid_tile(r.x, r.y);
+    if (tile_is_empty(tile)) {
+      continue;
+    }
+    if (tile_is_full(tile)) {
+      continue;
+    }
+    tile_base_pop(tile);
+  }
+});
+
+define_action("hit-put", (self, base) => {
+  const value = data_base_index(base);
+  if (value <= 0) {
+    return;
+  }
+  const ranges = hit_ranges(self.x, self.y, self.ha);
+  let count = 0;
+  for (const r of ranges) {
+    const tile = grid_tile(r.x, r.y);
+    if (tile_is_full(tile)) {
+      continue;
+    }
+    tile_base_push(tile, value);
+    count += 1;
+  }
+  if (self.hit.item > 0 && count > 0) {
+    item_lose(self.hit.item, count);
+  }
 });

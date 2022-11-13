@@ -1,0 +1,11 @@
+[[hit]]
+name = "put-rock"
+action = [
+  ["hit-put", "rock"],
+]
+
+[[hit]]
+name = "put-sand"
+action = [
+  ["hit-put", "sand"],
+]

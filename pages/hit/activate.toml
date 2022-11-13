@@ -1,0 +1,5 @@
+[[hit]]
+name = "activate"
+action = [
+  ["hit-activate"],
+]
