@@ -958,6 +958,18 @@
   const grid_mob = (no) => {
     return $grid.m.find((o) => o.no === no);
   };
+  const grid_mob_ranges = (ranges) => {
+    return $grid.m.filter((mob) => {
+      const x = Math.floor(mob.x);
+      const y = Math.floor(mob.y);
+      for (const r of ranges) {
+        if (r.x === x && r.y === y) {
+          return true;
+        }
+      }
+      return false;
+    });
+  };
   const grid_add_mob = (no, x, y, ha) => {
     const h = tile_height(grid_tile(x, y));
     $grid.m.push(mob_make(no, x, y, h, ha, 0));
@@ -970,6 +982,7 @@
     for (const mob of $grid.m) {
       mob_tick_after(mob);
     }
+    $grid.m = $grid.m.filter((mob) => mob_is_alive(mob));
   };
   const grid_encode = (data) => {
     return data;
@@ -1194,7 +1207,8 @@
       h,
       ha: ha || 0,
       va: va || 0,
-      hit: null
+      hit: null,
+      dmg: 0
     };
   };
   const mob_tick_before = (mob) => {
@@ -1318,6 +1332,16 @@
   };
   const mob_set_hit = (mob, no, item) => {
     mob.hit = hit_make(no, item);
+  };
+  const mob_is_alive = (mob) => {
+    const data = data_mob(mob.no);
+    if (!data) {
+      return false;
+    }
+    return data.hp == 0 || mob.dmg < data.hp;
+  };
+  const mob_damage = (mob, value) => {
+    mob.dmg += value;
   };
   const STATE_RESET = 0;
   const BUTTON_STATE_RELEASED = 0;
@@ -1622,6 +1646,7 @@
   });
   define_action("newplayer", (self) => {
     item_init_empty(8);
+    item_gain(data_item_index("sword"), 1);
     item_gain(data_item_index("pick"), 1);
     item_gain(data_item_index("shovel"), 1);
   });
@@ -1773,6 +1798,13 @@
     }
     if (self.hit.item > 0 && count > 0) {
       item_lose(self.hit.item, count);
+    }
+  });
+  define_action("hit-damage", (self) => {
+    const ranges = hit_ranges(self.x, self.y, self.ha);
+    const targets = grid_mob_ranges(ranges);
+    for (const mob of targets) {
+      mob_damage(mob, 1);
     }
   });
 })();

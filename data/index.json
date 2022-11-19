@@ -171,6 +171,11 @@
             "n": "shovel",
             "p": 0,
             "i": 3
+        },
+        {
+            "n": "sword",
+            "p": 0,
+            "i": 4
         }
     ],
     "base": [
@@ -242,24 +247,29 @@
             "i": 0
         },
         {
-            "n": "dig",
+            "n": "damage",
             "p": 0,
             "i": 1
         },
         {
-            "n": "mining",
+            "n": "dig",
             "p": 0,
             "i": 2
         },
         {
-            "n": "put-rock",
+            "n": "mining",
             "p": 0,
             "i": 3
         },
         {
-            "n": "put-sand",
+            "n": "put-rock",
             "p": 0,
             "i": 4
+        },
+        {
+            "n": "put-sand",
+            "p": 0,
+            "i": 5
         }
     ],
     "grid": [

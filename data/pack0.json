@@ -304,26 +304,33 @@
             "text": "マイニングツール",
             "desc": "鉱物を破壊して素材を採集出来る",
             "icon": 0,
-            "hit": 3,
+            "hit": 4,
             "consume": false
         },
         {
             "text": "石材",
             "desc": "何の変哲もない石",
             "icon": 0,
-            "hit": 4,
+            "hit": 5,
             "consume": false
         },
         {
             "text": "砂",
             "desc": "何の変哲もない砂",
             "icon": 0,
-            "hit": 5,
+            "hit": 6,
             "consume": false
         },
         {
             "text": "シャベル",
             "desc": "床を掘って穴を作る",
+            "icon": 0,
+            "hit": 3,
+            "consume": false
+        },
+        {
+            "text": "剣",
+            "desc": "相手にダメージを与える",
             "icon": 0,
             "hit": 2,
             "consume": false
@@ -385,6 +392,7 @@
             "draw": 0,
             "r": 0.25,
             "m": 1,
+            "hp": 0,
             "action": [
                 [
                     "fpsmove",
@@ -397,6 +405,7 @@
             "draw": 5,
             "r": 0.4,
             "m": 0.5,
+            "hp": 1,
             "action": null
         }
     ],
@@ -406,6 +415,14 @@
             "action": [
                 [
                     "hit-activate"
+                ]
+            ]
+        },
+        {
+            "draw": 0,
+            "action": [
+                [
+                    "hit-damage"
                 ]
             ]
         },
