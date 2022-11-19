@@ -2,6 +2,7 @@
 define_action("newplayer", (self) => {
   // item
   item_init_empty(8);
+  item_gain(data_item_index("sword"), 1);
   item_gain(data_item_index("pick"), 1);
   item_gain(data_item_index("shovel"), 1);
 });
@@ -162,5 +163,13 @@ define_action("hit-put", (self, base) => {
   }
   if (self.hit.item > 0 && count > 0) {
     item_lose(self.hit.item, count);
+  }
+});
+
+define_action("hit-damage", (self) => {
+  const ranges = hit_ranges(self.x, self.y, self.ha);
+  const targets = grid_mob_ranges(ranges);
+  for (const mob of targets) {
+    mob_damage(mob, 1);
   }
 });

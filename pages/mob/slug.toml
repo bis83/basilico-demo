@@ -3,6 +3,7 @@ name = "slug"
 draw = "slug"
 radius = 0.4
 mass = 0.5
+hp = 1
 
 [[draw]]
 name = "slug"

@@ -1,0 +1,5 @@
+[[hit]]
+name = "damage"
+action = [
+  ["hit-damage"],
+]
