@@ -58,7 +58,10 @@ define_action("hand", (self) => {
   if (!data) {
     return;
   }
-  mob_set_hit(mob, data.hit, item.no);
+  if (!data.usable) {
+    return;
+  }
+  mob_set_hit(mob, data.usable.hit, item.no);
 });
 
 define_action("activate", (self) => {
