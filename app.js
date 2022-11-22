@@ -879,9 +879,6 @@
     }
     return i;
   };
-  const data_item_index = (name) => {
-    return data_lookup_index("item", name);
-  };
   const data_base_index = (name) => {
     return data_lookup_index("base", name);
   };
@@ -1189,7 +1186,7 @@
     }
   };
   const mob_make = (no, x, y, h, ha, va) => {
-    return {
+    const mob = {
       no,
       x,
       y,
@@ -1200,6 +1197,16 @@
       dmg: 0,
       item: item_make(8)
     };
+    const data = data_mob(no);
+    if (!data) {
+      return null;
+    }
+    if (data.item) {
+      for (const item of data.item) {
+        item_gain(mob.item, item.no, item.n);
+      }
+    }
+    return mob;
   };
   const mob_tick_before = (mob) => {
     const data = data_mob(mob.no);
@@ -1636,15 +1643,6 @@
     const moveXY = com_value(lstick);
     const cameraXY = com_value(rstick);
     mob_fps_movement(self, moveXY, cameraXY);
-  });
-  define_action("newplayer", (self) => {
-    const mob = view_camera_mob();
-    if (!mob) {
-      return;
-    }
-    item_gain(mob.item, data_item_index("sword"), 1);
-    item_gain(mob.item, data_item_index("pick"), 1);
-    item_gain(mob.item, data_item_index("shovel"), 1);
   });
   define_action("inventory_next", (self) => {
     const mob = view_camera_mob();
