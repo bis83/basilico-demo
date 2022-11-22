@@ -984,64 +984,6 @@
     }
     $grid.m = $grid.m.filter((mob) => mob_is_alive(mob));
   };
-  const grid_encode = (data) => {
-    return data;
-  };
-  const grid_decode = (data) => {
-    return data;
-  };
-  const $item = {
-    s: [],
-    i: 0
-  };
-  const item_index = (no) => {
-    return $item.s.findIndex((o) => o && o.no === no);
-  };
-  const item_null_index = () => {
-    return $item.s.findIndex((o) => !o);
-  };
-  const item_select = (i) => {
-    const idx = i == null ? $item.i : i;
-    return $item.s[idx];
-  };
-  const item_set_cursor = (offset) => {
-    const idx = mod($item.i + offset, $item.s.length);
-    $item.i = idx;
-  };
-  const item_gain = (no, num) => {
-    let i = item_index(no);
-    if (i < 0) {
-      i = item_null_index();
-      if (i < 0) {
-        return;
-      }
-      $item.s[i] = { no, num };
-      return;
-    }
-    $item.s[i].num += num;
-  };
-  const item_lose = (no, num) => {
-    const i = item_index(no);
-    if (i < 0) {
-      return;
-    }
-    $item.s[i].num -= num;
-    if ($item.s[i].num <= 0) {
-      $item.s[i] = null;
-    }
-  };
-  const item_init_empty = (slot) => {
-    slot = slot || 0;
-    $item.s.length = slot;
-    $item.s.fill(null);
-    $item.i = 0;
-  };
-  const item_encode = (data) => {
-    return data;
-  };
-  const item_decode = (data) => {
-    return data;
-  };
   const $view = {
     w: 0,
     h: 0,
@@ -1199,6 +1141,53 @@
     }
     tile.base.pop();
   };
+  const item_make = (slot) => {
+    slot = slot || 0;
+    const item = {
+      s: [],
+      i: 0
+    };
+    item.s.length = slot;
+    item.s.fill(null);
+    item.i = 0;
+    return item;
+  };
+  const item_index = (item, no) => {
+    return item.s.findIndex((o) => o && o.no === no);
+  };
+  const item_null_index = (item) => {
+    return item.s.findIndex((o) => !o);
+  };
+  const item_select = (item, i) => {
+    const idx = i == null ? item.i : i;
+    return item.s[idx];
+  };
+  const item_set_cursor = (item, offset) => {
+    const idx = mod(item.i + offset, item.s.length);
+    item.i = idx;
+  };
+  const item_gain = (item, no, count) => {
+    let i = item_index(item, no);
+    if (i < 0) {
+      i = item_null_index(item);
+      if (i < 0) {
+        return;
+      }
+      item.s[i] = { no, n: count };
+      return;
+    }
+    item.s[i].n += count;
+  };
+  const item_lose = (item, no, count) => {
+    const i = item_index(item, no);
+    if (i < 0) {
+      return;
+    }
+    item.s[i].n -= count;
+    if (item.s[i].n <= 0) {
+      item.s[i] = null;
+    }
+  };
   const mob_make = (no, x, y, h, ha, va) => {
     return {
       no,
@@ -1208,7 +1197,8 @@
       ha: ha || 0,
       va: va || 0,
       hit: null,
-      dmg: 0
+      dmg: 0,
+      item: item_make(8)
     };
   };
   const mob_tick_before = (mob) => {
@@ -1560,9 +1550,14 @@
       }
     }
   };
+  const grid_encode = (data) => {
+    return data;
+  };
+  const grid_decode = (data) => {
+    return data;
+  };
   const newgame = () => {
     grid_init_empty();
-    item_init_empty();
   };
   const loadgame = () => {
     if (!$view.slot) {
@@ -1571,9 +1566,6 @@
     const data = localstorage_get($view.slot);
     if (!data) {
       return false;
-    }
-    if (data.item) {
-      Object.assign($item, item_decode(data.item));
     }
     if (data.grid) {
       Object.assign($grid, grid_decode(data.grid));
@@ -1585,7 +1577,6 @@
       return;
     }
     const data = {};
-    data.item = item_encode($item);
     data.grid = grid_encode($grid);
     localstorage_set($view.slot, data);
   };
@@ -1647,38 +1638,53 @@
     mob_fps_movement(self, moveXY, cameraXY);
   });
   define_action("newplayer", (self) => {
-    item_init_empty(8);
-    item_gain(data_item_index("sword"), 1);
-    item_gain(data_item_index("pick"), 1);
-    item_gain(data_item_index("shovel"), 1);
+    const mob = view_camera_mob();
+    if (!mob) {
+      return;
+    }
+    item_gain(mob.item, data_item_index("sword"), 1);
+    item_gain(mob.item, data_item_index("pick"), 1);
+    item_gain(mob.item, data_item_index("shovel"), 1);
   });
   define_action("inventory_next", (self) => {
-    item_set_cursor(1);
+    const mob = view_camera_mob();
+    if (!mob) {
+      return;
+    }
+    item_set_cursor(mob.item, 1);
   });
   define_action("inventory_prev", (self) => {
-    item_set_cursor(-1);
+    const mob = view_camera_mob();
+    if (!mob) {
+      return;
+    }
+    item_set_cursor(mob.item, -1);
   });
   define_action("inventory", (self) => {
+    const mob = view_camera_mob();
+    if (!mob) {
+      return;
+    }
     let text = "";
-    for (let i = 0; i < $item.s.length; ++i) {
-      if ($item.i === i) {
+    for (let i = 0; i < mob.item.s.length; ++i) {
+      if (mob.item.i === i) {
         text += ">";
       } else {
         text += " ";
       }
       text += "[" + i + "]";
-      if ($item.s[i] != null) {
-        const item = data_item($item.s[i].no);
+      if (mob.item.s[i] != null) {
+        const item = data_item(mob.item.s[i].no);
         if (!item) {
           continue;
         }
-        text += item.text + ":" + $item.s[i].num;
+        text += item.text + ":" + mob.item.s[i].n;
       }
       text += "\n";
     }
     text += "\n";
     {
-      const slot = item_select();
+      const slot = item_select(mob.item);
       if (slot != null) {
         const item = data_item(slot.no);
         if (item != null) {
@@ -1694,7 +1700,7 @@
     if (!mob) {
       return;
     }
-    const item = item_select();
+    const item = item_select(mob.item);
     if (!item) {
       return;
     }
@@ -1757,6 +1763,10 @@
     }
   });
   define_action("hit-mining", (self) => {
+    const mob = view_camera_mob();
+    if (!mob) {
+      return;
+    }
     const ranges = hit_ranges(self.x, self.y, self.ha);
     for (const r of ranges) {
       const tile = grid_tile(r.x, r.y);
@@ -1768,7 +1778,7 @@
         continue;
       }
       if (data.mine) {
-        item_gain(data.mine.item, data.mine.count);
+        item_gain(mob.item, data.mine.item, data.mine.count);
         tile_del(tile);
       }
     }
@@ -1791,6 +1801,10 @@
     if (value <= 0) {
       return;
     }
+    const mob = view_camera_mob();
+    if (!mob) {
+      return;
+    }
     const ranges = hit_ranges(self.x, self.y, self.ha);
     let count = 0;
     for (const r of ranges) {
@@ -1802,7 +1816,7 @@
       count += 1;
     }
     if (self.hit.item > 0 && count > 0) {
-      item_lose(self.hit.item, count);
+      item_lose(mob.item, self.hit.item, count);
     }
   });
   define_action("hit-damage", (self) => {

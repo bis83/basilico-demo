@@ -758,6 +758,10 @@
                 "keyboard": "z",
                 "action": [
                     [
+                        "nextview",
+                        "main"
+                    ],
+                    [
                         "newgame",
                         "data0"
                     ],
@@ -767,10 +771,6 @@
                     ],
                     [
                         "newplayer"
-                    ],
-                    [
-                        "nextview",
-                        "main"
                     ]
                 ]
             }
