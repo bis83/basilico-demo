@@ -18,5 +18,4 @@ action = [
   ["nextview", "main"],
   ["newgame", "data0"],
   ["newgrid", "world"],
-  ["newplayer"],
 ]

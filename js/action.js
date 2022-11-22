@@ -1,14 +1,4 @@
 
-define_action("newplayer", (self) => {
-  const mob = view_camera_mob();
-  if (!mob) {
-    return;
-  }
-  item_gain(mob.item, data_item_index("sword"), 1);
-  item_gain(mob.item, data_item_index("pick"), 1);
-  item_gain(mob.item, data_item_index("shovel"), 1);
-});
-
 define_action("inventory_next", (self) => {
   const mob = view_camera_mob();
   if (!mob) {

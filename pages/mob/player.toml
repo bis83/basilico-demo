@@ -1,6 +1,11 @@
 [[mob]]
 name = "player"
 radius = 0.25
+item = [
+  { item = "sword", count = 1 },
+  { item = "pick", count = 1 },
+  { item = "shovel", count = 1 },
+]
 
 action = [
   ["fpsmove", "left-stick", "right-stick"],
