@@ -1,39 +1,53 @@
 
 define_action("newplayer", (self) => {
-  // item
-  item_init_empty(8);
-  item_gain(data_item_index("sword"), 1);
-  item_gain(data_item_index("pick"), 1);
-  item_gain(data_item_index("shovel"), 1);
+  const mob = view_camera_mob();
+  if (!mob) {
+    return;
+  }
+  item_gain(mob.item, data_item_index("sword"), 1);
+  item_gain(mob.item, data_item_index("pick"), 1);
+  item_gain(mob.item, data_item_index("shovel"), 1);
 });
 
 define_action("inventory_next", (self) => {
-  item_set_cursor(1);
+  const mob = view_camera_mob();
+  if (!mob) {
+    return;
+  }
+  item_set_cursor(mob.item, 1);
 });
 define_action("inventory_prev", (self) => {
-  item_set_cursor(-1);
+  const mob = view_camera_mob();
+  if (!mob) {
+    return;
+  }
+  item_set_cursor(mob.item, -1);
 });
 define_action("inventory", (self) => {
+  const mob = view_camera_mob();
+  if (!mob) {
+    return;
+  }
   let text = "";
-  for (let i = 0; i < $item.s.length; ++i) {
-    if ($item.i === i) {
+  for (let i = 0; i < mob.item.s.length; ++i) {
+    if (mob.item.i === i) {
       text += ">";
     } else {
       text += " ";
     }
     text += "[" + i + "]";
-    if ($item.s[i] != null) {
-      const item = data_item($item.s[i].no);
+    if (mob.item.s[i] != null) {
+      const item = data_item(mob.item.s[i].no);
       if (!item) {
         continue;
       }
-      text += item.text + ":" + $item.s[i].num;
+      text += item.text + ":" + mob.item.s[i].n;
     }
     text += "\n";
   }
   text += "\n";
   {
-    const slot = item_select();
+    const slot = item_select(mob.item);
     if (slot != null) {
       const item = data_item(slot.no);
       if (item != null) {
@@ -50,7 +64,7 @@ define_action("hand", (self) => {
   if (!mob) {
     return;
   }
-  const item = item_select();
+  const item = item_select(mob.item);
   if (!item) {
     return;
   }
@@ -118,6 +132,10 @@ define_action("hit-activate", (self) => {
 });
 
 define_action("hit-mining", (self) => {
+  const mob = view_camera_mob();
+  if (!mob) {
+    return;
+  }
   const ranges = hit_ranges(self.x, self.y, self.ha);
   for (const r of ranges) {
     const tile = grid_tile(r.x, r.y);
@@ -129,7 +147,7 @@ define_action("hit-mining", (self) => {
       continue;
     }
     if (data.mine) {
-      item_gain(data.mine.item, data.mine.count);
+      item_gain(mob.item, data.mine.item, data.mine.count);
       tile_del(tile);
     }
   }
@@ -154,6 +172,10 @@ define_action("hit-put", (self, base) => {
   if (value <= 0) {
     return;
   }
+  const mob = view_camera_mob();
+  if (!mob) {
+    return;
+  }
   const ranges = hit_ranges(self.x, self.y, self.ha);
   let count = 0;
   for (const r of ranges) {
@@ -165,7 +187,7 @@ define_action("hit-put", (self, base) => {
     count += 1;
   }
   if (self.hit.item > 0 && count > 0) {
-    item_lose(self.hit.item, count);
+    item_lose(mob.item, self.hit.item, count);
   }
 });
 

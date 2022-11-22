@@ -15,8 +15,8 @@ contents = "New Game"
 gamepad = "b8"
 keyboard = "z"
 action = [
+  ["nextview", "main"],
   ["newgame", "data0"],
   ["newgrid", "world"],
   ["newplayer"],
-  ["nextview", "main"],
 ]
