@@ -1421,13 +1421,15 @@
     };
   };
   const hit_ranges = (x, y, ha) => {
+    const bx = Math.floor(x);
+    const by = Math.floor(y);
     let ranges = [];
-    const h = deg2rad(ha);
-    x += Math.cos(h) * 0.8;
-    y += Math.sin(h) * 0.8;
-    x = Math.floor(x);
-    y = Math.floor(y);
-    ranges.push({ x, y });
+    const hr = deg2rad(ha);
+    const tx = Math.floor(x + Math.cos(hr) * 0.8);
+    const ty = Math.floor(y + Math.sin(hr) * 0.8);
+    if (bx != tx || by != ty) {
+      ranges.push({ x: tx, y: ty });
+    }
     return ranges;
   };
   const draw_start_frame = () => {
@@ -1700,7 +1702,10 @@
     if (!data) {
       return;
     }
-    mob_set_hit(mob, data.hit, item.no);
+    if (!data.usable) {
+      return;
+    }
+    mob_set_hit(mob, data.usable.hit, item.no);
   });
   define_action("activate", (self) => {
     const mob = view_camera_mob();
