@@ -73,11 +73,20 @@ define_action("activate", (self) => {
   if (!mob) {
     return;
   }
-  const hit = data_hit_index("activate");
-  if (hit <= 0) {
-    return;
+  const ranges = hit_ranges(mob.x, mob.y, mob.ha);
+  for (const r of ranges) {
+    const tile = grid_tile(r.x, r.y);
+    if (!tile) {
+      continue;
+    }
+    const data = data_tile(tile.no);
+    if (!data) {
+      continue;
+    }
+    if (data.device) {
+      action_invoke(tile, data.device.action);
+    }
   }
-  mob_set_hit(mob, hit);
 });
 
 define_action("activate-target", (self) => {
@@ -85,7 +94,6 @@ define_action("activate-target", (self) => {
   if (!mob) {
     return;
   }
-
   let text = "";
   const ranges = hit_ranges(mob.x, mob.y, mob.ha);
   for (const r of ranges) {
@@ -102,23 +110,6 @@ define_action("activate-target", (self) => {
   }
   cvs_text(self.cvs, text);
   gl_updateGLTexture2D(self.img, self.cvs);
-});
-
-define_action("hit-activate", (self) => {
-  const ranges = hit_ranges(self.x, self.y, self.ha);
-  for (const r of ranges) {
-    const tile = grid_tile(r.x, r.y);
-    if (!tile) {
-      continue;
-    }
-    const data = data_tile(tile.no);
-    if (!data) {
-      continue;
-    }
-    if (data.device) {
-      action_invoke(tile, data.device.action);
-    }
-  }
 });
 
 define_action("hit-mining", (self) => {
