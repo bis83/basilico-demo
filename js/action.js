@@ -54,18 +54,7 @@ define_action("hand", (self) => {
   if (!mob) {
     return;
   }
-  const item = item_select(mob.item);
-  if (!item) {
-    return;
-  }
-  const data = data_item(item.no);
-  if (!data) {
-    return;
-  }
-  if (!data.usable) {
-    return;
-  }
-  mob_set_hit(mob, data.usable.hit, item.no);
+  mob.hit.act = true;
 });
 
 define_action("activate", (self) => {
