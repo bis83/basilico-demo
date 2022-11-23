@@ -242,34 +242,29 @@
     "hit": [
         null,
         {
-            "n": "activate",
+            "n": "damage",
             "p": 0,
             "i": 0
         },
         {
-            "n": "damage",
+            "n": "dig",
             "p": 0,
             "i": 1
         },
         {
-            "n": "dig",
+            "n": "mining",
             "p": 0,
             "i": 2
         },
         {
-            "n": "mining",
+            "n": "put-rock",
             "p": 0,
             "i": 3
         },
         {
-            "n": "put-rock",
-            "p": 0,
-            "i": 4
-        },
-        {
             "n": "put-sand",
             "p": 0,
-            "i": 5
+            "i": 4
         }
     ],
     "grid": [

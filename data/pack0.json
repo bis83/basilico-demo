@@ -305,7 +305,7 @@
             "desc": "鉱物を破壊して素材を採集出来る",
             "icon": 0,
             "usable": {
-                "hit": 4,
+                "hit": 3,
                 "consume": false
             },
             "trait": null
@@ -315,7 +315,7 @@
             "desc": "何の変哲もない石",
             "icon": 0,
             "usable": {
-                "hit": 5,
+                "hit": 4,
                 "consume": false
             },
             "trait": null
@@ -325,7 +325,7 @@
             "desc": "何の変哲もない砂",
             "icon": 0,
             "usable": {
-                "hit": 6,
+                "hit": 5,
                 "consume": false
             },
             "trait": null
@@ -335,7 +335,7 @@
             "desc": "床を掘って穴を作る",
             "icon": 0,
             "usable": {
-                "hit": 3,
+                "hit": 2,
                 "consume": false
             },
             "trait": null
@@ -345,7 +345,7 @@
             "desc": "相手にダメージを与える",
             "icon": 0,
             "usable": {
-                "hit": 2,
+                "hit": 1,
                 "consume": false
             },
             "trait": null
@@ -440,14 +440,6 @@
         }
     ],
     "hit": [
-        {
-            "draw": 0,
-            "action": [
-                [
-                    "hit-activate"
-                ]
-            ]
-        },
         {
             "draw": 0,
             "action": [
