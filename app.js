@@ -1010,8 +1010,8 @@
       h,
       ha: ha || 0,
       va: va || 0,
-      hit: null,
       dmg: 0,
+      hit: hit_make(),
       item: item_make(8)
     };
     const data = data_mob(no);
@@ -1036,16 +1036,7 @@
     mob_fall(mob);
   };
   const mob_tick_after = (mob) => {
-    if (mob.hit) {
-      const data = data_hit(mob.hit.no);
-      if (!data) {
-        return;
-      }
-      if (data.action) {
-        action_invoke(mob, data.action);
-      }
-      mob.hit = null;
-    }
+    hit_tick(mob.hit, mob);
   };
   const mob_fall = (mob) => {
     const h = tile_height(grid_tile(mob.x, mob.y));
@@ -1144,9 +1135,6 @@
       }
     }
   };
-  const mob_set_hit = (mob, no, item) => {
-    mob.hit = hit_make(no, item);
-  };
   const mob_is_alive = (mob) => {
     const data = data_mob(mob.no);
     if (!data) {
@@ -1228,10 +1216,11 @@
       action_invoke(com, data.tick.action);
     }
   };
-  const hit_make = (no, item) => {
+  const hit_make = () => {
     return {
-      no: no || 0,
-      item: item || 0
+      no: 0,
+      item: 0,
+      act: false
     };
   };
   const hit_ranges = (x, y, ha) => {
@@ -1245,6 +1234,34 @@
       ranges.push({ x: tx, y: ty });
     }
     return ranges;
+  };
+  const hit_from_item = (hit, item) => {
+    const slot = item_select(item);
+    if (!slot) {
+      return;
+    }
+    const data = data_item(slot.no);
+    if (!data) {
+      return;
+    }
+    if (!data.usable) {
+      return;
+    }
+    hit.no = data.usable.hit;
+    hit.item = item.no;
+  };
+  const hit_tick = (hit, mob) => {
+    hit_from_item(hit, mob.item);
+    if (hit.no > 0 && hit.act) {
+      const data = data_hit(hit.no);
+      if (!data) {
+        return;
+      }
+      if (data.action) {
+        action_invoke(mob, data.action);
+      }
+      hit.act = false;
+    }
   };
   const $grid = {
     w: 0,
@@ -1695,18 +1712,7 @@
     if (!mob) {
       return;
     }
-    const item = item_select(mob.item);
-    if (!item) {
-      return;
-    }
-    const data = data_item(item.no);
-    if (!data) {
-      return;
-    }
-    if (!data.usable) {
-      return;
-    }
-    mob_set_hit(mob, data.usable.hit, item.no);
+    mob.hit.act = true;
   });
   define_action("activate", (self) => {
     const mob = view_camera_mob();
