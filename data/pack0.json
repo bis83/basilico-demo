@@ -23,13 +23,13 @@
                 0,
                 0,
                 2,
-                60
+                48
             ],
             "i": 3,
             "iv": [
                 3,
                 0,
-                12
+                6
             ]
         },
         {
@@ -38,9 +38,24 @@
                 0,
                 0,
                 2,
-                96
+                60
             ],
             "i": 5,
+            "iv": [
+                3,
+                0,
+                12
+            ]
+        },
+        {
+            "b": 6,
+            "bv": [
+                0,
+                0,
+                2,
+                96
+            ],
+            "i": 7,
             "iv": [
                 3,
                 0,
@@ -48,7 +63,7 @@
             ]
         },
         {
-            "b": 6,
+            "b": 8,
             "bv": [
                 0,
                 0,
@@ -65,7 +80,7 @@
             ]
         },
         {
-            "b": 7,
+            "b": 9,
             "bv": [
                 0,
                 0,
@@ -74,26 +89,11 @@
                 3,
                 720
             ],
-            "i": 8,
-            "iv": [
-                3,
-                0,
-                60
-            ]
-        },
-        {
-            "b": 9,
-            "bv": [
-                0,
-                0,
-                2,
-                72
-            ],
             "i": 10,
             "iv": [
                 3,
                 0,
-                24
+                60
             ]
         },
         {
@@ -102,15 +102,13 @@
                 0,
                 0,
                 2,
-                48,
-                3,
-                64
+                72
             ],
             "i": 12,
             "iv": [
                 3,
                 0,
-                6
+                24
             ]
         },
         {
@@ -119,13 +117,15 @@
                 0,
                 0,
                 2,
-                96
+                48,
+                3,
+                64
             ],
             "i": 14,
             "iv": [
                 3,
                 0,
-                36
+                6
             ]
         },
         {
@@ -134,9 +134,24 @@
                 0,
                 0,
                 2,
+                96
+            ],
+            "i": 16,
+            "iv": [
+                3,
+                0,
+                36
+            ]
+        },
+        {
+            "b": 17,
+            "bv": [
+                0,
+                0,
+                2,
                 48
             ],
-            "i": 12,
+            "i": 14,
             "iv": [
                 3,
                 0,
@@ -144,7 +159,7 @@
             ]
         },
         {
-            "b": 16,
+            "b": 18,
             "bv": [
                 0,
                 0,
@@ -161,19 +176,19 @@
     ],
     "image": [
         {
-            "b": 17,
-            "s": 0
-        },
-        {
-            "b": 18,
-            "s": 0
-        },
-        {
             "b": 19,
             "s": 0
         },
         {
             "b": 20,
+            "s": 0
+        },
+        {
+            "b": 21,
+            "s": 0
+        },
+        {
+            "b": 22,
             "s": 0
         }
     ],
@@ -236,7 +251,7 @@
             "ortho": false
         },
         {
-            "mesh": 7,
+            "mesh": 8,
             "shader": 3,
             "image": 4,
             "depth": false,
@@ -249,12 +264,21 @@
             "shader": 2,
             "image": 0,
             "depth": true,
+            "alpha": true,
+            "cw": true,
+            "ortho": false
+        },
+        {
+            "mesh": 3,
+            "shader": 2,
+            "image": 0,
+            "depth": true,
             "alpha": false,
             "cw": false,
             "ortho": false
         },
         {
-            "mesh": 3,
+            "mesh": 4,
             "shader": 2,
             "image": 0,
             "depth": false,
@@ -263,7 +287,7 @@
             "ortho": false
         },
         {
-            "mesh": 5,
+            "mesh": 6,
             "shader": 1,
             "image": 0,
             "depth": true,
@@ -272,7 +296,7 @@
             "ortho": false
         },
         {
-            "mesh": 4,
+            "mesh": 5,
             "shader": 3,
             "image": 2,
             "depth": true,
@@ -281,7 +305,7 @@
             "ortho": false
         },
         {
-            "mesh": 4,
+            "mesh": 5,
             "shader": 3,
             "image": 3,
             "depth": true,
@@ -290,7 +314,7 @@
             "ortho": false
         },
         {
-            "mesh": 6,
+            "mesh": 7,
             "shader": 2,
             "image": 0,
             "depth": true,
@@ -369,12 +393,12 @@
         {
             "text": "柱",
             "desc": "何でもない柱",
-            "draw": 7
+            "draw": 8
         },
         {
             "text": "石の山",
             "desc": "石が採掘できる山場",
-            "draw": 8,
+            "draw": 9,
             "mine": {
                 "item": 2,
                 "count": 10
@@ -383,7 +407,7 @@
         {
             "text": "砂の山",
             "desc": "砂が採掘できる山場",
-            "draw": 9,
+            "draw": 10,
             "mine": {
                 "item": 3,
                 "count": 10
@@ -392,7 +416,7 @@
         {
             "text": "セーブポイント",
             "desc": "状態をセーブできます",
-            "draw": 10,
+            "draw": 11,
             "device": {
                 "action": [
                     [
@@ -431,7 +455,7 @@
             ]
         },
         {
-            "draw": 5,
+            "draw": 6,
             "r": 0.4,
             "m": 0.5,
             "hp": 1,
@@ -441,7 +465,7 @@
     ],
     "hit": [
         {
-            "draw": 0,
+            "draw": 5,
             "action": [
                 [
                     "hit-damage"
@@ -449,7 +473,7 @@
             ]
         },
         {
-            "draw": 0,
+            "draw": 5,
             "action": [
                 [
                     "hit-dig"
@@ -457,7 +481,7 @@
             ]
         },
         {
-            "draw": 0,
+            "draw": 5,
             "action": [
                 [
                     "hit-mining"
@@ -465,7 +489,7 @@
             ]
         },
         {
-            "draw": 0,
+            "draw": 5,
             "action": [
                 [
                     "hit-put",
@@ -474,7 +498,7 @@
             ]
         },
         {
-            "draw": 0,
+            "draw": 5,
             "action": [
                 [
                     "hit-put",
@@ -796,7 +820,7 @@
             "draw3d": true,
             "cam": 1,
             "draw": [
-                6
+                7
             ]
         },
         {
@@ -812,6 +836,8 @@
     "base64": [
         "AAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAEAAAAAAAAAAAAAAAAAAAAA/AAAAQAAAAAAAAAA/AAAAAAAAAEAAAAA/AAAAQAAAAEAAAAA/ICAg/yAgIP8gICD/ICAg/0BAQP9AQED/QEBA/0BAQP8AAAAAADwAAAAAADwAPAA8ADQANAA6ADQANAA6ADoAOg==",
         "AAABAAIAAgABAAMAAQAFAAMAAwAFAAcABQAEAAcABwAEAAYABAAAAAYABgAAAAIAAgADAAYABgADAAcABQABAAQABAABAAAA",
+        "ZmaGv2Zmhr8K1yM8ZmaGP2Zmhr8K1yM8ZmaGv2Zmhj8K1yM8ZmaGP2Zmhj8K1yM8/wAAgP8AAID/AACA/wAAgA==",
+        "AAABAAIAAgABAAMA",
         "zcxMv83MzL4AAAAAzcxMP83MzL4AAAAAzcxMv83MzD4AAAAAzcxMP83MzD4AAAAAmpkZPwAAAADNzEw/0rSM/9K0jP/StIz/0rSM/w==",
         "AgAEAAAAAAAEAAEAAQAEAAMAAwAEAAIA",
         "AACAvwAAgL8AAIC/AACAPwAAgL8AAIC/AACAvwAAgD8AAIC/AACAPwAAgD8AAIC/AACAvwAAgL8AAIA/AACAPwAAgL8AAIA/AACAvwAAgD8AAIA/AACAPwAAgD8AAIA/CAgI/wgICP8ICAj/CAgI/7TI8P+0yPD/tMjw/7TI8P8=",

@@ -11,49 +11,54 @@
             "i": 0
         },
         {
-            "n": "slug",
+            "n": "hit",
             "p": 0,
             "i": 1
         },
         {
-            "n": "skybox",
+            "n": "slug",
             "p": 0,
             "i": 2
         },
         {
-            "n": "mine",
+            "n": "skybox",
             "p": 0,
             "i": 3
         },
         {
-            "n": "pillar",
+            "n": "mine",
             "p": 0,
             "i": 4
         },
         {
-            "n": "savepoint",
+            "n": "pillar",
             "p": 0,
             "i": 5
         },
         {
-            "n": "rect",
+            "n": "savepoint",
             "p": 0,
             "i": 6
         },
         {
-            "n": "box",
+            "n": "rect",
             "p": 0,
             "i": 7
         },
         {
-            "n": "reticle",
+            "n": "box",
             "p": 0,
             "i": 8
         },
         {
-            "n": "debug-grid",
+            "n": "reticle",
             "p": 0,
             "i": 9
+        },
+        {
+            "n": "debug-grid",
+            "p": 0,
+            "i": 10
         }
     ],
     "image": [
@@ -120,34 +125,39 @@
             "i": 3
         },
         {
-            "n": "slug",
+            "n": "hit",
             "p": 0,
             "i": 4
         },
         {
-            "n": "skybox",
+            "n": "slug",
             "p": 0,
             "i": 5
         },
         {
-            "n": "pillar",
+            "n": "skybox",
             "p": 0,
             "i": 6
         },
         {
-            "n": "rock-mine",
+            "n": "pillar",
             "p": 0,
             "i": 7
         },
         {
-            "n": "sand-mine",
+            "n": "rock-mine",
             "p": 0,
             "i": 8
         },
         {
-            "n": "savepoint",
+            "n": "sand-mine",
             "p": 0,
             "i": 9
+        },
+        {
+            "n": "savepoint",
+            "p": 0,
+            "i": 10
         }
     ],
     "item": [
