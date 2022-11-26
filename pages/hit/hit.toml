@@ -1,0 +1,31 @@
+[[draw]]
+name = "hit"
+mesh = "hit"
+shader = "mesh-pc"
+alpha = true
+depth = true
+cw = true
+
+[[mesh]]
+name = "hit"
+
+[mesh.buffer]
+position = [
+  -1.05, -1.05, 0.01,
+  +1.05, -1.05, 0.01,
+  -1.05, +1.05, 0.01,
+  +1.05, +1.05, 0.01,
+]
+color = [
+  255, 0, 0, 128,
+  255, 0, 0, 128,
+  255, 0, 0, 128,
+  255, 0, 0, 128,
+]
+index = [
+  0, 1, 2,
+  2, 1, 3,
+]
+view = [
+  { mode = 3, start = 0, count = 6 },
+]

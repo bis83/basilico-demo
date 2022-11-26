@@ -1,5 +1,6 @@
 [[hit]]
 name = "dig"
+draw = "hit"
 action = [
   ["hit-dig"],
 ]

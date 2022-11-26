@@ -1,11 +1,13 @@
 [[hit]]
 name = "put-rock"
+draw = "hit"
 action = [
   ["hit-put", "rock"],
 ]
 
 [[hit]]
 name = "put-sand"
+draw = "hit"
 action = [
   ["hit-put", "sand"],
 ]
