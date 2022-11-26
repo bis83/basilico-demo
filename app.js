@@ -304,8 +304,11 @@
       1
     ];
   };
-  const grid_to_world = (x, y, h) => {
+  const grid_coord_to_world = (x, y, h) => {
     return [x * 2, y * 2, h * 0.5];
+  };
+  const grid_index_to_world = (x, y, h) => {
+    return [Math.floor(x) * 2 + 1, Math.floor(y) * 2 + 1, h * 0.5];
   };
   const $timer = {
     t: performance.now(),
@@ -1402,7 +1405,7 @@
     if (mob) {
       const EYE_HEIGHT = 1.75;
       dir = vec3dir(mob.ha, mob.va);
-      eye = grid_to_world(mob.x, mob.y, mob.h);
+      eye = grid_coord_to_world(mob.x, mob.y, mob.h);
       eye[2] += EYE_HEIGHT;
     }
     const at = vec3add(eye, dir);
@@ -1484,7 +1487,7 @@
         continue;
       }
       draw_call(data2.draw, (u) => {
-        const pos = grid_to_world(x, y, i);
+        const pos = grid_index_to_world(x, y, i);
         $view.m.set(mat4translate(pos[0], pos[1], pos[2]));
         $gl.uniformMatrix4fv(u.w, false, $view.m);
       });
@@ -1495,9 +1498,9 @@
     }
     const h = tile_height(tile);
     draw_call(data.draw, (u) => {
-      const pos = grid_to_world(x, y, h);
+      const pos = grid_index_to_world(x, y, h);
       const m = mat4angle(tile.ha || 0, tile.va || 0);
-      mat4translated(m, pos[0] + 1, pos[1] + 1, pos[2]);
+      mat4translated(m, pos[0], pos[1], pos[2]);
       $view.m.set(m);
       $gl.uniformMatrix4fv(u.w, false, $view.m);
     });
@@ -1511,7 +1514,7 @@
       return;
     }
     draw_call(data.draw, (u) => {
-      const pos = grid_to_world(mob.x, mob.y, mob.h);
+      const pos = grid_coord_to_world(mob.x, mob.y, mob.h);
       const m = mat4angle(mob.ha || 0, mob.va || 0);
       mat4translated(m, pos[0], pos[1], pos[2]);
       $view.m.set(m);
@@ -1531,8 +1534,8 @@
       }
       const h = tile_height(tile);
       draw_call(data.draw, (u) => {
-        const pos = grid_to_world(r.x, r.y, h);
-        $view.m.set(mat4translate(pos[0] + 1, pos[1] + 1, pos[2]));
+        const pos = grid_index_to_world(r.x, r.y, h);
+        $view.m.set(mat4translate(pos[0], pos[1], pos[2]));
         $gl.uniformMatrix4fv(u.w, false, $view.m);
       });
     }
