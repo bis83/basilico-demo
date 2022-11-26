@@ -1,6 +1,7 @@
 [[mob]]
 name = "player"
 radius = 0.25
+hp = 5
 item = [
   { item = "sword", count = 1 },
   { item = "pick", count = 1 },

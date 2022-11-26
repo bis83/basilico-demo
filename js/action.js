@@ -19,6 +19,17 @@ define_action("inventory", (self) => {
     return;
   }
   let text = "";
+  {
+    const data = data_mob(mob.no);
+    if (!data) {
+      return;
+    }
+    const mhp = data.hp;
+    const hp = Math.max(0, mhp - mob.dmg);
+    text += "HP: " + hp + "/" + mhp;
+    text += "\n";
+  }
+  text += "\n";
   for (let i = 0; i < mob.item.s.length; ++i) {
     if (mob.item.i === i) {
       text += ">";
