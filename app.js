@@ -626,16 +626,21 @@
     $gl.clearDepth(1);
     $gl.clear($gl.COLOR_BUFFER_BIT | $gl.DEPTH_BUFFER_BIT);
   };
-  const gl_state = (depth, alpha, cw) => {
-    $gl.enable($gl.CULL_FACE);
-    $gl.frontFace(cw ? $gl.CW : $gl.CCW);
-    if (depth) {
+  const gl_state = (state) => {
+    if (state.cw) {
+      $gl.enable($gl.CULL_FACE);
+      $gl.frontFace($gl.CW);
+    } else {
+      $gl.enable($gl.CULL_FACE);
+      $gl.frontFace($gl.CCW);
+    }
+    if (state.d) {
       $gl.enable($gl.DEPTH_TEST);
       $gl.depthFunc($gl.LEQUAL);
     } else {
       $gl.disable($gl.DEPTH_TEST);
     }
-    if (alpha) {
+    if (state.a) {
       $gl.enable($gl.BLEND);
       $gl.blendFunc($gl.SRC_ALPHA, $gl.ONE_MINUS_SRC_ALPHA);
     } else {
@@ -1455,7 +1460,7 @@
     if (!data) {
       return;
     }
-    gl_state(data.depth, data.alpha, data.cw);
+    gl_state(data.state);
     const shader = data_shader(data.shader);
     if (!shader) {
       return;

@@ -227,100 +227,122 @@
             "mesh": 1,
             "shader": 3,
             "image": 1,
-            "depth": true,
-            "alpha": false,
-            "cw": false,
-            "ortho": false
+            "ortho": false,
+            "state": {
+                "d": true,
+                "a": false,
+                "cw": false
+            }
         },
         {
             "mesh": 1,
             "shader": 3,
             "image": 2,
-            "depth": true,
-            "alpha": false,
-            "cw": false,
-            "ortho": false
+            "ortho": false,
+            "state": {
+                "d": true,
+                "a": false,
+                "cw": false
+            }
         },
         {
             "mesh": 1,
             "shader": 3,
             "image": 3,
-            "depth": true,
-            "alpha": false,
-            "cw": false,
-            "ortho": false
+            "ortho": false,
+            "state": {
+                "d": true,
+                "a": false,
+                "cw": false
+            }
         },
         {
             "mesh": 8,
             "shader": 3,
             "image": 4,
-            "depth": false,
-            "alpha": true,
-            "cw": false,
-            "ortho": true
+            "ortho": true,
+            "state": {
+                "d": false,
+                "a": true,
+                "cw": false
+            }
         },
         {
             "mesh": 2,
             "shader": 2,
             "image": 0,
-            "depth": true,
-            "alpha": true,
-            "cw": true,
-            "ortho": false
+            "ortho": false,
+            "state": {
+                "d": true,
+                "a": true,
+                "cw": true
+            }
         },
         {
             "mesh": 3,
             "shader": 2,
             "image": 0,
-            "depth": true,
-            "alpha": false,
-            "cw": false,
-            "ortho": false
+            "ortho": false,
+            "state": {
+                "d": true,
+                "a": false,
+                "cw": false
+            }
         },
         {
             "mesh": 4,
             "shader": 2,
             "image": 0,
-            "depth": false,
-            "alpha": false,
-            "cw": false,
-            "ortho": false
+            "ortho": false,
+            "state": {
+                "d": false,
+                "a": false,
+                "cw": false
+            }
         },
         {
             "mesh": 6,
             "shader": 1,
             "image": 0,
-            "depth": true,
-            "alpha": false,
-            "cw": true,
-            "ortho": false
+            "ortho": false,
+            "state": {
+                "d": true,
+                "a": false,
+                "cw": true
+            }
         },
         {
             "mesh": 5,
             "shader": 3,
             "image": 2,
-            "depth": true,
-            "alpha": false,
-            "cw": false,
-            "ortho": false
+            "ortho": false,
+            "state": {
+                "d": true,
+                "a": false,
+                "cw": false
+            }
         },
         {
             "mesh": 5,
             "shader": 3,
             "image": 3,
-            "depth": true,
-            "alpha": false,
-            "cw": false,
-            "ortho": false
+            "ortho": false,
+            "state": {
+                "d": true,
+                "a": false,
+                "cw": false
+            }
         },
         {
             "mesh": 7,
             "shader": 2,
             "image": 0,
-            "depth": true,
-            "alpha": false,
-            "cw": false,
-            "ortho": false
+            "ortho": false,
+            "state": {
+                "d": true,
+                "a": false,
+                "cw": false
+            }
         }
     ],
     "item": [
