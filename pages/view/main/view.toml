@@ -1,10 +1,5 @@
 [[view]]
 name = "main"
-draw3d = true
-camera-mob = "player"
-draw = [
-  "skybox",
-]
 com = [
   # movement
   "left-stick",
@@ -24,4 +19,10 @@ com = [
 
   # misc
   "button-escape",
+]
+
+[view.grid]
+camera-mob = "player"
+draw = [
+  "skybox",
 ]
