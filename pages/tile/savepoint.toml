@@ -14,7 +14,7 @@ action = [
 name = "savepoint"
 mesh = "savepoint"
 shader = "mesh-pc"
-depth = true
+state = { depth = true }
 
 [[mesh]]
 name = "savepoint"

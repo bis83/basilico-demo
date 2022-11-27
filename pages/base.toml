@@ -4,7 +4,7 @@ mesh = "rect"
 shader = "mesh-pt"
 image = "icon"
 ortho = true
-alpha = true
+state = { alpha = true }
 
 [[image]]
 name = "icon"

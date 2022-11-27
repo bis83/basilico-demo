@@ -9,7 +9,7 @@ name = "base-rock"
 mesh = "base"
 shader = "mesh-pt"
 image = "rock"
-depth = true
+state = { depth = true }
 
 [[image]]
 name = "rock"

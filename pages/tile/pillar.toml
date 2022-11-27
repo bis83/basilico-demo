@@ -9,8 +9,7 @@ save-id = 400
 name = "pillar"
 mesh = "pillar"
 shader = "mesh-p"
-depth = true
-cw = true
+state = { depth = true, cw = true }
 
 [[mesh]]
 name = "pillar"

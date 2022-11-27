@@ -14,4 +14,4 @@ name = "rock-mine"
 mesh = "mine"
 shader = "mesh-pt"
 image = "rock"
-depth = true
+state = { depth = true }

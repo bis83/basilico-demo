@@ -2,9 +2,7 @@
 name = "hit"
 mesh = "hit"
 shader = "mesh-pc"
-alpha = true
-depth = true
-cw = true
+state = { alpha = true, depth = true, cw = true }
 
 [[mesh]]
 name = "hit"

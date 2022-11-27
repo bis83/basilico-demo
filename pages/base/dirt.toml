@@ -8,7 +8,7 @@ name = "base-dirt"
 mesh = "base"
 shader = "mesh-pt"
 image = "dirt"
-depth = true
+state = { depth = true }
 
 [[image]]
 name = "dirt"

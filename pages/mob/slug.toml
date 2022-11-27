@@ -9,7 +9,7 @@ hp = 1
 name = "slug"
 mesh = "slug"
 shader = "mesh-pc"
-depth = true
+state = { depth = true }
 
 [[mesh]]
 name = "slug"
