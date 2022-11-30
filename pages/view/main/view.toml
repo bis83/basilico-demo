@@ -18,6 +18,7 @@ com = [
   "activate-target",
 
   # misc
+  "button-giveup",
   "button-escape",
 ]
 

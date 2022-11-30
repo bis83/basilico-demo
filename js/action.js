@@ -14,45 +14,44 @@ define_action("inventory_prev", (self) => {
   item_set_cursor(mob.item, -1);
 });
 define_action("inventory", (self) => {
-  const mob = view_camera_mob();
-  if (!mob) {
-    return;
-  }
   let text = "";
-  {
-    const data = data_mob(mob.no);
-    if (!data) {
-      return;
-    }
-    const mhp = data.hp;
-    const hp = Math.max(0, mhp - mob.dmg);
-    text += "HP: " + hp + "/" + mhp;
-    text += "\n";
-  }
-  text += "\n";
-  for (let i = 0; i < mob.item.s.length; ++i) {
-    if (mob.item.i === i) {
-      text += ">";
-    } else {
-      text += " ";
-    }
-    text += "[" + i + "]";
-    if (mob.item.s[i] != null) {
-      const item = data_item(mob.item.s[i].no);
-      if (!item) {
-        continue;
+  const mob = view_camera_mob();
+  if (mob) {
+    {
+      const data = data_mob(mob.no);
+      if (!data) {
+        return;
       }
-      text += item.text + ":" + mob.item.s[i].n;
+      const mhp = data.hp;
+      const hp = Math.max(0, mhp - mob.dmg);
+      text += "HP: " + hp + "/" + mhp;
+      text += "\n";
     }
     text += "\n";
-  }
-  text += "\n";
-  {
-    const slot = item_select(mob.item);
-    if (slot != null) {
-      const item = data_item(slot.no);
-      if (item != null) {
-        text += item.desc + "\n";
+    for (let i = 0; i < mob.item.s.length; ++i) {
+      if (mob.item.i === i) {
+        text += ">";
+      } else {
+        text += " ";
+      }
+      text += "[" + i + "]";
+      if (mob.item.s[i] != null) {
+        const item = data_item(mob.item.s[i].no);
+        if (!item) {
+          continue;
+        }
+        text += item.text + ":" + mob.item.s[i].n;
+      }
+      text += "\n";
+    }
+    text += "\n";
+    {
+      const slot = item_select(mob.item);
+      if (slot != null) {
+        const item = data_item(slot.no);
+        if (item != null) {
+          text += item.desc + "\n";
+        }
       }
     }
   }
@@ -90,23 +89,22 @@ define_action("activate", (self) => {
 });
 
 define_action("activate-target", (self) => {
-  const mob = view_camera_mob();
-  if (!mob) {
-    return;
-  }
   let text = "";
-  const ranges = hit_ranges(mob.x, mob.y, mob.ha);
-  for (const r of ranges) {
-    const tile = grid_tile(r.x, r.y);
-    if (!tile) {
-      continue;
+  const mob = view_camera_mob();
+  if (mob) {
+    const ranges = hit_ranges(mob.x, mob.y, mob.ha);
+    for (const r of ranges) {
+      const tile = grid_tile(r.x, r.y);
+      if (!tile) {
+        continue;
+      }
+      const data = data_tile(tile.no);
+      if (!data) {
+        continue;
+      }
+      text += data.desc;
+      text += "\n";
     }
-    const data = data_tile(tile.no);
-    if (!data) {
-      continue;
-    }
-    text += data.desc;
-    text += "\n";
   }
   cvs_text(self.cvs, text);
   gl_updateGLTexture2D(self.img, self.cvs);
@@ -178,4 +176,12 @@ define_action("hit-damage", (self) => {
   for (const mob of targets) {
     mob_damage(mob, 1);
   }
+});
+
+define_action("giveup", (self) => {
+  const mob = view_camera_mob();
+  if (!mob) {
+    return;
+  }
+  mob_damage(mob, 9999);
 });
