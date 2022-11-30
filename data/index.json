@@ -303,44 +303,49 @@
             "i": 2
         },
         {
-            "n": "button-hand",
+            "n": "button-giveup",
             "p": 0,
             "i": 3
         },
         {
-            "n": "button-inventory-next",
+            "n": "button-hand",
             "p": 0,
             "i": 4
         },
         {
-            "n": "button-inventory-prev",
+            "n": "button-inventory-next",
             "p": 0,
             "i": 5
         },
         {
-            "n": "inventory",
+            "n": "button-inventory-prev",
             "p": 0,
             "i": 6
         },
         {
-            "n": "left-stick",
+            "n": "inventory",
             "p": 0,
             "i": 7
         },
         {
-            "n": "right-stick",
+            "n": "left-stick",
             "p": 0,
             "i": 8
         },
         {
-            "n": "button-loadgame",
+            "n": "right-stick",
             "p": 0,
             "i": 9
         },
         {
-            "n": "button-newgame",
+            "n": "button-loadgame",
             "p": 0,
             "i": 10
+        },
+        {
+            "n": "button-newgame",
+            "p": 0,
+            "i": 11
         }
     ],
     "view": [
