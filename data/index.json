@@ -323,29 +323,39 @@
             "i": 6
         },
         {
-            "n": "inventory",
+            "n": "gameover",
             "p": 0,
             "i": 7
         },
         {
-            "n": "left-stick",
+            "n": "inventory",
             "p": 0,
             "i": 8
         },
         {
-            "n": "right-stick",
+            "n": "left-stick",
             "p": 0,
             "i": 9
         },
         {
-            "n": "button-loadgame",
+            "n": "right-stick",
             "p": 0,
             "i": 10
         },
         {
-            "n": "button-newgame",
+            "n": "button-loadgame",
             "p": 0,
             "i": 11
+        },
+        {
+            "n": "button-newgame",
+            "p": 0,
+            "i": 12
+        },
+        {
+            "n": "button-result",
+            "p": 0,
+            "i": 13
         }
     ],
     "view": [
@@ -359,6 +369,11 @@
             "n": "pause",
             "p": 0,
             "i": 1
+        },
+        {
+            "n": "result",
+            "p": 0,
+            "i": 2
         }
     ]
 }

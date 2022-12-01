@@ -1311,7 +1311,7 @@
     }
     if (data.m) {
       for (const a of data.m) {
-        grid_spawn_mob(a.no, a.x + 0.5, a.y + 0.5, a.ha);
+        grid_spawn_mob(a.no, a.x + 0.5, a.y + 0.5, a.ha, a.va);
       }
     }
   };
@@ -1344,9 +1344,9 @@
       return false;
     });
   };
-  const grid_spawn_mob = (no, x, y, ha) => {
+  const grid_spawn_mob = (no, x, y, ha, va) => {
     const h = tile_height(grid_tile(x, y));
-    $grid.m.push(mob_make(no, x, y, h, ha, 0));
+    $grid.m.push(mob_make(no, x, y, h, ha, va));
   };
   const grid_tick = () => {
     for (const mob of $grid.m) {
@@ -1448,9 +1448,9 @@
           com_tick(com, data2);
         }
       }
-    }
-    if (data.grid) {
-      grid_tick();
+      if (data.grid) {
+        grid_tick();
+      }
     }
     view_tick_after();
   };
@@ -1868,5 +1868,11 @@
       return;
     }
     mob_damage(mob, 9999);
+  });
+  define_action("gameover", (self, next) => {
+    const mob = view_camera_mob();
+    if (!mob) {
+      view_next(next);
+    }
   });
 })();
