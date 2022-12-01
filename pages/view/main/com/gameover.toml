@@ -1,0 +1,7 @@
+[[com]]
+name = "gameover"
+
+[com.tick]
+action = [
+  ["gameover", "result"],
+]

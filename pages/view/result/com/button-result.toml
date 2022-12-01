@@ -1,0 +1,19 @@
+[[com]]
+name = "button-result"
+
+[com.rect]
+draw = "ui-rect"
+x = 0
+y = 0
+width = 256
+height = 256
+
+[com.text]
+contents = "Result"
+
+[com.touch]
+gamepad = "b8"
+keyboard = "z"
+action = [
+  ["nextview", "pause"],
+]

@@ -185,3 +185,10 @@ define_action("giveup", (self) => {
   }
   mob_damage(mob, 9999);
 });
+
+define_action("gameover", (self, next) => {
+  const mob = view_camera_mob();
+  if (!mob) {
+    view_next(next);
+  }
+});

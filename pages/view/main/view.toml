@@ -20,6 +20,8 @@ com = [
   # misc
   "button-giveup",
   "button-escape",
+
+  "gameover",
 ]
 
 [view.grid]

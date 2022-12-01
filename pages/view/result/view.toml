@@ -1,0 +1,5 @@
+[[view]]
+name = "result"
+com = [
+  "button-result",
+]
