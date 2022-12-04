@@ -716,11 +716,11 @@
   const VS_LAYOUT_NORMAL = 1;
   const VS_LAYOUT_COLOR = 2;
   const VS_LAYOUT_UV = 3;
-  const decodeMesh = (data, base64) => {
+  const decodeMesh = (data, content) => {
     data.vao = $gl.createVertexArray();
     $gl.bindVertexArray(data.vao);
     if (data.b >= 0) {
-      data.b = gl_staticBuffer($gl.ARRAY_BUFFER, base64ToArrayBuffer(base64[data.b]));
+      data.b = gl_staticBuffer($gl.ARRAY_BUFFER, base64ToArrayBuffer(content[data.b]));
       if (data.bv) {
         for (let i = 0; i < data.bv.length; i += 2) {
           switch (data.bv[i]) {
@@ -741,14 +741,14 @@
       }
     }
     if (data.i >= 0) {
-      data.i = gl_staticBuffer($gl.ELEMENT_ARRAY_BUFFER, base64ToArrayBuffer(base64[data.i]));
+      data.i = gl_staticBuffer($gl.ELEMENT_ARRAY_BUFFER, base64ToArrayBuffer(content[data.i]));
     }
     $gl.bindVertexArray(null);
     return data;
   };
-  const decodeShader = (data) => {
-    data.vs = gl_createGLShader($gl.VERTEX_SHADER, data.vs);
-    data.fs = gl_createGLShader($gl.FRAGMENT_SHADER, data.fs);
+  const decodeShader = (data, content) => {
+    data.vs = gl_createGLShader($gl.VERTEX_SHADER, content[data.vs]);
+    data.fs = gl_createGLShader($gl.FRAGMENT_SHADER, content[data.fs]);
     data.prog = gl_createGLProgram(data.vs, data.fs);
     if (data.u) {
       const umap = {};
@@ -771,14 +771,14 @@
     return data;
   };
   let $imageLoading = 0;
-  const decodeImage = (data, base64) => {
+  const decodeImage = (data, content) => {
     data.tex = null;
     const img = new Image();
     img.onload = () => {
       data.tex = gl_createGLTexture2D(img, data.s);
       $imageLoading -= 1;
     };
-    img.src = "data:image/png;base64," + base64[data.b];
+    img.src = "data:image/png;base64," + content[data.b];
     $imageLoading += 1;
     return data;
   };
@@ -799,13 +799,13 @@
     const path = "data/pack" + no + ".json";
     fetch(path).then((res) => res.json()).then((json) => {
       if (json.mesh) {
-        json.mesh = json.mesh.map((data) => decodeMesh(data, json.base64));
+        json.mesh = json.mesh.map((data) => decodeMesh(data, json.content));
       }
       if (json.image) {
-        json.image = json.image.map((data) => decodeImage(data, json.base64));
+        json.image = json.image.map((data) => decodeImage(data, json.content));
       }
       if (json.shader) {
-        json.shader = json.shader.map((data) => decodeShader(data));
+        json.shader = json.shader.map((data) => decodeShader(data, json.content));
       }
       $data.pack[no] = json;
     });
@@ -1362,7 +1362,7 @@
     w: 0,
     h: 0,
     view: null,
-    slot: null,
+    slot: 0,
     com: [],
     cam: {
       eye: [0, 0, 0],
@@ -1373,8 +1373,8 @@
     m: new Float32Array(16)
   };
   const view_reset = () => {
-    $view.slot = null;
     $view.view = $data.index.init;
+    $view.slot = 0;
   };
   const view_camera_mob = () => {
     const data = data_view($view.view);
@@ -1614,10 +1614,7 @@
     grid_init_empty();
   };
   const loadgame = () => {
-    if (!$view.slot) {
-      return false;
-    }
-    const data = localstorage_get($view.slot);
+    const data = localstorage_get(`data${$view.slot}`);
     if (!data) {
       return false;
     }
@@ -1627,12 +1624,9 @@
     return true;
   };
   const savegame = () => {
-    if (!$view.slot) {
-      return;
-    }
     const data = {};
     data.grid = grid_encode($grid);
-    localstorage_set($view.slot, data);
+    localstorage_set(`data${$view.slot}`, data);
   };
   const init = () => {
     gl_init();
@@ -1668,12 +1662,10 @@
   define_action("resetview", (self) => {
     view_reset();
   });
-  define_action("newgame", (self, slot) => {
-    $view.slot = slot;
+  define_action("newgame", (self) => {
     newgame();
   });
-  define_action("loadgame", (self, slot) => {
-    $view.slot = slot;
+  define_action("loadgame", (self) => {
     loadgame();
   });
   define_action("savegame", (self) => {

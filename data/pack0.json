@@ -194,8 +194,8 @@
     ],
     "shader": [
         {
-            "vs": "#version 300 es\nlayout (location = 0) in vec3 p;\nuniform mat4 w;\nuniform mat4 vp;\nvoid main() {\n  gl_Position = vp * w * vec4(p, 1);\n}\n",
-            "fs": "#version 300 es\nprecision mediump float;\nout vec4 fc;\nvoid main() {\n  fc = vec4(0.8, 0.8, 0.8, 1.0);\n}\n",
+            "vs": 23,
+            "fs": 24,
             "u": [
                 "w",
                 "vp"
@@ -203,8 +203,8 @@
             "ub": null
         },
         {
-            "vs": "#version 300 es\nlayout (location = 0) in vec3 p;\nlayout (location = 2) in vec4 c;\nuniform mat4 w;\nuniform mat4 vp;\nout vec4 vc;\nvoid main() {\n  gl_Position = vp * w * vec4(p, 1);\n  vc = c;\n}\n",
-            "fs": "#version 300 es\nprecision mediump float;\nin vec4 vc;\nout vec4 fc;\nvoid main() {\n  fc = vc;\n}\n",
+            "vs": 25,
+            "fs": 26,
             "u": [
                 "w",
                 "vp"
@@ -212,8 +212,8 @@
             "ub": null
         },
         {
-            "vs": "#version 300 es\nlayout (location = 0) in vec3 p;\nlayout (location = 3) in vec2 uv;\nuniform mat4 w;\nuniform mat4 vp;\nout vec2 vu;\nvoid main() {\n  gl_Position = vp * w * vec4(p, 1);\n  vu = uv;\n}\n",
-            "fs": "#version 300 es\nprecision mediump float;\nin vec2 vu;\nuniform sampler2D tex0;\nout vec4 fc;\nvoid main() {\n  fc = texture(tex0, vu);\n}\n",
+            "vs": 27,
+            "fs": 28,
             "u": [
                 "w",
                 "vp",
@@ -812,8 +812,7 @@
                 "keyboard": "x",
                 "action": [
                     [
-                        "loadgame",
-                        "data0"
+                        "loadgame"
                     ],
                     [
                         "nextview",
@@ -845,8 +844,7 @@
                         "main"
                     ],
                     [
-                        "newgame",
-                        "data0"
+                        "newgame"
                     ],
                     [
                         "newgrid",
@@ -917,7 +915,7 @@
             "grid": null
         }
     ],
-    "base64": [
+    "content": [
         "AACAvwAAgL8AAAAAAACAPwAAgL8AAAAAAACAvwAAgD8AAAAAAACAPwAAgD8AAAAAAACAvwAAgL8AAAA/AACAPwAAgL8AAAA/AACAvwAAgD8AAAA/AACAPwAAgD8AAAA/ICAg/yAgIP8gICD/ICAg/0BAQP9AQED/QEBA/0BAQP8AAAAAADwAAAAAADwAPAA8ADQANAA6ADQANAA6ADoAOg==",
         "AAABAAIAAgABAAMAAQAFAAMAAwAFAAcABQAEAAcABwAEAAYABAAAAAYABgAAAAIAAgADAAYABgADAAcABQABAAQABAABAAAA",
         "ZmaGv2Zmhr8K1yM8ZmaGP2Zmhr8K1yM8ZmaGv2Zmhj8K1yM8ZmaGP2Zmhj8K1yM8/wAAgP8AAID/AACA/wAAgA==",
@@ -940,6 +938,12 @@
         "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAMtJREFUWEdj7A+z/s/AwMBw/fE3EEU3oCnLBbaLEeYAejoCZjnYAWmWhv+RBWgdEuh2gR0Acgk9HIHNDrgDaO0IXB5EcQCtHIEvdDEcQG1HEIparA6AOWKP8BeqZEuXtzw4szlOB4BsfmrwjyoOkL7AhNMcohzwRtueLIeIXD0I1jfqgNEQGA2B0RAYDYHREBj6IUBWVYikiawQALVkBqxBQqgZRUqIEDJrcDVKCbmWFJ+jqyXYLKel5TDH4OyY0MNyXI4Y+M7pQHfPAa2E6UHpvSXqAAAAAElFTkSuQmCC",
         "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAVlJREFUWEfNl0EOAUEQRdsNLCxwARJrFyEhHMZK4iYSCyexlnABLCzcgIxkZLqmqv/vMgmW3VXVr/6v7ozWYjZ5jobjcDwdgvydL9cw6PeiZSu2liwWrLxWAYCS2X0NGOU2CoAO0/aTAO1ONzzut1redrcPy/n0s27FIaDCljeARzpU3IKSZ0UKeDtJwUi1ZOx/z0BJy1w9r401BZBkVQk9h0qbf2/BerV5aq8gmnK5z9ikvbQuBXJuCwKDAB6fc9SrASDinOKp2FJFqECqCAOLbtUbAAWhrnNmgn4JtaLMPKAYqdpXFiBlmH0KQLOI8Z+JoQCYTjwxRWMRAEPMHiRrWbPxEwWqA/4BQFfR6gBNPVJMVYApyt591FijFnhmiALwFNZyNDVMAFZi5LG2Hw1hEx8kzMxYoJQF1WQ0VNZBrv+GHu9Z60rVshXI+VRn5iMC+MbL1GGpui9HNf9LtfIDXAAAAABJRU5ErkJggg==",
         "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAVJJREFUWEfNl7ENwjAQRZ0RKJiAFSjZg44uSCyAGAGxABJpEB1zQMkCFEyABCOAEilR7Pj8v89BgTI+X/69f2eH7HU5fJ6PmxlPpsb9bdZ7s92trMdSbGez80Dal5UC0GZ23ScY7e1VAHqZbz0oQMI2muXmfS2afCm2VAI06FC1bF9ZBLSVhMS4tNzY/+6BWi1DRmtjhwBC1kaoeek8P5lzsWjSDG/B/bj8+E5B1OXuOmOT76RVEXAxhsQiYZQAjdcswY4ApJhNjOJqihQBKRkjFk1VJQAFsdWguKjLSPId9QNad6klWaCpWHUX+Cxi/GdiBiVQFvaz69g9rKTeGIRAW1wjAI2idipQo3oJoFEqk7L3ASqsVwuYrleNoSaxb4+PhkiAsQH5K61bTdjHB0mK2OgeQE0Ve3Oq/hmF0LPTUVOLJhDzqc70iCUgxcvQy0J5v8lLIjveo1QaAAAAAElFTkSuQmCC",
-        "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"
+        "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",
+        "#version 300 es\nlayout (location = 0) in vec3 p;\nuniform mat4 w;\nuniform mat4 vp;\nvoid main() {\n  gl_Position = vp * w * vec4(p, 1);\n}\n",
+        "#version 300 es\nprecision mediump float;\nout vec4 fc;\nvoid main() {\n  fc = vec4(0.8, 0.8, 0.8, 1.0);\n}\n",
+        "#version 300 es\nlayout (location = 0) in vec3 p;\nlayout (location = 2) in vec4 c;\nuniform mat4 w;\nuniform mat4 vp;\nout vec4 vc;\nvoid main() {\n  gl_Position = vp * w * vec4(p, 1);\n  vc = c;\n}\n",
+        "#version 300 es\nprecision mediump float;\nin vec4 vc;\nout vec4 fc;\nvoid main() {\n  fc = vc;\n}\n",
+        "#version 300 es\nlayout (location = 0) in vec3 p;\nlayout (location = 3) in vec2 uv;\nuniform mat4 w;\nuniform mat4 vp;\nout vec2 vu;\nvoid main() {\n  gl_Position = vp * w * vec4(p, 1);\n  vu = uv;\n}\n",
+        "#version 300 es\nprecision mediump float;\nin vec2 vu;\nuniform sampler2D tex0;\nout vec4 fc;\nvoid main() {\n  fc = texture(tex0, vu);\n}\n"
     ]
 }
