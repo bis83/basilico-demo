@@ -298,64 +298,59 @@
             "i": 1
         },
         {
-            "n": "button-escape",
+            "n": "button-giveup",
             "p": 0,
             "i": 2
         },
         {
-            "n": "button-giveup",
+            "n": "button-hand",
             "p": 0,
             "i": 3
         },
         {
-            "n": "button-hand",
+            "n": "button-inventory-next",
             "p": 0,
             "i": 4
         },
         {
-            "n": "button-inventory-next",
+            "n": "button-inventory-prev",
             "p": 0,
             "i": 5
         },
         {
-            "n": "button-inventory-prev",
+            "n": "gameover",
             "p": 0,
             "i": 6
         },
         {
-            "n": "gameover",
+            "n": "inventory",
             "p": 0,
             "i": 7
         },
         {
-            "n": "inventory",
+            "n": "left-stick",
             "p": 0,
             "i": 8
         },
         {
-            "n": "left-stick",
+            "n": "right-stick",
             "p": 0,
             "i": 9
         },
         {
-            "n": "right-stick",
+            "n": "button-loadgame",
             "p": 0,
             "i": 10
         },
         {
-            "n": "button-loadgame",
+            "n": "button-newgame",
             "p": 0,
             "i": 11
         },
         {
-            "n": "button-newgame",
-            "p": 0,
-            "i": 12
-        },
-        {
             "n": "button-result",
             "p": 0,
-            "i": 13
+            "i": 12
         }
     ],
     "view": [

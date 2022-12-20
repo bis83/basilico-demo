@@ -1659,9 +1659,6 @@
   define_action("nextview", (self, view) => {
     view_next(view);
   });
-  define_action("resetview", (self) => {
-    view_reset();
-  });
   define_action("newgame", (self) => {
     newgame();
   });
