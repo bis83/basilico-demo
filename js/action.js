@@ -1,4 +1,38 @@
 
+define_action("nextview", (self, view) => {
+  view_next(view);
+});
+
+define_action("resetview", (self) => {
+  view_reset();
+});
+
+define_action("newgame", (self) => {
+  newgame();
+});
+
+define_action("loadgame", (self) => {
+  loadgame();
+});
+
+define_action("savegame", (self) => {
+  savegame();
+});
+
+define_action("fpsmove", (self, lstick, rstick) => {
+  const moveXY = com_value(lstick);
+  const cameraXY = com_value(rstick);
+  mob_fps_movement(self, moveXY, cameraXY);
+});
+
+define_action("newgrid", (self, name) => {
+  const no = data_grid_index(name);
+  if (no <= 0) {
+    return;
+  }
+  grid_load(no);
+});
+
 define_action("inventory_next", (self) => {
   const mob = view_camera_mob();
   if (!mob) {
