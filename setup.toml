@@ -1,7 +1,5 @@
 title = "Demo"
 addr = ":8080"
-logging = false
-assert = false
 minify = false
 initial-view = "pause"
 
