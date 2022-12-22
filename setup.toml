@@ -1,12 +1,7 @@
 title = "Demo"
 addr = ":8080"
-minify = false
-initial-view = "pause"
-
+minify = true
+pages = true
 script = [
   "js/action.js",
-]
-
-gltf = [
-  "gltf/pillar_a.gltf",
 ]
