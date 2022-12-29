@@ -1,5 +1,4 @@
 title = "Demo"
-addr = ":8080"
 minify = true
 pages = true
 script = [
