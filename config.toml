@@ -1,4 +1,5 @@
 title = "Demo"
+message = "Welcome Basilico."
 minify = true
 pages = true
 script = [
