@@ -1,7 +1,0 @@
-[[item]]
-name = "rock"
-text = "石材"
-desc = "何の変哲もない石"
-
-[item.usable]
-hit = "put-rock"

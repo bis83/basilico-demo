@@ -1,6 +1,0 @@
-[[hit]]
-name = "damage"
-draw = "hit"
-action = [
-  ["hit-damage"],
-]

@@ -1,7 +1,0 @@
-[[item]]
-name = "sword"
-text = "剣"
-desc = "相手にダメージを与える"
-
-[item.usable]
-hit = "damage"

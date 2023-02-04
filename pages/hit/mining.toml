@@ -1,6 +1,0 @@
-[[hit]]
-name = "mining"
-draw = "hit"
-action = [
-  ["hit-mining"],
-]

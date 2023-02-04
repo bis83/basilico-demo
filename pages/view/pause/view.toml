@@ -1,6 +1,0 @@
-[[view]]
-name = "pause"
-com = [
-  "button-newgame",
-  "button-loadgame",
-]

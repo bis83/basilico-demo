@@ -1,5 +1,0 @@
-[index]
-initial-view = "pause"
-gltf = [
-  "gltf/pillar_a.gltf",
-]
