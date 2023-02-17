@@ -2,6 +2,8 @@ title = "Demo"
 message = "Welcome Basilico."
 minify = true
 middleware = [
+  "basil3d",
 ]
 script = [
+  "js/main.js",
 ]
