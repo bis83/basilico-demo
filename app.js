@@ -1,1 +1,10 @@
-(()=>{const o=(e,t,n)=>{e.addEventListener(t,n)};const s=()=>document.getElementById("message"),l=()=>{const e=s();e.style.display="none"};o(window,"load",()=>{l()});})();
+(() => {
+  const html_listen = (target, key, func) => {
+    target.addEventListener(key, func);
+  };
+  const basil3d_start = () => {
+  };
+  html_listen(window, "load", () => {
+    basil3d_start();
+  });
+})();

@@ -1,0 +1,18 @@
+{
+    "content": [
+        "#version 300 es\nlayout (location = 0) in vec3 p;\nuniform mat4 w;\nuniform mat4 vp;\nvoid main() {\n  gl_Position = vp * w * vec4(p, 1);\n}\n",
+        "#version 300 es\nprecision mediump float;\nout vec4 fc;\nvoid main() {\n  fc = vec4(0.8, 0.8, 0.8, 1.0);\n}\n"
+    ],
+    "mesh": {
+        "shader": [
+            {
+                "content": 0,
+                "type": 0
+            },
+            {
+                "content": 1,
+                "type": 1
+            }
+        ]
+    }
+}
