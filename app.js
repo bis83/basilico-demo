@@ -12,6 +12,135 @@
     const elem = html_message();
     elem.style.display = `none`;
   };
+  const deg2rad = (deg) => {
+    return deg / 180 * Math.PI;
+  };
+  const vec3dot = (a, b) => {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  };
+  const vec3length = (a) => {
+    const d = vec3dot(a, a);
+    return Math.sqrt(d);
+  };
+  const vec3add = (a, b) => {
+    return [
+      a[0] + b[0],
+      a[1] + b[1],
+      a[2] + b[2]
+    ];
+  };
+  const vec3sub = (a, b) => {
+    return [
+      a[0] - b[0],
+      a[1] - b[1],
+      a[2] - b[2]
+    ];
+  };
+  const vec3normalize = (v) => {
+    const l = vec3length(v);
+    return [
+      v[0] / l,
+      v[1] / l,
+      v[2] / l
+    ];
+  };
+  const vec3cross = (a, b) => {
+    return [
+      a[1] * b[2] - a[2] * b[1],
+      a[2] * b[0] - a[0] * b[2],
+      a[0] * b[1] - a[1] * b[0]
+    ];
+  };
+  const mat4multiply = (a, b) => {
+    return [
+      a[0] * b[0] + a[1] * b[4] + a[2] * b[8] + a[3] * b[12],
+      a[0] * b[1] + a[1] * b[5] + a[2] * b[9] + a[3] * b[13],
+      a[0] * b[2] + a[1] * b[6] + a[2] * b[10] + a[3] * b[14],
+      a[0] * b[3] + a[1] * b[7] + a[2] * b[11] + a[3] * b[15],
+      a[4] * b[0] + a[5] * b[4] + a[6] * b[8] + a[7] * b[12],
+      a[4] * b[1] + a[5] * b[5] + a[6] * b[9] + a[7] * b[13],
+      a[4] * b[2] + a[5] * b[6] + a[6] * b[10] + a[7] * b[14],
+      a[4] * b[3] + a[5] * b[7] + a[6] * b[11] + a[7] * b[15],
+      a[8] * b[0] + a[9] * b[4] + a[10] * b[8] + a[11] * b[12],
+      a[8] * b[1] + a[9] * b[5] + a[10] * b[9] + a[11] * b[13],
+      a[8] * b[2] + a[9] * b[6] + a[10] * b[10] + a[11] * b[14],
+      a[8] * b[3] + a[9] * b[7] + a[10] * b[11] + a[11] * b[15],
+      a[12] * b[0] + a[13] * b[4] + a[14] * b[8] + a[15] * b[12],
+      a[12] * b[1] + a[13] * b[5] + a[14] * b[9] + a[15] * b[13],
+      a[12] * b[2] + a[13] * b[6] + a[14] * b[10] + a[15] * b[14],
+      a[12] * b[3] + a[13] * b[7] + a[14] * b[11] + a[15] * b[15]
+    ];
+  };
+  const mat4translate = (x, y, z) => {
+    return [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      x,
+      y,
+      z,
+      1
+    ];
+  };
+  const mat4lookat = (eye, at, up) => {
+    const tz = vec3normalize(vec3sub(at, eye));
+    const tx = vec3normalize(vec3cross(up, tz));
+    const ty = vec3cross(tz, tx);
+    const dx = vec3dot(eye, tx);
+    const dy = vec3dot(eye, ty);
+    const dz = vec3dot(eye, tz);
+    return [
+      tx[0],
+      ty[0],
+      tz[0],
+      0,
+      tx[1],
+      ty[1],
+      tz[1],
+      0,
+      tx[2],
+      ty[2],
+      tz[2],
+      0,
+      -dx,
+      -dy,
+      -dz,
+      1
+    ];
+  };
+  const mat4perspective = (fovy, aspect, near, far) => {
+    const sy = 1 / Math.tan(fovy);
+    const sx = sy / aspect;
+    const sz = far / (far - near);
+    const wz = -(sz * near);
+    return [
+      sx,
+      0,
+      0,
+      0,
+      0,
+      sy,
+      0,
+      0,
+      0,
+      0,
+      sz,
+      1,
+      0,
+      0,
+      wz,
+      0
+    ];
+  };
   const basil3d_gpu_create = (device, canvasFormat) => {
     const obj = {
       bindGroupLayout: [],
@@ -23,9 +152,11 @@
     };
     obj.shaderModule.push(device.createShaderModule({
       code: `
+    @binding(0) @group(0) var<uniform> viewProj : mat4x4<f32>;
+    @binding(1) @group(0) var<uniform> world : mat4x4<f32>;
     @vertex
     fn mainVertex(@location(0) position: vec3<f32>) -> @builtin(position) vec4<f32> {
-      return vec4(position, 1.0);
+      return viewProj * world * vec4(position, 1.0);
     }
     @fragment
     fn mainFragment() -> @location(0) vec4<f32> {
@@ -34,16 +165,15 @@
     `
     }));
     obj.bindGroupLayout.push(device.createBindGroupLayout({
-      entries: []
-    }));
-    obj.bindGroupLayout.push(device.createBindGroupLayout({
-      entries: []
-    }));
-    obj.bindGroupLayout.push(device.createBindGroupLayout({
-      entries: []
+      entries: [
+        { binding: 0, visibility: GPUShaderStage.VERTEX, buffer: {} },
+        { binding: 1, visibility: GPUShaderStage.VERTEX, buffer: { hasDynamicOffset: true } }
+      ]
     }));
     obj.pipelineLayout.push(device.createPipelineLayout({
-      bindGroupLayouts: []
+      bindGroupLayouts: [
+        obj.bindGroupLayout[0]
+      ]
     }));
     obj.pipeline.push(device.createRenderPipeline({
       layout: obj.pipelineLayout[0],
@@ -63,37 +193,147 @@
       }
     }));
     obj.buffer.push(device.createBuffer({
-      size: 3 * 4 * 3,
-      usage: GPUBufferUsage.VERTEX,
-      mappedAtCreation: true
+      size: 64 * 1,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
     }));
-    new Float32Array(obj.buffer[0].getMappedRange()).set([
-      1,
-      -1,
-      0,
-      -1,
-      -1,
-      0,
-      0,
-      1,
-      0
-    ]);
-    obj.buffer[0].unmap();
+    obj.buffer.push(device.createBuffer({
+      size: 256 * 1024,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+    }));
+    obj.bindGroup.push(device.createBindGroup({
+      layout: obj.bindGroupLayout[0],
+      entries: [
+        { binding: 0, resource: { buffer: obj.buffer[0] } },
+        { binding: 1, resource: { buffer: obj.buffer[1], size: 256, offset: 0 } }
+      ]
+    }));
     return obj;
   };
+  const basil3d_update_canvas = (gpu, canvas) => {
+    if (canvas.width !== window.innerWidth) {
+      canvas.width = window.innerWidth;
+    }
+    if (canvas.height !== window.innerHeight) {
+      canvas.height = window.innerHeight;
+    }
+  };
+  const basil3d_app_load = (device) => {
+    const obj = {
+      gpu: {},
+      audio: {},
+      loading: 0
+    };
+    const path = "app.json";
+    fetch(path).then((res) => res.json()).then((json) => {
+      if (json.gpu) {
+        json.gpu.buffer = json.gpu.buffer.map((data) => {
+          const binary = window.atob(json.embed[data.embed]);
+          const buffer = device.createBuffer({
+            size: binary.length,
+            usage: GPUBufferUsage.VERTEX | GPUBufferUsage.INDEX,
+            mappedAtCreation: true
+          });
+          const view = new DataView(buffer.getMappedRange());
+          for (let i = 0; i < binary.length; ++i) {
+            view.setUint8(i, binary.charCodeAt(i));
+          }
+          buffer.unmap();
+          return buffer;
+        });
+        obj.gpu = json.gpu;
+      }
+      if (json.audio) {
+        obj.audio = json.audio;
+      }
+      obj.loading -= 1;
+    });
+    obj.loading += 1;
+    return obj;
+  };
+  const basil3d_app_is_loading = (app) => {
+    return app.loading > 0;
+  };
+  const basil3d_app_gpu_label = (app, label) => {
+    for (const obj of app.gpu.label) {
+      if (obj.name === label) {
+        return obj;
+      }
+    }
+    return null;
+  };
+  const basil3d_app_gpu_draw = (app, label, gpu, pass, offset) => {
+    const obj = basil3d_app_gpu_label(app, label);
+    if (!obj) {
+      return;
+    }
+    for (const i of obj.mesh) {
+      const mesh = app.gpu.mesh[i];
+      pass.setPipeline(gpu.pipeline[0]);
+      pass.setBindGroup(0, gpu.bindGroup[0], [offset]);
+      if (mesh.vb0) {
+        const [index, offset2, size] = mesh.vb0;
+        pass.setVertexBuffer(0, app.gpu.buffer[index], offset2, size);
+      }
+      if (mesh.ib) {
+        const [index, offset2, size] = mesh.ib;
+        pass.setIndexBuffer(app.gpu.buffer[index], "uint16", offset2, size);
+      }
+      pass.drawIndexed(mesh.count);
+    }
+  };
   const basil3d_scene_create = () => {
-    return {};
+    return {
+      camera: {
+        aspect: 1,
+        fovy: deg2rad(30),
+        zNear: 0.1,
+        zFar: 1e3,
+        dir: [0, 0, 1],
+        eye: [0, 0, 0],
+        up: [0, 1, 0]
+      },
+      object: []
+    };
   };
-  const basil3d_scene_render = (scene, gpu, pass) => {
-    pass.setPipeline(gpu.pipeline[0]);
-    pass.setVertexBuffer(0, gpu.buffer[0]);
-    pass.draw(3, 1, 0, 0);
+  const basil3d_scene_add_object = (scene, label, matrix) => {
+    scene.object.push({
+      label,
+      matrix,
+      offset: 0
+    });
   };
-  const basil3d_start = async () => {
+  const basil3d_scene_write_buffers = (scene, app, gpu, canvas, device) => {
+    const mat = new Float32Array(16);
+    {
+      scene.camera.aspect = canvas.width / canvas.height;
+      const at = vec3add(scene.camera.eye, scene.camera.dir);
+      const view = mat4lookat(scene.camera.eye, at, scene.camera.up);
+      const proj = mat4perspective(scene.camera.fovy, scene.camera.aspect, scene.camera.zNear, scene.camera.zFar);
+      const vp = mat4multiply(view, proj);
+      mat.set(vp);
+      device.queue.writeBuffer(gpu.buffer[0], 0, mat);
+    }
+    {
+      let offset = 0;
+      for (const obj of scene.object) {
+        mat.set(obj.matrix);
+        device.queue.writeBuffer(gpu.buffer[1], offset, mat);
+        obj.offset = offset;
+        offset += 256;
+      }
+    }
+  };
+  const basil3d_scene_render_pass = (scene, app, gpu, pass) => {
+    for (const obj of scene.object) {
+      basil3d_app_gpu_draw(app, obj.label, gpu, pass, obj.offset);
+    }
+  };
+  const basil3d_start = async (setup2) => {
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter.requestDevice();
     const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
     const gpu = basil3d_gpu_create(device, canvasFormat);
+    const app = basil3d_app_load(device);
     const scene = basil3d_scene_create();
     const canvas = html_canvas();
     const context = canvas.getContext("webgpu");
@@ -103,32 +343,52 @@
       alphaMode: "opaque"
     });
     const frame = () => {
-      if (canvas.width !== window.innerWidth) {
-        canvas.width = window.innerWidth;
+      basil3d_update_canvas(gpu, canvas);
+      if (basil3d_app_is_loading(app)) {
+        const ce = device.createCommandEncoder();
+        const renderPassDesc = {
+          colorAttachments: [{
+            view: context.getCurrentTexture().createView(),
+            clearValue: { r: 0.2, g: 0.2, b: 0.2, a: 1 },
+            loadOp: "clear",
+            storeOp: "store"
+          }]
+        };
+        const pass = ce.beginRenderPass(renderPassDesc);
+        pass.end();
+        device.queue.submit([ce.finish()]);
+      } else {
+        if (setup2) {
+          setup2(scene);
+          setup2 = null;
+        }
+        basil3d_scene_write_buffers(scene, app, gpu, canvas, device);
+        const ce = device.createCommandEncoder();
+        const renderPassDesc = {
+          colorAttachments: [{
+            view: context.getCurrentTexture().createView(),
+            clearValue: { r: 0.2, g: 0.2, b: 0.2, a: 1 },
+            loadOp: "clear",
+            storeOp: "store"
+          }]
+        };
+        const pass = ce.beginRenderPass(renderPassDesc);
+        basil3d_scene_render_pass(scene, app, gpu, pass);
+        pass.end();
+        device.queue.submit([ce.finish()]);
       }
-      if (canvas.height !== window.innerHeight) {
-        canvas.height = window.innerHeight;
-      }
-      const ce = device.createCommandEncoder();
-      const view = context.getCurrentTexture().createView();
-      const renderPassDesc = {
-        colorAttachments: [{
-          view,
-          clearValue: { r: 0.2, g: 0.2, b: 0.2, a: 1 },
-          loadOp: "clear",
-          storeOp: "store"
-        }]
-      };
-      const pass = ce.beginRenderPass(renderPassDesc);
-      basil3d_scene_render(scene, gpu, pass);
-      pass.end();
-      device.queue.submit([ce.finish()]);
       requestAnimationFrame(frame);
     };
     requestAnimationFrame(frame);
   };
-  html_listen(window, "load", () => {
+  const setup = (scene) => {
     html_hide_message();
-    basil3d_start();
+    scene.camera.eye = [0, 1.5, -5];
+    basil3d_scene_add_object(scene, "tr_01", mat4translate(-2, 0, 0));
+    basil3d_scene_add_object(scene, "tr_01", mat4translate(2, 0, 0));
+    basil3d_scene_add_object(scene, "tr_01", mat4translate(0, 0, 4));
+  };
+  html_listen(window, "load", () => {
+    basil3d_start(setup);
   });
 })();
