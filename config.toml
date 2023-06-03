@@ -1,9 +1,5 @@
 message = "Welcome Basilico."
-middleware = [
-  "basil3d",
-]
+middleware = ["basil3d"]
 minify = false
-script = [
-  "js/main.js",
-]
+script = ["js/main.js"]
 title = "Demo"
