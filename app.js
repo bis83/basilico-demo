@@ -253,33 +253,13 @@
   const basil3d_app_is_loading = (app) => {
     return app.loading > 0;
   };
-  const basil3d_app_gpu_label = (app, label) => {
-    for (const obj of app.gpu.label) {
-      if (obj.name === label) {
-        return obj;
+  const basil3d_app_gpu_label_index = (app, name) => {
+    for (let i = 0; i < app.gpu.label.length; ++i) {
+      if (app.gpu.label[i].name === name) {
+        return i;
       }
     }
-    return null;
-  };
-  const basil3d_app_gpu_draw = (app, label, gpu, pass, offset) => {
-    const obj = basil3d_app_gpu_label(app, label);
-    if (!obj) {
-      return;
-    }
-    for (const i of obj.mesh) {
-      const mesh = app.gpu.mesh[i];
-      pass.setPipeline(gpu.pipeline[0]);
-      pass.setBindGroup(0, gpu.bindGroup[0], [offset]);
-      if (mesh.vb0) {
-        const [index, offset2, size] = mesh.vb0;
-        pass.setVertexBuffer(0, app.gpu.buffer[index], offset2, size);
-      }
-      if (mesh.ib) {
-        const [index, offset2, size] = mesh.ib;
-        pass.setIndexBuffer(app.gpu.buffer[index], "uint16", offset2, size);
-      }
-      pass.drawIndexed(mesh.count);
-    }
+    return -1;
   };
   const basil3d_scene_create = () => {
     return {
@@ -292,14 +272,17 @@
         eye: [0, 0, 0],
         up: [0, 1, 0]
       },
-      object: []
+      entity: []
     };
   };
-  const basil3d_scene_add_object = (scene, label, matrix) => {
-    scene.object.push({
-      label,
-      matrix,
-      offset: 0
+  const basil3d_scene_add_entity = (scene, app, label, matrix) => {
+    const id = basil3d_app_gpu_label_index(app, label);
+    if (id < 0) {
+      return;
+    }
+    scene.entity.push({
+      id,
+      matrix
     });
   };
   const basil3d_scene_write_buffers = (scene, app, gpu, canvas, device) => {
@@ -313,19 +296,41 @@
       mat.set(vp);
       device.queue.writeBuffer(gpu.buffer[0], 0, mat);
     }
-    {
-      let offset = 0;
-      for (const obj of scene.object) {
-        mat.set(obj.matrix);
-        device.queue.writeBuffer(gpu.buffer[1], offset, mat);
-        obj.offset = offset;
-        offset += 256;
-      }
+    const batch = [];
+    batch.length = app.gpu.mesh.length;
+    for (let i = 0; i < batch.length; ++i) {
+      batch[i] = [];
     }
+    let offset = 0;
+    for (const e of scene.entity) {
+      for (const i of app.gpu.label[e.id].mesh) {
+        batch[i].push(offset);
+      }
+      mat.set(e.matrix);
+      device.queue.writeBuffer(gpu.buffer[1], offset, mat);
+      offset += 256;
+    }
+    return batch;
   };
-  const basil3d_scene_render_pass = (scene, app, gpu, pass) => {
-    for (const obj of scene.object) {
-      basil3d_app_gpu_draw(app, obj.label, gpu, pass, obj.offset);
+  const basil3d_scene_render_pass = (batch, app, gpu, pass) => {
+    for (let i = 0; i < batch.length; ++i) {
+      if (batch[i].length <= 0) {
+        continue;
+      }
+      const mesh = app.gpu.mesh[i];
+      pass.setPipeline(gpu.pipeline[0]);
+      if (mesh.vb0) {
+        const [index, offset, size] = mesh.vb0;
+        pass.setVertexBuffer(0, app.gpu.buffer[index], offset, size);
+      }
+      if (mesh.ib) {
+        const [index, offset, size] = mesh.ib;
+        pass.setIndexBuffer(app.gpu.buffer[index], "uint16", offset, size);
+      }
+      for (const offset of batch[i]) {
+        pass.setBindGroup(0, gpu.bindGroup[0], [offset]);
+        pass.drawIndexed(mesh.count);
+      }
     }
   };
   const basil3d_start = async (setup2) => {
@@ -359,10 +364,10 @@
         device.queue.submit([ce.finish()]);
       } else {
         if (setup2) {
-          setup2(scene);
+          setup2(app, scene);
           setup2 = null;
         }
-        basil3d_scene_write_buffers(scene, app, gpu, canvas, device);
+        const batch = basil3d_scene_write_buffers(scene, app, gpu, canvas, device);
         const ce = device.createCommandEncoder();
         const renderPassDesc = {
           colorAttachments: [{
@@ -373,7 +378,7 @@
           }]
         };
         const pass = ce.beginRenderPass(renderPassDesc);
-        basil3d_scene_render_pass(scene, app, gpu, pass);
+        basil3d_scene_render_pass(batch, app, gpu, pass);
         pass.end();
         device.queue.submit([ce.finish()]);
       }
@@ -381,12 +386,12 @@
     };
     requestAnimationFrame(frame);
   };
-  const setup = (scene) => {
+  const setup = (app, scene) => {
     html_hide_message();
     scene.camera.eye = [0, 1.5, -5];
-    basil3d_scene_add_object(scene, "tr_01", mat4translate(-2, 0, 0));
-    basil3d_scene_add_object(scene, "tr_01", mat4translate(2, 0, 0));
-    basil3d_scene_add_object(scene, "tr_01", mat4translate(0, 0, 4));
+    basil3d_scene_add_entity(scene, app, "tr_01", mat4translate(-2, 0, 0));
+    basil3d_scene_add_entity(scene, app, "tr_01", mat4translate(2, 0, 0));
+    basil3d_scene_add_entity(scene, app, "tr_01", mat4translate(0, 0, 4));
   };
   html_listen(window, "load", () => {
     basil3d_start(setup);
