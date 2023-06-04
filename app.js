@@ -253,9 +253,9 @@
   const basil3d_app_is_loading = (app) => {
     return app.loading > 0;
   };
-  const basil3d_app_gpu_label_index = (app, name) => {
-    for (let i = 0; i < app.gpu.label.length; ++i) {
-      if (app.gpu.label[i].name === name) {
+  const basil3d_app_gpu_id = (app, name) => {
+    for (let i = 0; i < app.gpu.id.length; ++i) {
+      if (app.gpu.id[i].name === name) {
         return i;
       }
     }
@@ -275,15 +275,22 @@
       entity: []
     };
   };
-  const basil3d_scene_add_entity = (scene, app, label, matrix) => {
-    const id = basil3d_app_gpu_label_index(app, label);
-    if (id < 0) {
-      return;
+  const basil3d_scene_setup = (scene, app, desc) => {
+    if (desc.camera) {
+      Object.assign(scene.camera, desc.camera);
     }
-    scene.entity.push({
-      id,
-      matrix
-    });
+    if (desc.entity) {
+      for (const e of desc.entity) {
+        const id = basil3d_app_gpu_id(app, e.name);
+        if (id < 0) {
+          continue;
+        }
+        scene.entity.push({
+          id,
+          matrix: e.matrix
+        });
+      }
+    }
   };
   const basil3d_scene_write_buffers = (scene, app, gpu, canvas, device) => {
     const mat = new Float32Array(16);
@@ -303,7 +310,7 @@
     }
     let offset = 0;
     for (const e of scene.entity) {
-      for (const i of app.gpu.label[e.id].mesh) {
+      for (const i of app.gpu.id[e.id].mesh) {
         batch[i].push(offset);
       }
       mat.set(e.matrix);
@@ -388,10 +395,16 @@
   };
   const setup = (app, scene) => {
     html_hide_message();
-    scene.camera.eye = [0, 1.5, -5];
-    basil3d_scene_add_entity(scene, app, "tr_01", mat4translate(-2, 0, 0));
-    basil3d_scene_add_entity(scene, app, "tr_01", mat4translate(2, 0, 0));
-    basil3d_scene_add_entity(scene, app, "tr_01", mat4translate(0, 0, 4));
+    basil3d_scene_setup(scene, app, {
+      camera: {
+        eye: [0, 1.5, -5]
+      },
+      entity: [
+        { name: "tr_01", matrix: mat4translate(-2, 0, 0) },
+        { name: "tr_01", matrix: mat4translate(2, 0, 0) },
+        { name: "tr_01", matrix: mat4translate(0, 0, 4) }
+      ]
+    });
   };
   html_listen(window, "load", () => {
     basil3d_start(setup);
