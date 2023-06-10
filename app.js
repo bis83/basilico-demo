@@ -148,19 +148,36 @@
       shaderModule: [],
       pipeline: [],
       buffer: [],
+      texture: [],
       bindGroup: []
     };
     obj.shaderModule.push(device.createShaderModule({
       code: `
     @binding(0) @group(0) var<uniform> viewProj : mat4x4<f32>;
     @binding(1) @group(0) var<uniform> world : mat4x4<f32>;
+    struct VertexInput {
+      @location(0) position: vec3<f32>,
+      @location(1) normal : vec3<f32>,
+    };
+    struct VertexOutput {
+      @builtin(position) position : vec4<f32>,
+      @location(0) normal : vec3<f32>,
+    };
+    struct FragmentOutput {
+      @location(0) normal : vec4<f32>,
+    };
     @vertex
-    fn mainVertex(@location(0) position: vec3<f32>) -> @builtin(position) vec4<f32> {
-      return viewProj * world * vec4(position, 1.0);
+    fn mainVertex(input : VertexInput) -> VertexOutput {
+      var output : VertexOutput;
+      output.position = (viewProj * world * vec4(input.position, 1.0));
+      output.normal = normalize((world * vec4(input.normal, 1.0)).xyz);
+      return output;
     }
     @fragment
-    fn mainFragment() -> @location(0) vec4<f32> {
-      return vec4(1.0, 1.0, 1.0, 1.0);
+    fn mainFragment(input : VertexOutput) -> FragmentOutput {
+      var output : FragmentOutput;
+      output.normal = vec4(input.normal * 0.5 + 0.5, 0);
+      return output;
     }
     `
     }));
@@ -181,7 +198,8 @@
         module: obj.shaderModule[0],
         entryPoint: "mainVertex",
         buffers: [
-          { arrayStride: 12, attributes: [{ format: "float32x3", offset: 0, shaderLocation: 0 }] }
+          { arrayStride: 12, attributes: [{ format: "float32x3", offset: 0, shaderLocation: 0 }] },
+          { arrayStride: 12, attributes: [{ format: "float32x3", offset: 0, shaderLocation: 1 }] }
         ]
       },
       fragment: {
@@ -190,6 +208,11 @@
         targets: [
           { format: canvasFormat }
         ]
+      },
+      depthStencil: {
+        depthWriteEnabled: true,
+        depthCompare: "less",
+        format: "depth24plus"
       }
     }));
     obj.buffer.push(device.createBuffer({
@@ -208,14 +231,6 @@
       ]
     }));
     return obj;
-  };
-  const basil3d_update_canvas = (gpu, canvas) => {
-    if (canvas.width !== window.innerWidth) {
-      canvas.width = window.innerWidth;
-    }
-    if (canvas.height !== window.innerHeight) {
-      canvas.height = window.innerHeight;
-    }
   };
   const basil3d_app_load = (device) => {
     const obj = {
@@ -292,7 +307,38 @@
       }
     }
   };
-  const basil3d_scene_write_buffers = (scene, app, gpu, canvas, device) => {
+  const basil3d_gpu_on_frame_start = (gpu, device, canvas) => {
+    if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      if (gpu.texture[0]) {
+        gpu.texture[0].destroy();
+        gpu.texture[0] = null;
+      }
+    }
+    if (!gpu.texture[0]) {
+      gpu.texture[0] = device.createTexture({
+        size: [canvas.width, canvas.height],
+        format: "depth24plus",
+        usage: GPUTextureUsage.RENDER_ATTACHMENT
+      });
+    }
+  };
+  const basil3d_gpu_on_frame_loading = (gpu, device, context) => {
+    const ce = device.createCommandEncoder();
+    const renderPassDesc = {
+      colorAttachments: [{
+        view: context.getCurrentTexture().createView(),
+        clearValue: { r: 0.2, g: 0.2, b: 0.2, a: 1 },
+        loadOp: "clear",
+        storeOp: "store"
+      }]
+    };
+    const pass = ce.beginRenderPass(renderPassDesc);
+    pass.end();
+    device.queue.submit([ce.finish()]);
+  };
+  const basil3d_gpu_on_frame_scene = (gpu, device, context, canvas, scene, app) => {
     const mat = new Float32Array(16);
     {
       scene.camera.aspect = canvas.width / canvas.height;
@@ -317,9 +363,22 @@
       device.queue.writeBuffer(gpu.buffer[1], offset, mat);
       offset += 256;
     }
-    return batch;
-  };
-  const basil3d_scene_render_pass = (batch, app, gpu, pass) => {
+    const ce = device.createCommandEncoder();
+    const renderPassDesc = {
+      colorAttachments: [{
+        view: context.getCurrentTexture().createView(),
+        clearValue: { r: 0.2, g: 0.2, b: 0.2, a: 1 },
+        loadOp: "clear",
+        storeOp: "store"
+      }],
+      depthStencilAttachment: {
+        view: gpu.texture[0].createView(),
+        depthClearValue: 1,
+        depthLoadOp: "clear",
+        depthStoreOp: "store"
+      }
+    };
+    const pass = ce.beginRenderPass(renderPassDesc);
     for (let i = 0; i < batch.length; ++i) {
       if (batch[i].length <= 0) {
         continue;
@@ -327,18 +386,24 @@
       const mesh = app.gpu.mesh[i];
       pass.setPipeline(gpu.pipeline[0]);
       if (mesh.vb0) {
-        const [index, offset, size] = mesh.vb0;
-        pass.setVertexBuffer(0, app.gpu.buffer[index], offset, size);
+        const [index, offset2, size] = mesh.vb0;
+        pass.setVertexBuffer(0, app.gpu.buffer[index], offset2, size);
+      }
+      if (mesh.vb1) {
+        const [index, offset2, size] = mesh.vb1;
+        pass.setVertexBuffer(1, app.gpu.buffer[index], offset2, size);
       }
       if (mesh.ib) {
-        const [index, offset, size] = mesh.ib;
-        pass.setIndexBuffer(app.gpu.buffer[index], "uint16", offset, size);
+        const [index, offset2, size] = mesh.ib;
+        pass.setIndexBuffer(app.gpu.buffer[index], "uint16", offset2, size);
       }
-      for (const offset of batch[i]) {
-        pass.setBindGroup(0, gpu.bindGroup[0], [offset]);
+      for (const offset2 of batch[i]) {
+        pass.setBindGroup(0, gpu.bindGroup[0], [offset2]);
         pass.drawIndexed(mesh.count);
       }
     }
+    pass.end();
+    device.queue.submit([ce.finish()]);
   };
   const basil3d_start = async (setup2) => {
     const adapter = await navigator.gpu.requestAdapter();
@@ -355,39 +420,15 @@
       alphaMode: "opaque"
     });
     const frame = () => {
-      basil3d_update_canvas(gpu, canvas);
+      basil3d_gpu_on_frame_start(gpu, device, canvas);
       if (basil3d_app_is_loading(app)) {
-        const ce = device.createCommandEncoder();
-        const renderPassDesc = {
-          colorAttachments: [{
-            view: context.getCurrentTexture().createView(),
-            clearValue: { r: 0.2, g: 0.2, b: 0.2, a: 1 },
-            loadOp: "clear",
-            storeOp: "store"
-          }]
-        };
-        const pass = ce.beginRenderPass(renderPassDesc);
-        pass.end();
-        device.queue.submit([ce.finish()]);
+        basil3d_gpu_on_frame_loading(gpu, device, context);
       } else {
         if (setup2) {
           setup2(app, scene);
           setup2 = null;
         }
-        const batch = basil3d_scene_write_buffers(scene, app, gpu, canvas, device);
-        const ce = device.createCommandEncoder();
-        const renderPassDesc = {
-          colorAttachments: [{
-            view: context.getCurrentTexture().createView(),
-            clearValue: { r: 0.2, g: 0.2, b: 0.2, a: 1 },
-            loadOp: "clear",
-            storeOp: "store"
-          }]
-        };
-        const pass = ce.beginRenderPass(renderPassDesc);
-        basil3d_scene_render_pass(batch, app, gpu, pass);
-        pass.end();
-        device.queue.submit([ce.finish()]);
+        basil3d_gpu_on_frame_scene(gpu, device, context, canvas, scene, app);
       }
       requestAnimationFrame(frame);
     };
@@ -402,7 +443,7 @@
       entity: [
         { name: "tr_01", matrix: mat4translate(-2, 0, 0) },
         { name: "tr_01", matrix: mat4translate(2, 0, 0) },
-        { name: "tr_01", matrix: mat4translate(0, 0, 4) }
+        { name: "wa_00", matrix: mat4translate(0, 0, 4) }
       ]
     });
   };
