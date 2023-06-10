@@ -9,7 +9,7 @@ const setup = (app, scene) => {
     entity: [
       { name: "tr_01", matrix: mat4translate(-2, 0, 0) },
       { name: "tr_01", matrix: mat4translate(+2, 0, 0) },
-      { name: "tr_01", matrix: mat4translate(0, 0, 4) },
+      { name: "wa_00", matrix: mat4translate(0, 0, 4) },
     ],
   });
 };
