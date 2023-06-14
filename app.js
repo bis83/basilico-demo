@@ -8,6 +8,11 @@
   const html_message = () => {
     return document.getElementById("message");
   };
+  const html_show_message = (text) => {
+    const elem = html_message();
+    elem.style.display = ``;
+    elem.textContent = text;
+  };
   const html_hide_message = () => {
     const elem = html_message();
     elem.style.display = `none`;
@@ -213,6 +218,15 @@
     });
     gpu.shaderModule[3] = device.createShaderModule({
       code: `
+    @fragment
+    fn mainFragment(@builtin(position) coord : vec4<f32>) -> @location(0) vec4<f32> {
+      var C_A = vec3<f32>(0.1, 0.1, 0.12);
+      return vec4(C_A, 1.0);
+    }
+    `
+    });
+    gpu.shaderModule[4] = device.createShaderModule({
+      code: `
     @group(0) @binding(0) var lbuffer0 : texture_2d<f32>;
     fn toneMapping(x : vec3<f32>) -> vec3<f32> {
       var a = 2.51f;
@@ -222,9 +236,15 @@
       var e = 0.14f;
       return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
     }
+    fn vignette(coord : vec2<f32>) -> f32 {
+      var uv = coord.xy / vec2<f32>(textureDimensions(lbuffer0, 0).xy);
+      uv *= 1.0 - uv.yx;
+      return pow(uv.x * uv.y * 15.0, 0.25);
+    }
     @fragment
     fn mainFragment(@builtin(position) coord : vec4<f32>) -> @location(0) vec4<f32> {
       var color = textureLoad(lbuffer0, vec2<i32>(floor(coord.xy)), 0).rgb;
+      color *= vignette(coord.xy);
       return vec4<f32>(toneMapping(color), 1);
     }
     `
@@ -302,6 +322,26 @@
       },
       fragment: {
         module: gpu.shaderModule[3],
+        entryPoint: "mainFragment",
+        targets: [
+          { format: "rgba16float" }
+        ]
+      },
+      depthStencil: {
+        depthWriteEnabled: false,
+        depthCompare: "equal",
+        format: "depth24plus"
+      }
+    });
+    gpu.pipeline[3] = device.createRenderPipeline({
+      layout: gpu.pipelineLayout[1],
+      vertex: {
+        module: gpu.shaderModule[1],
+        entryPoint: "mainVertex",
+        buffers: []
+      },
+      fragment: {
+        module: gpu.shaderModule[4],
         entryPoint: "mainFragment",
         targets: [
           { format: canvasFormat }
@@ -404,24 +444,22 @@
     if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      if (gpu.texture[0] !== void 0) {
-        gpu.texture[0].destroy();
-        delete gpu.texture[0];
-      }
-      if (gpu.texture[1] !== void 0) {
-        gpu.texture[1].destroy();
-        delete gpu.texture[1];
-      }
-      if (gpu.texture[2] !== void 0) {
-        gpu.texture[2].destroy();
-        delete gpu.texture[2];
-      }
-      if (gpu.bindGroup[1] !== void 0) {
-        delete gpu.bindGroup[1];
-      }
-      if (gpu.bindGroup[2] !== void 0) {
-        delete gpu.bindGroup[2];
-      }
+      const deleteTexture = (no) => {
+        if (gpu.texture[no] !== void 0) {
+          gpu.texture[no].destroy();
+          delete gpu.texture[no];
+        }
+      };
+      deleteTexture(0);
+      deleteTexture(1);
+      deleteTexture(2);
+      const deleteBindGroup = (no) => {
+        if (gpu.bindGroup[no] !== void 0) {
+          delete gpu.bindGroup[no];
+        }
+      };
+      deleteBindGroup(1);
+      deleteBindGroup(2);
     }
     if (gpu.texture[0] === void 0) {
       gpu.texture[0] = device.createTexture({
@@ -558,18 +596,20 @@
       pass.setPipeline(gpu.pipeline[1]);
       pass.setBindGroup(0, gpu.bindGroup[1]);
       pass.draw(4);
+      pass.setPipeline(gpu.pipeline[2]);
+      pass.draw(4);
       pass.end();
     }
     {
       const pass = ce.beginRenderPass({
         colorAttachments: [{
           view: context.getCurrentTexture().createView(),
-          clearValue: { r: 0, g: 0, b: 0, a: 1 },
+          clearValue: { r: 0, g: 0, b: 0, a: 0 },
           loadOp: "clear",
           storeOp: "store"
         }]
       });
-      pass.setPipeline(gpu.pipeline[2]);
+      pass.setPipeline(gpu.pipeline[3]);
       pass.setBindGroup(0, gpu.bindGroup[2]);
       pass.draw(4);
       pass.end();
@@ -577,6 +617,10 @@
     device.queue.submit([ce.finish()]);
   };
   const basil3d_start = async (setup2) => {
+    if (!navigator.gpu) {
+      html_show_message("ERROR: WebGPU not supported.");
+      return;
+    }
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter.requestDevice();
     const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -620,6 +664,7 @@
     });
   };
   html_listen(window, "load", () => {
+    html_show_message("Welcome Basilico.");
     basil3d_start(setup);
   });
 })();
