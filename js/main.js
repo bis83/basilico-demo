@@ -1,7 +1,6 @@
 
 const setup = (app, scene) => {
   html_hide_message();
-
   basil3d_scene_setup(scene, app, {
     camera: {
       eye: [6.0, 2.5, -5.0],
@@ -16,5 +15,6 @@ const setup = (app, scene) => {
 };
 
 html_listen(window, "load", () => {
+  html_show_message("Welcome Basilico.");
   basil3d_start(setup);
 });
