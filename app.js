@@ -163,6 +163,7 @@
       pipeline: [],
       buffer: [],
       texture: [],
+      sampler: [],
       bindGroup: []
     };
     gpu.shaderModule[0] = device.createShaderModule({
@@ -220,7 +221,7 @@
       code: `
     @fragment
     fn mainFragment(@builtin(position) coord : vec4<f32>) -> @location(0) vec4<f32> {
-      var C_A = vec3<f32>(0.1, 0.1, 0.12);
+      var C_A = vec3<f32>(0.1, 0.1, 0.1);
       return vec4(C_A, 1.0);
     }
     `
@@ -228,6 +229,7 @@
     gpu.shaderModule[4] = device.createShaderModule({
       code: `
     @group(0) @binding(0) var lbuffer0 : texture_2d<f32>;
+    @group(0) @binding(1) var sampler0 : sampler;
     fn toneMapping(x : vec3<f32>) -> vec3<f32> {
       var a = 2.51f;
       var b = 0.03f;
@@ -236,15 +238,25 @@
       var e = 0.14f;
       return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
     }
-    fn vignette(coord : vec2<f32>) -> f32 {
-      var uv = coord.xy / vec2<f32>(textureDimensions(lbuffer0, 0).xy);
-      uv *= 1.0 - uv.yx;
-      return pow(uv.x * uv.y * 15.0, 0.25);
+    fn vignette(uv : vec2<f32>) -> f32 {
+      var a = uv * (1.0 - uv.yx);
+      return pow(a.x * a.y * 15.0, 0.25);
+    }
+    fn chromaticAberration(uv : vec2<f32>) -> vec3<f32> {
+      var redOffset = 0.002;
+      var greenOffset = 0.0001;
+      var blueOffset = -0.0001;
+      var dir = uv - vec2<f32>(0.5, 0.5);
+      var r = textureSample(lbuffer0, sampler0, uv + dir * redOffset).r;
+      var g = textureSample(lbuffer0, sampler0, uv + dir * greenOffset).g;
+      var b = textureSample(lbuffer0, sampler0, uv + dir * blueOffset).b;
+      return vec3<f32>(r, g, b);
     }
     @fragment
     fn mainFragment(@builtin(position) coord : vec4<f32>) -> @location(0) vec4<f32> {
-      var color = textureLoad(lbuffer0, vec2<i32>(floor(coord.xy)), 0).rgb;
-      color *= vignette(coord.xy);
+      var uv = coord.xy / vec2<f32>(textureDimensions(lbuffer0, 0).xy);
+      var color = chromaticAberration(uv);
+      color *= vignette(uv);
       return vec4<f32>(toneMapping(color), 1);
     }
     `
@@ -257,7 +269,8 @@
     });
     gpu.bindGroupLayout[1] = device.createBindGroupLayout({
       entries: [
-        { binding: 0, visibility: GPUShaderStage.FRAGMENT, texture: { sampleType: "unfilterable-float" } }
+        { binding: 0, visibility: GPUShaderStage.FRAGMENT, texture: {} },
+        { binding: 1, visibility: GPUShaderStage.FRAGMENT, sampler: {} }
       ]
     });
     gpu.pipelineLayout[0] = device.createPipelineLayout({
@@ -355,6 +368,11 @@
     gpu.buffer[1] = device.createBuffer({
       size: 256 * 1024,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+    });
+    gpu.sampler[0] = device.createSampler({
+      magFilter: "linear",
+      minFilter: "linear",
+      mipmapFilter: "linear"
     });
     gpu.bindGroup[0] = device.createBindGroup({
       layout: gpu.bindGroupLayout[0],
@@ -486,7 +504,8 @@
       gpu.bindGroup[1] = device.createBindGroup({
         layout: gpu.bindGroupLayout[1],
         entries: [
-          { binding: 0, resource: gpu.texture[1].createView() }
+          { binding: 0, resource: gpu.texture[1].createView() },
+          { binding: 1, resource: gpu.sampler[0] }
         ]
       });
     }
@@ -494,7 +513,8 @@
       gpu.bindGroup[2] = device.createBindGroup({
         layout: gpu.bindGroupLayout[1],
         entries: [
-          { binding: 0, resource: gpu.texture[2].createView() }
+          { binding: 0, resource: gpu.texture[2].createView() },
+          { binding: 1, resource: gpu.sampler[0] }
         ]
       });
     }
@@ -653,7 +673,7 @@
     html_hide_message();
     basil3d_scene_setup(scene, app, {
       camera: {
-        eye: [6, 2.5, -5],
+        eye: [3.5, 2.5, -3],
         dir: vec3dir(135, -10)
       },
       entity: [
