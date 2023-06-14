@@ -3,7 +3,7 @@ const setup = (app, scene) => {
   html_hide_message();
   basil3d_scene_setup(scene, app, {
     camera: {
-      eye: [6.0, 2.5, -5.0],
+      eye: [3.5, 2.5, -3.0],
       dir: vec3dir(135, -10),
     },
     entity: [
