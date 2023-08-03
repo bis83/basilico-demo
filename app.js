@@ -20,6 +20,16 @@
   const deg2rad = (deg) => {
     return deg / 180 * Math.PI;
   };
+  const xy_length = (x, y) => {
+    return Math.sqrt(x * x + y * y);
+  };
+  const xy_normalize = (x, y) => {
+    const l = xy_length(x, y);
+    return l != 0 ? [x / l, y / l] : [0, 0];
+  };
+  const xy_hit_rect = ([x, y], minX, maxX, minY, maxY) => {
+    return minX <= x && x <= maxX && minY <= y && y <= maxY;
+  };
   const vec3dot = (a, b) => {
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
   };
@@ -383,6 +393,220 @@
     });
     return gpu;
   };
+  const basil3d_listen_create = () => {
+    const listen = {
+      timer: {
+        t: performance.now(),
+        dt: 0,
+        n: 0
+      },
+      gamepad: {
+        index: null,
+        lx: 0,
+        ly: 0,
+        rx: 0,
+        ry: 0,
+        b0: false,
+        b1: false,
+        b8: false,
+        b9: false,
+        lb: false,
+        rb: false,
+        lt: false,
+        rt: false
+      },
+      keyboard: {
+        w: false,
+        a: false,
+        s: false,
+        d: false,
+        up: false,
+        left: false,
+        down: false,
+        right: false,
+        q: false,
+        e: false,
+        z: false,
+        x: false,
+        space: false,
+        lctrl: false,
+        esc: false
+      },
+      touch: /* @__PURE__ */ new Map()
+    };
+    const keymap = (keyboard, code, value) => {
+      switch (code) {
+        case "KeyW":
+          keyboard.w = value;
+          break;
+        case "KeyA":
+          keyboard.a = value;
+          break;
+        case "KeyS":
+          keyboard.s = value;
+          break;
+        case "KeyD":
+          keyboard.d = value;
+          break;
+        case "ArrowUp":
+          keyboard.up = value;
+          break;
+        case "ArrowLeft":
+          keyboard.left = value;
+          break;
+        case "ArrowDown":
+          keyboard.down = value;
+          break;
+        case "ArrowRight":
+          keyboard.right = value;
+          break;
+        case "KeyQ":
+          keyboard.q = value;
+          break;
+        case "KeyE":
+          keyboard.e = value;
+          break;
+        case "KeyZ":
+          keyboard.z = value;
+          break;
+        case "KeyX":
+          keyboard.x = value;
+          break;
+        case "Space":
+          keyboard.space = value;
+          break;
+        case "ControlLeft":
+          keyboard.lctrl = value;
+          break;
+        case "Escape":
+          keyboard.esc = value;
+          break;
+        default:
+          return false;
+      }
+      return true;
+    };
+    html_listen(window, "focus", (ev) => {
+    });
+    html_listen(window, "blur", (ev) => {
+    });
+    html_listen(window, "resize", (ev) => {
+    });
+    html_listen(window, "gamepadconnected", (ev) => {
+      listen.gamepad.index = ev.gamepad.index;
+    });
+    html_listen(window, "gamepaddisconnected", (ev) => {
+      if (listen.gamepad.index === ev.gamepad.index) {
+        listen.gamepad.index = null;
+      }
+    });
+    html_listen(document, "keydown", (ev) => {
+      if (keymap(listen.keyboard, ev.code, true)) {
+        ev.preventDefault();
+      }
+    });
+    html_listen(document, "keyup", (ev) => {
+      if (keymap(listen.keyboard, ev.code, false)) {
+        ev.preventDefault();
+      }
+    });
+    html_listen(document.body, "contextmenu", (ev) => {
+      ev.preventDefault();
+    });
+    html_listen(document.body, "pointerdown", (ev) => {
+      listen.touch.set(ev.pointerId, {
+        x: ev.clientX,
+        y: ev.clientY,
+        sx: ev.clientX,
+        sy: ev.clientY,
+        time: performance.now()
+      });
+    });
+    html_listen(document.body, "pointerup", (ev) => {
+      listen.touch.delete(ev.pointerId);
+    });
+    html_listen(document.body, "pointerout", (ev) => {
+      listen.touch.delete(ev.pointerId);
+    });
+    html_listen(document.body, "pointermove", (ev) => {
+      const touch = listen.touch.get(ev.pointerId);
+      if (touch) {
+        touch.x = ev.clientX;
+        touch.y = ev.clientY;
+      }
+    });
+    return listen;
+  };
+  const basil3d_listen_tick = (listen, time) => {
+    listen.timer.dt = (time - listen.timer.t) / 1e3;
+    listen.timer.t = time;
+    listen.timer.n += 1;
+    if (listen.gamepad.index !== null) {
+      const gamepads = navigator.getGamepads();
+      const gp = gamepads[listen.gamepad.index];
+      listen.gamepad.lx = Math.trunc(gp.axes[0] * 4) / 4;
+      listen.gamepad.ly = Math.trunc(gp.axes[1] * 4) / 4;
+      listen.gamepad.rx = Math.trunc(gp.axes[2] * 4) / 4;
+      listen.gamepad.ry = Math.trunc(gp.axes[3] * 4) / 4;
+      listen.gamepad.b0 = gp.buttons[0].value >= 0.5;
+      listen.gamepad.b1 = gp.buttons[1].value >= 0.5;
+      listen.gamepad.b8 = gp.buttons[8].value >= 0.5;
+      listen.gamepad.b9 = gp.buttons[9].value >= 0.5;
+      listen.gamepad.lb = gp.buttons[4].value >= 0.5;
+      listen.gamepad.rb = gp.buttons[5].value >= 0.5;
+      listen.gamepad.lt = gp.buttons[6].value >= 0.5;
+      listen.gamepad.rt = gp.buttons[7].value >= 0.5;
+    }
+  };
+  const basil3d_listen_delta_time = (listen) => {
+    return listen.timer.dt;
+  };
+  const basil3d_listen_get = (listen, shortcut_key, shortcut_gamepad, touch_rect) => {
+    if (touch_rect) {
+      for (const touch of listen.touch.values()) {
+        if (xy_hit_rect([touch.sx, touch.sy], ...touch_rect)) {
+          const x = touch.x - touch.sx;
+          const y = -(touch.y - touch.sy);
+          return xy_normalize(x, y);
+        }
+      }
+    }
+    if (shortcut_key) {
+      if (shortcut_key === "wasd") {
+        const keyboard = listen.keyboard;
+        const x = keyboard.a ? -1 : keyboard.d ? 1 : 0;
+        const y = keyboard.w ? 1 : keyboard.s ? -1 : 0;
+        if (x !== 0 || y !== 0) {
+          return xy_normalize(x, y);
+        }
+      } else if (shortcut_key === "arrow") {
+        const keyboard = listen.keyboard;
+        const x = keyboard.right ? 1 : keyboard.left ? -1 : 0;
+        const y = keyboard.up ? 1 : keyboard.down ? -1 : 0;
+        if (x !== 0 || y !== 0) {
+          return xy_normalize(x, y);
+        }
+      } else {
+        if (listen.keyboard[shortcut_key]) {
+          return [1, 0];
+        }
+      }
+    }
+    if (shortcut_gamepad) {
+      if (shortcut_gamepad === "left-stick") {
+        const gamepad = listen.gamepad;
+        return xy_normalize(gamepad.lx, -gamepad.ly);
+      } else if (shortcut_gamepad === "right-stick") {
+        const gamepad = listen.gamepad;
+        return xy_normalize(gamepad.rx, -gamepad.ry);
+      } else {
+        if (listen.gamepad[shortcut_gamepad]) {
+          return [1, 0];
+        }
+      }
+    }
+    return null;
+  };
   const basil3d_app_load = (device) => {
     const obj = {
       gpu: {},
@@ -427,23 +651,24 @@
     }
     return -1;
   };
-  const basil3d_scene_create = () => {
+  const basil3d_view_create = () => {
     return {
       camera: {
         aspect: 1,
         fovy: deg2rad(30),
         zNear: 0.1,
         zFar: 1e3,
-        dir: [0, 0, 1],
         eye: [0, 0, 0],
+        ha: 0,
+        va: 0,
         up: [0, 1, 0]
       },
       entity: []
     };
   };
-  const basil3d_scene_setup = (scene, app, desc) => {
+  const basil3d_view_setup = (view, app, desc) => {
     if (desc.camera) {
-      Object.assign(scene.camera, desc.camera);
+      Object.assign(view.camera, desc.camera);
     }
     if (desc.entity) {
       for (const e of desc.entity) {
@@ -451,7 +676,7 @@
         if (id < 0) {
           continue;
         }
-        scene.entity.push({
+        view.entity.push({
           id,
           matrix: e.matrix
         });
@@ -459,9 +684,9 @@
     }
   };
   const basil3d_gpu_on_frame_start = (gpu, device, canvas) => {
-    if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+    if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
       const deleteTexture = (no) => {
         if (gpu.texture[no] !== void 0) {
           gpu.texture[no].destroy();
@@ -532,16 +757,18 @@
     pass.end();
     device.queue.submit([ce.finish()]);
   };
-  const basil3d_gpu_on_frame_scene = (gpu, device, context, canvas, scene, app) => {
+  const basil3d_gpu_on_frame_view = (gpu, device, context, canvas, app, view) => {
     const batch = [];
     {
       const mat = new Float32Array(16);
       {
-        scene.camera.aspect = canvas.width / canvas.height;
-        const at = vec3add(scene.camera.eye, scene.camera.dir);
-        const view = mat4lookat(scene.camera.eye, at, scene.camera.up);
-        const proj = mat4perspective(scene.camera.fovy, scene.camera.aspect, scene.camera.zNear, scene.camera.zFar);
-        const vp = mat4multiply(view, proj);
+        const camera = view.camera;
+        camera.aspect = canvas.width / canvas.height;
+        const dir = vec3dir(camera.ha, camera.va);
+        const at = vec3add(camera.eye, dir);
+        const look = mat4lookat(camera.eye, at, camera.up);
+        const proj = mat4perspective(camera.fovy, camera.aspect, camera.zNear, camera.zFar);
+        const vp = mat4multiply(look, proj);
         mat.set(vp);
         device.queue.writeBuffer(gpu.buffer[0], 0, mat);
       }
@@ -550,7 +777,7 @@
         batch[i] = [];
       }
       let offset = 0;
-      for (const e of scene.entity) {
+      for (const e of view.entity) {
         for (const i of app.gpu.id[e.id].mesh) {
           batch[i].push(offset);
         }
@@ -636,7 +863,7 @@
     }
     device.queue.submit([ce.finish()]);
   };
-  const basil3d_start = async (setup2) => {
+  const basil3d_start = async (setup2, update2) => {
     if (!navigator.gpu) {
       html_show_message("ERROR: WebGPU not supported.");
       return;
@@ -644,9 +871,6 @@
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter.requestDevice();
     const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
-    const gpu = basil3d_gpu_create(device, canvasFormat);
-    const app = basil3d_app_load(device);
-    const scene = basil3d_scene_create();
     const canvas = html_canvas();
     const context = canvas.getContext("webgpu");
     context.configure({
@@ -654,27 +878,36 @@
       format: canvasFormat,
       alphaMode: "opaque"
     });
-    const frame = () => {
+    const gpu = basil3d_gpu_create(device, canvasFormat);
+    const listen = basil3d_listen_create();
+    const app = basil3d_app_load(device);
+    const view = basil3d_view_create();
+    const frame = (time) => {
+      basil3d_listen_tick(listen, time);
       basil3d_gpu_on_frame_start(gpu, device, canvas);
       if (basil3d_app_is_loading(app)) {
         basil3d_gpu_on_frame_loading(gpu, device, context);
       } else {
         if (setup2) {
-          setup2(app, scene);
+          setup2(app, view);
           setup2 = null;
         }
-        basil3d_gpu_on_frame_scene(gpu, device, context, canvas, scene, app);
+        if (update2) {
+          update2(app, view, listen);
+        }
+        basil3d_gpu_on_frame_view(gpu, device, context, canvas, app, view);
       }
       requestAnimationFrame(frame);
     };
     requestAnimationFrame(frame);
   };
-  const setup = (app, scene) => {
+  const setup = (app, view) => {
     html_hide_message();
-    basil3d_scene_setup(scene, app, {
+    basil3d_view_setup(view, app, {
       camera: {
         eye: [3.5, 2.5, -3],
-        dir: vec3dir(135, -10)
+        ha: 135,
+        va: -10
       },
       entity: [
         { name: "tr_01", matrix: mat4translate(-2, 0, 0) },
@@ -683,8 +916,35 @@
       ]
     });
   };
+  const update = (app, view, listen) => {
+    const mob = view.camera;
+    const dt = basil3d_listen_delta_time(listen);
+    const moveXY = basil3d_listen_get(listen, "wasd", "left-stick");
+    const cameraXY = basil3d_listen_get(listen, "arrow", "right-stick");
+    if (cameraXY) {
+      const cameraSpeed = 90;
+      const cameraX = -cameraXY[0];
+      const cameraY = cameraXY[1];
+      mob.ha += cameraSpeed * dt * cameraX;
+      mob.va += cameraSpeed * dt * cameraY;
+      mob.va = Math.max(-60, Math.min(mob.va, 80));
+    }
+    if (moveXY) {
+      const moveSpeed = 2;
+      const rx = deg2rad(mob.ha + 90);
+      const ry = deg2rad(mob.ha);
+      const moveX = -moveXY[0];
+      const moveY = moveXY[1];
+      const vx = moveX * Math.cos(rx) + moveY * Math.cos(ry);
+      const vy = moveX * Math.sin(rx) + moveY * Math.sin(ry);
+      const dx = moveSpeed * dt * vx;
+      const dy = moveSpeed * dt * vy;
+      mob.eye[0] += dx;
+      mob.eye[2] += dy;
+    }
+  };
   html_listen(window, "load", () => {
     html_show_message("Welcome Basilico.");
-    basil3d_start(setup);
+    basil3d_start(setup, update);
   });
 })();
