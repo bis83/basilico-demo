@@ -608,9 +608,10 @@
     return null;
   };
   const basil3d_app_load = (device) => {
-    const obj = {
+    const app = {
       gpu: {},
       audio: {},
+      json: {},
       loading: 0
     };
     const path = "app.json";
@@ -630,15 +631,18 @@
           buffer.unmap();
           return buffer;
         });
-        obj.gpu = json.gpu;
+        app.gpu = json.gpu;
       }
       if (json.audio) {
-        obj.audio = json.audio;
+        app.audio = json.audio;
       }
-      obj.loading -= 1;
+      if (json.json) {
+        app.json = json.json;
+      }
+      app.loading -= 1;
     });
-    obj.loading += 1;
-    return obj;
+    app.loading += 1;
+    return app;
   };
   const basil3d_app_is_loading = (app) => {
     return app.loading > 0;
@@ -650,6 +654,9 @@
       }
     }
     return -1;
+  };
+  const basil3d_app_json = (app, name) => {
+    return app.json[name];
   };
   const basil3d_view_create = () => {
     return {
@@ -676,9 +683,13 @@
         if (id < 0) {
           continue;
         }
+        const x = e.x || 0;
+        const y = e.y || 0;
+        const z = e.z || 0;
+        const m = mat4translate(x, y, z);
         view.entity.push({
           id,
-          matrix: e.matrix
+          matrix: m
         });
       }
     }
@@ -903,18 +914,7 @@
   };
   const setup = (app, view) => {
     html_hide_message();
-    basil3d_view_setup(view, app, {
-      camera: {
-        eye: [3.5, 2.5, -3],
-        ha: 135,
-        va: -10
-      },
-      entity: [
-        { name: "tr_01", matrix: mat4translate(-2, 0, 0) },
-        { name: "tr_01", matrix: mat4translate(2, 0, 0) },
-        { name: "wa_00", matrix: mat4translate(0, 0, 4) }
-      ]
-    });
+    basil3d_view_setup(view, app, basil3d_app_json(app, "sample"));
   };
   const update = (app, view, listen) => {
     const mob = view.camera;
