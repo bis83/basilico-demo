@@ -1,18 +1,7 @@
 
 const setup = (app, view) => {
   html_hide_message();
-  basil3d_view_setup(view, app, {
-    camera: {
-      eye: [3.5, 2.5, -3.0],
-      ha: 135,
-      va: -10,
-    },
-    entity: [
-      { name: "tr_01", matrix: mat4translate(-2, 0, 0) },
-      { name: "tr_01", matrix: mat4translate(+2, 0, 0) },
-      { name: "wa_00", matrix: mat4translate(0, 0, 4) },
-    ],
-  });
+  basil3d_view_setup(view, app, basil3d_app_json(app, "sample"));
 };
 
 const update = (app, view, listen) => {
