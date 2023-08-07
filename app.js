@@ -75,6 +75,26 @@
       Math.cos(v) * Math.sin(h)
     ];
   };
+  const mat4identity = () => {
+    return [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ];
+  };
   const mat4multiply = (a, b) => {
     return [
       a[0] * b[0] + a[1] * b[4] + a[2] * b[8] + a[3] * b[12],
@@ -95,25 +115,10 @@
       a[12] * b[3] + a[13] * b[7] + a[14] * b[11] + a[15] * b[15]
     ];
   };
-  const mat4translate = (x, y, z) => {
-    return [
-      1,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      x,
-      y,
-      z,
-      1
-    ];
+  const mat4translated = (m, x, y, z) => {
+    m[12] = x;
+    m[13] = y;
+    m[14] = z;
   };
   const mat4lookat = (eye, at, up) => {
     const tz = vec3normalize(vec3sub(at, eye));
@@ -179,7 +184,11 @@
     gpu.shaderModule[0] = device.createShaderModule({
       code: `
     @binding(0) @group(0) var<uniform> viewProj : mat4x4<f32>;
-    @binding(1) @group(0) var<uniform> world : mat4x4<f32>;
+    struct InstanceInput {
+      world : mat4x4<f32>,
+      albedo : vec4<f32>,
+    }
+    @binding(1) @group(0) var<uniform> inst : InstanceInput;
     struct VertexInput {
       @location(0) position: vec3<f32>,
       @location(1) normal : vec3<f32>,
@@ -190,18 +199,20 @@
     };
     struct FragmentOutput {
       @location(0) normal : vec4<f32>,
+      @location(1) albedo : vec4<f32>,
     };
     @vertex
     fn mainVertex(input : VertexInput) -> VertexOutput {
       var output : VertexOutput;
-      output.position = (viewProj * world * vec4(input.position, 1.0));
-      output.normal = normalize((world * vec4(input.normal, 1.0)).xyz);
+      output.position = (viewProj * inst.world * vec4(input.position, 1.0));
+      output.normal = normalize((inst.world * vec4(input.normal, 1.0)).xyz);
       return output;
     }
     @fragment
     fn mainFragment(input : VertexOutput) -> FragmentOutput {
       var output : FragmentOutput;
       output.normal = vec4(input.normal * 0.5 + 0.5, 0);
+      output.albedo = inst.albedo.rgba;
       return output;
     }
     `
@@ -217,13 +228,16 @@
     gpu.shaderModule[2] = device.createShaderModule({
       code: `
     @group(0) @binding(0) var gbuffer0 : texture_2d<f32>;
+    @group(0) @binding(1) var gbuffer1 : texture_2d<f32>;
     @fragment
     fn mainFragment(@builtin(position) coord : vec4<f32>) -> @location(0) vec4<f32> {
       var N = normalize(textureLoad(gbuffer0, vec2<i32>(floor(coord.xy)), 0).xyz * 2.0 - 1.0);
       var L = normalize(vec3<f32>(0.0, 1.0, 0.0));
       var C_L = vec3<f32>(1.0, 1.0, 1.0);
       var C_A = vec3<f32>(1.0, 1.0, 1.0);
-      return vec4(C_L * max(dot(N, L), 0) + C_A, 1.0);
+      var C = C_L * max(dot(N, L), 0) + C_A;
+      var B = textureLoad(gbuffer1, vec2<i32>(floor(coord.xy)), 0);
+      return vec4(C * B.rgb, 1.0);
     }
     `
     });
@@ -239,7 +253,7 @@
     gpu.shaderModule[4] = device.createShaderModule({
       code: `
     @group(0) @binding(0) var lbuffer0 : texture_2d<f32>;
-    @group(0) @binding(1) var sampler0 : sampler;
+    @group(0) @binding(2) var sampler0 : sampler;
     fn toneMapping(x : vec3<f32>) -> vec3<f32> {
       var a = 2.51f;
       var b = 0.03f;
@@ -274,13 +288,14 @@
     gpu.bindGroupLayout[0] = device.createBindGroupLayout({
       entries: [
         { binding: 0, visibility: GPUShaderStage.VERTEX, buffer: {} },
-        { binding: 1, visibility: GPUShaderStage.VERTEX, buffer: { hasDynamicOffset: true } }
+        { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { hasDynamicOffset: true } }
       ]
     });
     gpu.bindGroupLayout[1] = device.createBindGroupLayout({
       entries: [
         { binding: 0, visibility: GPUShaderStage.FRAGMENT, texture: {} },
-        { binding: 1, visibility: GPUShaderStage.FRAGMENT, sampler: {} }
+        { binding: 1, visibility: GPUShaderStage.FRAGMENT, texture: {} },
+        { binding: 2, visibility: GPUShaderStage.FRAGMENT, sampler: {} }
       ]
     });
     gpu.pipelineLayout[0] = device.createPipelineLayout({
@@ -307,7 +322,8 @@
         module: gpu.shaderModule[0],
         entryPoint: "mainFragment",
         targets: [
-          { format: "rgb10a2unorm" }
+          { format: "rgb10a2unorm" },
+          { format: "rgba8unorm" }
         ]
       },
       depthStencil: {
@@ -683,13 +699,24 @@
         if (id < 0) {
           continue;
         }
-        const x = e.x || 0;
-        const y = e.y || 0;
-        const z = e.z || 0;
-        const m = mat4translate(x, y, z);
+        const matrix = mat4identity();
+        if (e.transform) {
+          const x = e.transform.x || 0;
+          const y = e.transform.y || 0;
+          const z = e.transform.z || 0;
+          mat4translated(matrix, x, y, z);
+        }
+        const albedo = [1, 1, 1, 1];
+        if (e.albedo) {
+          albedo[0] = e.albedo.r !== void 0 ? e.albedo.r : 1;
+          albedo[1] = e.albedo.g !== void 0 ? e.albedo.g : 1;
+          albedo[2] = e.albedo.b !== void 0 ? e.albedo.b : 1;
+          albedo[3] = e.albedo.a !== void 0 ? e.albedo.a : 1;
+        }
         view.entity.push({
           id,
-          matrix: m
+          matrix,
+          albedo
         });
       }
     }
@@ -707,6 +734,7 @@
       deleteTexture(0);
       deleteTexture(1);
       deleteTexture(2);
+      deleteTexture(3);
       const deleteBindGroup = (no) => {
         if (gpu.bindGroup[no] !== void 0) {
           delete gpu.bindGroup[no];
@@ -732,6 +760,13 @@
     if (gpu.texture[2] === void 0) {
       gpu.texture[2] = device.createTexture({
         size: [canvas.width, canvas.height],
+        format: "rgba8unorm",
+        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+      });
+    }
+    if (gpu.texture[3] === void 0) {
+      gpu.texture[3] = device.createTexture({
+        size: [canvas.width, canvas.height],
         format: "rgba16float",
         usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
       });
@@ -741,7 +776,8 @@
         layout: gpu.bindGroupLayout[1],
         entries: [
           { binding: 0, resource: gpu.texture[1].createView() },
-          { binding: 1, resource: gpu.sampler[0] }
+          { binding: 1, resource: gpu.texture[2].createView() },
+          { binding: 2, resource: gpu.sampler[0] }
         ]
       });
     }
@@ -749,8 +785,9 @@
       gpu.bindGroup[2] = device.createBindGroup({
         layout: gpu.bindGroupLayout[1],
         entries: [
-          { binding: 0, resource: gpu.texture[2].createView() },
-          { binding: 1, resource: gpu.sampler[0] }
+          { binding: 0, resource: gpu.texture[3].createView() },
+          { binding: 1, resource: gpu.texture[3].createView() },
+          { binding: 2, resource: gpu.sampler[0] }
         ]
       });
     }
@@ -772,28 +809,30 @@
     const batch = [];
     {
       const mat = new Float32Array(16);
-      {
-        const camera = view.camera;
-        camera.aspect = canvas.width / canvas.height;
-        const dir = vec3dir(camera.ha, camera.va);
-        const at = vec3add(camera.eye, dir);
-        const look = mat4lookat(camera.eye, at, camera.up);
-        const proj = mat4perspective(camera.fovy, camera.aspect, camera.zNear, camera.zFar);
-        const vp = mat4multiply(look, proj);
-        mat.set(vp);
-        device.queue.writeBuffer(gpu.buffer[0], 0, mat);
-      }
+      const camera = view.camera;
+      camera.aspect = canvas.width / canvas.height;
+      const dir = vec3dir(camera.ha, camera.va);
+      const at = vec3add(camera.eye, dir);
+      const look = mat4lookat(camera.eye, at, camera.up);
+      const proj = mat4perspective(camera.fovy, camera.aspect, camera.zNear, camera.zFar);
+      const vp = mat4multiply(look, proj);
+      mat.set(vp);
+      device.queue.writeBuffer(gpu.buffer[0], 0, mat);
+    }
+    {
       batch.length = app.gpu.mesh.length;
       for (let i = 0; i < batch.length; ++i) {
         batch[i] = [];
       }
       let offset = 0;
+      const buf = new Float32Array(20);
       for (const e of view.entity) {
         for (const i of app.gpu.id[e.id].mesh) {
           batch[i].push(offset);
         }
-        mat.set(e.matrix);
-        device.queue.writeBuffer(gpu.buffer[1], offset, mat);
+        buf.set(e.matrix);
+        buf.set(e.albedo, 16);
+        device.queue.writeBuffer(gpu.buffer[1], offset, buf);
         offset += 256;
       }
     }
@@ -806,12 +845,20 @@
           depthLoadOp: "clear",
           depthStoreOp: "store"
         },
-        colorAttachments: [{
-          view: gpu.texture[1].createView(),
-          clearValue: { r: 0, g: 0, b: 0, a: 0 },
-          loadOp: "clear",
-          storeOp: "store"
-        }]
+        colorAttachments: [
+          {
+            view: gpu.texture[1].createView(),
+            clearValue: { r: 0, g: 0, b: 0, a: 0 },
+            loadOp: "clear",
+            storeOp: "store"
+          },
+          {
+            view: gpu.texture[2].createView(),
+            clearValue: { r: 0, g: 0, b: 0, a: 0 },
+            loadOp: "clear",
+            storeOp: "store"
+          }
+        ]
       });
       for (let i = 0; i < batch.length; ++i) {
         if (batch[i].length <= 0) {
@@ -845,7 +892,7 @@
           depthReadOnly: true
         },
         colorAttachments: [{
-          view: gpu.texture[2].createView(),
+          view: gpu.texture[3].createView(),
           clearValue: { r: 0, g: 0, b: 0, a: 0 },
           loadOp: "clear",
           storeOp: "store"
