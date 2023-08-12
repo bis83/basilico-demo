@@ -115,6 +115,43 @@
       a[12] * b[3] + a[13] * b[7] + a[14] * b[11] + a[15] * b[15]
     ];
   };
+  const mat4invert = (a) => {
+    const b00 = a[0] * a[5] - a[1] * a[4];
+    const b01 = a[0] * a[6] - a[2] * a[4];
+    const b02 = a[0] * a[7] - a[3] * a[4];
+    const b03 = a[1] * a[6] - a[2] * a[5];
+    const b04 = a[1] * a[7] - a[3] * a[5];
+    const b05 = a[2] * a[7] - a[3] * a[6];
+    const b06 = a[8] * a[13] - a[9] * a[12];
+    const b07 = a[8] * a[14] - a[10] * a[12];
+    const b08 = a[8] * a[15] - a[11] * a[12];
+    const b09 = a[9] * a[14] - a[10] * a[13];
+    const b10 = a[9] * a[15] - a[11] * a[13];
+    const b11 = a[10] * a[15] - a[11] * a[14];
+    let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+    if (!det) {
+      return mat4identity();
+    }
+    det = 1 / det;
+    return [
+      (a[5] * b11 - a[6] * b10 + a[7] * b09) * det,
+      (a[2] * b10 - a[1] * b11 - a[3] * b09) * det,
+      (a[13] * b05 - a[14] * b04 + a[15] * b03) * det,
+      (a[10] * b04 - a[9] * b05 - a[11] * b03) * det,
+      (a[6] * b08 - a[4] * b11 - a[7] * b07) * det,
+      (a[0] * b11 - a[2] * b08 + a[3] * b07) * det,
+      (a[14] * b02 - a[12] * b05 - a[15] * b01) * det,
+      (a[8] * b05 - a[10] * b02 + a[11] * b01) * det,
+      (a[4] * b10 - a[5] * b08 + a[7] * b06) * det,
+      (a[1] * b08 - a[0] * b10 - a[3] * b06) * det,
+      (a[12] * b04 - a[13] * b02 + a[15] * b00) * det,
+      (a[9] * b02 - a[8] * b04 - a[11] * b00) * det,
+      (a[5] * b07 - a[4] * b09 - a[6] * b06) * det,
+      (a[0] * b09 - a[1] * b07 + a[2] * b06) * det,
+      (a[13] * b01 - a[12] * b03 - a[14] * b00) * det,
+      (a[8] * b03 - a[9] * b01 + a[10] * b00) * det
+    ];
+  };
   const mat4translated = (m, x, y, z) => {
     m[12] = x;
     m[13] = y;
@@ -177,18 +214,24 @@
       shaderModule: [],
       pipeline: [],
       buffer: [],
-      texture: [],
       sampler: [],
-      bindGroup: []
+      bindGroup: [],
+      gbuffer: []
     };
     gpu.shaderModule[0] = device.createShaderModule({
       code: `
-    @binding(0) @group(0) var<uniform> viewProj : mat4x4<f32>;
+    struct ViewInput {
+      viewProj : mat4x4<f32>,
+    }
+    @group(0) @binding(0) var<uniform> view : ViewInput;
+
     struct InstanceInput {
       world : mat4x4<f32>,
-      albedo : vec4<f32>,
+      factor0 : vec4<f32>,
+      factor1 : vec4<f32>,
     }
-    @binding(1) @group(0) var<uniform> inst : InstanceInput;
+    @group(0) @binding(1) var<uniform> inst : InstanceInput;
+
     struct VertexInput {
       @location(0) position: vec3<f32>,
       @location(1) normal : vec3<f32>,
@@ -198,21 +241,23 @@
       @location(0) normal : vec3<f32>,
     };
     struct FragmentOutput {
-      @location(0) normal : vec4<f32>,
-      @location(1) albedo : vec4<f32>,
+      @location(0) gbuffer0 : vec4<f32>,
+      @location(1) gbuffer1 : vec4<f32>,
+      @location(2) gbuffer2 : vec4<f32>,
     };
     @vertex
     fn mainVertex(input : VertexInput) -> VertexOutput {
       var output : VertexOutput;
-      output.position = (viewProj * inst.world * vec4(input.position, 1.0));
+      output.position = (view.viewProj * inst.world * vec4(input.position, 1.0));
       output.normal = normalize((inst.world * vec4(input.normal, 1.0)).xyz);
       return output;
     }
     @fragment
     fn mainFragment(input : VertexOutput) -> FragmentOutput {
       var output : FragmentOutput;
-      output.normal = vec4(input.normal * 0.5 + 0.5, 0);
-      output.albedo = inst.albedo.rgba;
+      output.gbuffer0 = vec4(input.normal * 0.5 + 0.5, 0);
+      output.gbuffer1 = inst.factor0.xyzw;
+      output.gbuffer2 = inst.factor1.xyzw;
       return output;
     }
     `
@@ -227,17 +272,82 @@
     });
     gpu.shaderModule[2] = device.createShaderModule({
       code: `
-    @group(0) @binding(0) var gbuffer0 : texture_2d<f32>;
-    @group(0) @binding(1) var gbuffer1 : texture_2d<f32>;
+    const EPSILON = 0.0001;
+    const M_PI = 3.141592653589793;
+
+    struct ViewInput {
+      viewProj : mat4x4<f32>,
+      invViewProj : mat4x4<f32>,
+      eye : vec4<f32>,
+    }
+    @group(0) @binding(0) var<uniform> view : ViewInput;
+    @group(0) @binding(1) var zbuffer : texture_depth_2d;
+    @group(0) @binding(2) var gbuffer0 : texture_2d<f32>;
+    @group(0) @binding(3) var gbuffer1 : texture_2d<f32>;
+    @group(0) @binding(4) var gbuffer2 : texture_2d<f32>;
+
+    fn decodeWorldPosition(xy : vec2<i32>) -> vec3<f32> {
+      var d = textureLoad(zbuffer, xy, 0);
+      var uv = vec2<f32>(xy) / vec2<f32>(textureDimensions(zbuffer, 0).xy);
+      var posClip = vec4<f32>(uv * vec2(2.0, -2.0) + vec2(-1.0, 1.0), d, 1);
+      var posWorldW = view.invViewProj * posClip;
+      var posWorld = posWorldW.xyz / posWorldW.www;
+      return posWorld;
+    }
+    fn decodeNormal(xy : vec2<i32>) -> vec3<f32> {
+      return normalize(textureLoad(gbuffer0, xy, 0).xyz * 2.0 - 1.0);
+    }
+
+    fn D_GGX(NdH : f32, roughness : f32) -> f32 {
+      var a  = roughness * roughness;
+      var a2 = a * a;
+      var d  = NdH * NdH * (a2 - 1.0) + 1.0;
+      return (a2) / (M_PI * d*d);
+    }
+    fn G_SchlicksmithGGX(NdL : f32, NdV : f32, roughness : f32) -> f32 {
+      var r = (roughness + 1.0);
+      var k = (r * r) / 8.0;
+      var GL = NdL / (NdL * (1.0 - k) + k);
+      var GV = NdV / (NdV * (1.0 - k) + k);
+      return GL * GV;
+    }
+    fn F_Schlick(VdH : f32, baseColor : vec3<f32>, metallic : f32) -> vec3<f32> {
+      var F0 = mix(vec3(0.04), baseColor, metallic);
+      return vec3<f32>(F0 + (1.0 - F0) * pow(1.0 - VdH, 5.0));
+    }
+    fn BRDF(N : vec3<f32>, L : vec3<f32>, V : vec3<f32>, baseColor : vec3<f32>, metallic : f32, roughness : f32) -> vec3<f32> {
+      var NdL = saturate(dot(N, L));
+      if(NdL > 0.0) {
+        var NdV = saturate(dot(N, V));
+        var H = normalize(V + L);
+        var NdH = saturate(dot(N, H));
+        var VdH = saturate(dot(V, H));
+        
+        var D = D_GGX(NdH, roughness);
+        var G = G_SchlicksmithGGX(NdL, NdV, roughness);
+        var F = F_Schlick(VdH, baseColor, metallic);
+
+        var spec = (F * G * D) / max(4.0 * NdL * NdV, EPSILON);
+        var diff = (1.0 - F) * (1.0 - metallic) / M_PI;
+        return NdL * (diff + spec);
+      } else {
+        return vec3<f32>(0);
+      }
+    }
+
     @fragment
     fn mainFragment(@builtin(position) coord : vec4<f32>) -> @location(0) vec4<f32> {
-      var N = normalize(textureLoad(gbuffer0, vec2<i32>(floor(coord.xy)), 0).xyz * 2.0 - 1.0);
-      var L = normalize(vec3<f32>(0.0, 1.0, 0.0));
-      var C_L = vec3<f32>(1.0, 1.0, 1.0);
-      var C_A = vec3<f32>(1.0, 1.0, 1.0);
-      var C = C_L * max(dot(N, L), 0) + C_A;
-      var B = textureLoad(gbuffer1, vec2<i32>(floor(coord.xy)), 0);
-      return vec4(C * B.rgb, 1.0);
+      var xy = vec2<i32>(floor(coord.xy));
+      var F0 = textureLoad(gbuffer1, xy, 0);
+      var F1 = textureLoad(gbuffer2, xy, 0);
+      var N = decodeNormal(xy);
+      var P = decodeWorldPosition(xy);
+      var V = normalize(view.eye.xyz - P);
+
+      var L = vec3<f32>(0.0, 1.0, 0.0);
+      var C_L = vec3<f32>(1.0, 1.0, 1.0) * BRDF(N, L, V, F0.rgb, F1.y, F1.z);
+      var C_A = vec3<f32>(0.5, 0.5, 0.5) * (F1.x * F0.rgb);
+      return vec4(C_L + C_A, 1.0);
     }
     `
     });
@@ -252,8 +362,8 @@
     });
     gpu.shaderModule[4] = device.createShaderModule({
       code: `
-    @group(0) @binding(0) var lbuffer0 : texture_2d<f32>;
-    @group(0) @binding(2) var sampler0 : sampler;
+    @group(0) @binding(2) var lbuffer0 : texture_2d<f32>;
+    @group(0) @binding(5) var sampler0 : sampler;
     fn toneMapping(x : vec3<f32>) -> vec3<f32> {
       var a = 2.51f;
       var b = 0.03f;
@@ -293,9 +403,12 @@
     });
     gpu.bindGroupLayout[1] = device.createBindGroupLayout({
       entries: [
-        { binding: 0, visibility: GPUShaderStage.FRAGMENT, texture: {} },
-        { binding: 1, visibility: GPUShaderStage.FRAGMENT, texture: {} },
-        { binding: 2, visibility: GPUShaderStage.FRAGMENT, sampler: {} }
+        { binding: 0, visibility: GPUShaderStage.FRAGMENT, buffer: {} },
+        { binding: 1, visibility: GPUShaderStage.FRAGMENT, texture: { sampleType: "depth" } },
+        { binding: 2, visibility: GPUShaderStage.FRAGMENT, texture: {} },
+        { binding: 3, visibility: GPUShaderStage.FRAGMENT, texture: {} },
+        { binding: 4, visibility: GPUShaderStage.FRAGMENT, texture: {} },
+        { binding: 5, visibility: GPUShaderStage.FRAGMENT, sampler: {} }
       ]
     });
     gpu.pipelineLayout[0] = device.createPipelineLayout({
@@ -323,6 +436,7 @@
         entryPoint: "mainFragment",
         targets: [
           { format: "rgb10a2unorm" },
+          { format: "rgba8unorm" },
           { format: "rgba8unorm" }
         ]
       },
@@ -388,7 +502,7 @@
       }
     });
     gpu.buffer[0] = device.createBuffer({
-      size: 64 * 1,
+      size: 256 * 1,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
     });
     gpu.buffer[1] = device.createBuffer({
@@ -726,15 +840,16 @@
       canvas.width = canvas.clientWidth;
       canvas.height = canvas.clientHeight;
       const deleteTexture = (no) => {
-        if (gpu.texture[no] !== void 0) {
-          gpu.texture[no].destroy();
-          delete gpu.texture[no];
+        if (gpu.gbuffer[no] !== void 0) {
+          gpu.gbuffer[no].destroy();
+          delete gpu.gbuffer[no];
         }
       };
       deleteTexture(0);
       deleteTexture(1);
       deleteTexture(2);
       deleteTexture(3);
+      deleteTexture(4);
       const deleteBindGroup = (no) => {
         if (gpu.bindGroup[no] !== void 0) {
           delete gpu.bindGroup[no];
@@ -743,29 +858,36 @@
       deleteBindGroup(1);
       deleteBindGroup(2);
     }
-    if (gpu.texture[0] === void 0) {
-      gpu.texture[0] = device.createTexture({
+    if (gpu.gbuffer[0] === void 0) {
+      gpu.gbuffer[0] = device.createTexture({
         size: [canvas.width, canvas.height],
         format: "depth24plus",
         usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
       });
     }
-    if (gpu.texture[1] === void 0) {
-      gpu.texture[1] = device.createTexture({
+    if (gpu.gbuffer[1] === void 0) {
+      gpu.gbuffer[1] = device.createTexture({
         size: [canvas.width, canvas.height],
         format: "rgb10a2unorm",
         usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
       });
     }
-    if (gpu.texture[2] === void 0) {
-      gpu.texture[2] = device.createTexture({
+    if (gpu.gbuffer[2] === void 0) {
+      gpu.gbuffer[2] = device.createTexture({
         size: [canvas.width, canvas.height],
         format: "rgba8unorm",
         usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
       });
     }
-    if (gpu.texture[3] === void 0) {
-      gpu.texture[3] = device.createTexture({
+    if (gpu.gbuffer[3] === void 0) {
+      gpu.gbuffer[3] = device.createTexture({
+        size: [canvas.width, canvas.height],
+        format: "rgba8unorm",
+        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+      });
+    }
+    if (gpu.gbuffer[4] === void 0) {
+      gpu.gbuffer[4] = device.createTexture({
         size: [canvas.width, canvas.height],
         format: "rgba16float",
         usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
@@ -775,9 +897,12 @@
       gpu.bindGroup[1] = device.createBindGroup({
         layout: gpu.bindGroupLayout[1],
         entries: [
-          { binding: 0, resource: gpu.texture[1].createView() },
-          { binding: 1, resource: gpu.texture[2].createView() },
-          { binding: 2, resource: gpu.sampler[0] }
+          { binding: 0, resource: { buffer: gpu.buffer[0] } },
+          { binding: 1, resource: gpu.gbuffer[0].createView() },
+          { binding: 2, resource: gpu.gbuffer[1].createView() },
+          { binding: 3, resource: gpu.gbuffer[2].createView() },
+          { binding: 4, resource: gpu.gbuffer[3].createView() },
+          { binding: 5, resource: gpu.sampler[0] }
         ]
       });
     }
@@ -785,9 +910,12 @@
       gpu.bindGroup[2] = device.createBindGroup({
         layout: gpu.bindGroupLayout[1],
         entries: [
-          { binding: 0, resource: gpu.texture[3].createView() },
-          { binding: 1, resource: gpu.texture[3].createView() },
-          { binding: 2, resource: gpu.sampler[0] }
+          { binding: 0, resource: { buffer: gpu.buffer[0] } },
+          { binding: 1, resource: gpu.gbuffer[0].createView() },
+          { binding: 2, resource: gpu.gbuffer[4].createView() },
+          { binding: 3, resource: gpu.gbuffer[4].createView() },
+          { binding: 4, resource: gpu.gbuffer[4].createView() },
+          { binding: 5, resource: gpu.sampler[0] }
         ]
       });
     }
@@ -808,7 +936,7 @@
   const basil3d_gpu_on_frame_view = (gpu, device, context, canvas, app, view) => {
     const batch = [];
     {
-      const mat = new Float32Array(16);
+      const mat = new Float32Array(36);
       const camera = view.camera;
       camera.aspect = canvas.width / canvas.height;
       const dir = vec3dir(camera.ha, camera.va);
@@ -816,7 +944,10 @@
       const look = mat4lookat(camera.eye, at, camera.up);
       const proj = mat4perspective(camera.fovy, camera.aspect, camera.zNear, camera.zFar);
       const vp = mat4multiply(look, proj);
-      mat.set(vp);
+      const ivp = mat4invert(vp);
+      mat.set(vp, 0);
+      mat.set(ivp, 16);
+      mat.set(camera.eye, 32);
       device.queue.writeBuffer(gpu.buffer[0], 0, mat);
     }
     {
@@ -825,13 +956,14 @@
         batch[i] = [];
       }
       let offset = 0;
-      const buf = new Float32Array(20);
+      const buf = new Float32Array(24);
       for (const e of view.entity) {
         for (const i of app.gpu.id[e.id].mesh) {
           batch[i].push(offset);
         }
-        buf.set(e.matrix);
+        buf.set(e.matrix, 0);
         buf.set(e.albedo, 16);
+        buf.set([1, 0.4, 0.4, 1], 20);
         device.queue.writeBuffer(gpu.buffer[1], offset, buf);
         offset += 256;
       }
@@ -840,20 +972,26 @@
     {
       const pass = ce.beginRenderPass({
         depthStencilAttachment: {
-          view: gpu.texture[0].createView(),
+          view: gpu.gbuffer[0].createView(),
           depthClearValue: 1,
           depthLoadOp: "clear",
           depthStoreOp: "store"
         },
         colorAttachments: [
           {
-            view: gpu.texture[1].createView(),
+            view: gpu.gbuffer[1].createView(),
             clearValue: { r: 0, g: 0, b: 0, a: 0 },
             loadOp: "clear",
             storeOp: "store"
           },
           {
-            view: gpu.texture[2].createView(),
+            view: gpu.gbuffer[2].createView(),
+            clearValue: { r: 0, g: 0, b: 0, a: 0 },
+            loadOp: "clear",
+            storeOp: "store"
+          },
+          {
+            view: gpu.gbuffer[3].createView(),
             clearValue: { r: 0, g: 0, b: 0, a: 0 },
             loadOp: "clear",
             storeOp: "store"
@@ -888,11 +1026,11 @@
     {
       const pass = ce.beginRenderPass({
         depthStencilAttachment: {
-          view: gpu.texture[0].createView(),
+          view: gpu.gbuffer[0].createView(),
           depthReadOnly: true
         },
         colorAttachments: [{
-          view: gpu.texture[3].createView(),
+          view: gpu.gbuffer[4].createView(),
           clearValue: { r: 0, g: 0, b: 0, a: 0 },
           loadOp: "clear",
           storeOp: "store"
@@ -988,6 +1126,14 @@
       const dy = moveSpeed * dt * vy;
       mob.eye[0] += dx;
       mob.eye[2] += dy;
+    }
+    const lb = basil3d_listen_get(listen, "q", "lb");
+    if (lb) {
+      mob.eye[1] -= 0.75 * dt;
+    }
+    const rb = basil3d_listen_get(listen, "e", "rb");
+    if (rb) {
+      mob.eye[1] += 0.75 * dt;
     }
   };
   html_listen(window, "load", () => {
