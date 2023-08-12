@@ -31,6 +31,14 @@ const update = (app, view, listen) => {
     mob.eye[0] += dx;
     mob.eye[2] += dy;
   }
+  const lb = basil3d_listen_get(listen, "q", "lb");
+  if (lb) {
+    mob.eye[1] -= 0.75 * dt;
+  }
+  const rb = basil3d_listen_get(listen, "e", "rb");
+  if (rb) {
+    mob.eye[1] += 0.75 * dt;
+  }
 };
 
 html_listen(window, "load", () => {
