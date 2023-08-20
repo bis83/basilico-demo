@@ -278,7 +278,10 @@
     struct ViewInput {
       viewProj : mat4x4<f32>,
       invViewProj : mat4x4<f32>,
-      eye : vec4<f32>,
+      eyePosition : vec4<f32>,
+      lightDir : vec4<f32>,
+      lightColor : vec4<f32>,
+      ambientColor : vec4<f32>,
     }
     @group(0) @binding(0) var<uniform> view : ViewInput;
     @group(0) @binding(1) var zbuffer : texture_depth_2d;
@@ -342,11 +345,11 @@
       var F1 = textureLoad(gbuffer2, xy, 0);
       var N = decodeNormal(xy);
       var P = decodeWorldPosition(xy);
-      var V = normalize(view.eye.xyz - P);
+      var V = normalize(view.eyePosition.xyz - P);
 
-      var L = vec3<f32>(0.0, 1.0, 0.0);
-      var C_L = vec3<f32>(1.0, 1.0, 1.0) * BRDF(N, L, V, F0.rgb, F1.y, F1.z);
-      var C_A = vec3<f32>(0.5, 0.5, 0.5) * (F1.x * F0.rgb);
+      var L = view.lightDir.xyz;
+      var C_L = view.lightColor.rgb * BRDF(N, L, V, F0.rgb, F1.y, F1.z);
+      var C_A = view.ambientColor.rgb * (F1.x * F0.rgb);
       return vec4(C_L + C_A, 1.0);
     }
     `
@@ -800,12 +803,36 @@
         va: 0,
         up: [0, 1, 0]
       },
+      light: {
+        ha: 0,
+        va: 0,
+        color: [0, 0, 0],
+        ambient: [0, 0, 0]
+      },
       entity: []
     };
   };
   const basil3d_view_setup = (view, app, desc) => {
     if (desc.camera) {
       Object.assign(view.camera, desc.camera);
+    }
+    if (desc.light) {
+      if (desc.light.ha !== void 0) {
+        view.light.ha = desc.light.ha;
+      }
+      if (desc.light.va !== void 0) {
+        view.light.va = desc.light.va;
+      }
+      if (desc.light.color) {
+        view.light.color[0] = desc.light.color.r !== void 0 ? desc.light.color.r : 0;
+        view.light.color[1] = desc.light.color.g !== void 0 ? desc.light.color.g : 0;
+        view.light.color[2] = desc.light.color.b !== void 0 ? desc.light.color.b : 0;
+      }
+      if (desc.light.ambient) {
+        view.light.ambient[0] = desc.light.ambient.r !== void 0 ? desc.light.ambient.r : 0;
+        view.light.ambient[1] = desc.light.ambient.g !== void 0 ? desc.light.ambient.g : 0;
+        view.light.ambient[2] = desc.light.ambient.b !== void 0 ? desc.light.ambient.b : 0;
+      }
     }
     if (desc.entity) {
       for (const e of desc.entity) {
@@ -820,17 +847,31 @@
           const z = e.transform.z || 0;
           mat4translated(matrix, x, y, z);
         }
-        const albedo = [1, 1, 1, 1];
+        const factor0 = [1, 1, 1, 1];
         if (e.albedo) {
-          albedo[0] = e.albedo.r !== void 0 ? e.albedo.r : 1;
-          albedo[1] = e.albedo.g !== void 0 ? e.albedo.g : 1;
-          albedo[2] = e.albedo.b !== void 0 ? e.albedo.b : 1;
-          albedo[3] = e.albedo.a !== void 0 ? e.albedo.a : 1;
+          factor0[0] = e.albedo.r !== void 0 ? e.albedo.r : 1;
+          factor0[1] = e.albedo.g !== void 0 ? e.albedo.g : 1;
+          factor0[2] = e.albedo.b !== void 0 ? e.albedo.b : 1;
+          factor0[3] = e.albedo.a !== void 0 ? e.albedo.a : 1;
+        }
+        const factor1 = [1, 0.5, 0.5, 0];
+        if (e.occlusion !== void 0) {
+          factor1[0] = e.occlusion;
+        }
+        if (e.metallic !== void 0) {
+          factor1[1] = e.metallic;
+        }
+        if (e.roughness !== void 0) {
+          factor1[2] = e.roughness;
+        }
+        if (e.emission !== void 0) {
+          factor1[3] = e.emission;
         }
         view.entity.push({
           id,
           matrix,
-          albedo
+          factor0,
+          factor1
         });
       }
     }
@@ -936,7 +977,7 @@
   const basil3d_gpu_on_frame_view = (gpu, device, context, canvas, app, view) => {
     const batch = [];
     {
-      const mat = new Float32Array(36);
+      const buf = new Float32Array(48);
       const camera = view.camera;
       camera.aspect = canvas.width / canvas.height;
       const dir = vec3dir(camera.ha, camera.va);
@@ -945,10 +986,15 @@
       const proj = mat4perspective(camera.fovy, camera.aspect, camera.zNear, camera.zFar);
       const vp = mat4multiply(look, proj);
       const ivp = mat4invert(vp);
-      mat.set(vp, 0);
-      mat.set(ivp, 16);
-      mat.set(camera.eye, 32);
-      device.queue.writeBuffer(gpu.buffer[0], 0, mat);
+      buf.set(vp, 0);
+      buf.set(ivp, 16);
+      buf.set(camera.eye, 32);
+      const light = view.light;
+      const ldir = vec3dir(light.ha, light.va);
+      buf.set(ldir, 36);
+      buf.set(light.color, 40);
+      buf.set(light.ambient, 44);
+      device.queue.writeBuffer(gpu.buffer[0], 0, buf);
     }
     {
       batch.length = app.gpu.mesh.length;
@@ -962,8 +1008,8 @@
           batch[i].push(offset);
         }
         buf.set(e.matrix, 0);
-        buf.set(e.albedo, 16);
-        buf.set([1, 0.4, 0.4, 1], 20);
+        buf.set(e.factor0, 16);
+        buf.set(e.factor1, 20);
         device.queue.writeBuffer(gpu.buffer[1], offset, buf);
         offset += 256;
       }
