@@ -218,6 +218,17 @@
       bindGroup: [],
       gbuffer: []
     };
+    const buffer0struct = `
+  struct ViewInput {
+    viewProj : mat4x4<f32>,
+    invViewProj : mat4x4<f32>,
+    eyePosition : vec4<f32>,
+    lightDir : vec4<f32>,
+    lightColor : vec4<f32>,
+    ambientColor : vec4<f32>,
+    backgroundColor : vec4<f32>,
+  }
+  `;
     gpu.buffer[0] = device.createBuffer({
       size: 256 * 1,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
@@ -232,10 +243,7 @@
       mipmapFilter: "linear"
     });
     gpu.shaderModule[0] = device.createShaderModule({
-      code: `
-    struct ViewInput {
-      viewProj : mat4x4<f32>,
-    }
+      code: buffer0struct + `
     @group(0) @binding(0) var<uniform> view : ViewInput;
 
     struct InstanceInput {
@@ -284,18 +292,10 @@
     `
     });
     gpu.shaderModule[2] = device.createShaderModule({
-      code: `
+      code: buffer0struct + `
     const EPSILON = 0.0001;
     const M_PI = 3.141592653589793;
 
-    struct ViewInput {
-      viewProj : mat4x4<f32>,
-      invViewProj : mat4x4<f32>,
-      eyePosition : vec4<f32>,
-      lightDir : vec4<f32>,
-      lightColor : vec4<f32>,
-      ambientColor : vec4<f32>,
-    }
     @group(0) @binding(0) var<uniform> view : ViewInput;
     @group(0) @binding(1) var zbuffer : texture_depth_2d;
     @group(0) @binding(2) var gbuffer0 : texture_2d<f32>;
@@ -369,10 +369,12 @@
     `
     });
     gpu.shaderModule[3] = device.createShaderModule({
-      code: `
+      code: buffer0struct + `
+    @group(0) @binding(0) var<uniform> view : ViewInput;
+    
     @fragment
     fn mainFragment(@builtin(position) coord : vec4<f32>) -> @location(0) vec4<f32> {
-      var C_A = vec3<f32>(0.1, 0.1, 0.1);
+      var C_A = (view.backgroundColor.rgb * view.backgroundColor.a);
       return vec4(C_A, 1.0);
     }
     `
@@ -808,7 +810,8 @@
         ha: 0,
         va: 0,
         color: [0, 0, 0],
-        ambient: [0, 0, 0]
+        ambient: [0, 0, 0],
+        background: [0, 0, 0]
       },
       entity: []
     };
@@ -835,6 +838,12 @@
         view.light.ambient[1] = desc.light.ambient.g !== void 0 ? desc.light.ambient.g : 0;
         view.light.ambient[2] = desc.light.ambient.b !== void 0 ? desc.light.ambient.b : 0;
         view.light.ambient[3] = desc.light.ambient.a !== void 0 ? desc.light.ambient.a : 0;
+      }
+      if (desc.light.background) {
+        view.light.background[0] = desc.light.background.r !== void 0 ? desc.light.background.r : 0;
+        view.light.background[1] = desc.light.background.g !== void 0 ? desc.light.background.g : 0;
+        view.light.background[2] = desc.light.background.b !== void 0 ? desc.light.background.b : 0;
+        view.light.background[3] = desc.light.background.a !== void 0 ? desc.light.background.a : 0;
       }
     }
     if (desc.entity) {
@@ -980,7 +989,7 @@
   const basil3d_gpu_on_frame_view = (gpu, device, context, canvas, app, view) => {
     const batch = [];
     {
-      const buf = new Float32Array(48);
+      const buf = new Float32Array(52);
       const camera = view.camera;
       camera.aspect = canvas.width / canvas.height;
       const dir = vec3dir(camera.ha, camera.va);
@@ -997,6 +1006,7 @@
       buf.set(ldir, 36);
       buf.set(light.color, 40);
       buf.set(light.ambient, 44);
+      buf.set(light.background, 48);
       device.queue.writeBuffer(gpu.buffer[0], 0, buf);
     }
     {
