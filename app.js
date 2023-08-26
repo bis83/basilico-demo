@@ -218,6 +218,19 @@
       bindGroup: [],
       gbuffer: []
     };
+    gpu.buffer[0] = device.createBuffer({
+      size: 256 * 1,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+    });
+    gpu.buffer[1] = device.createBuffer({
+      size: 256 * 1024,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+    });
+    gpu.sampler[0] = device.createSampler({
+      magFilter: "linear",
+      minFilter: "linear",
+      mipmapFilter: "linear"
+    });
     gpu.shaderModule[0] = device.createShaderModule({
       code: `
     struct ViewInput {
@@ -348,9 +361,10 @@
       var V = normalize(view.eyePosition.xyz - P);
 
       var L = view.lightDir.xyz;
-      var C_L = view.lightColor.rgb * BRDF(N, L, V, F0.rgb, F1.y, F1.z);
-      var C_A = view.ambientColor.rgb * (F1.x * F0.rgb);
-      return vec4(C_L + C_A, 1.0);
+      var C_L = (view.lightColor.rgb * view.lightColor.a) * BRDF(N, L, V, F0.rgb, F1.y, F1.z);
+      var C_A = (view.ambientColor.rgb * view.ambientColor.a) * (F1.x * F0.rgb);
+      var C_E = F0.rgb * F1.w;
+      return vec4(C_L + C_A + C_E, 1.0);
     }
     `
     });
@@ -412,6 +426,13 @@
         { binding: 3, visibility: GPUShaderStage.FRAGMENT, texture: {} },
         { binding: 4, visibility: GPUShaderStage.FRAGMENT, texture: {} },
         { binding: 5, visibility: GPUShaderStage.FRAGMENT, sampler: {} }
+      ]
+    });
+    gpu.bindGroup[0] = device.createBindGroup({
+      layout: gpu.bindGroupLayout[0],
+      entries: [
+        { binding: 0, resource: { buffer: gpu.buffer[0] } },
+        { binding: 1, resource: { buffer: gpu.buffer[1], size: 256, offset: 0 } }
       ]
     });
     gpu.pipelineLayout[0] = device.createPipelineLayout({
@@ -503,26 +524,6 @@
           { format: canvasFormat }
         ]
       }
-    });
-    gpu.buffer[0] = device.createBuffer({
-      size: 256 * 1,
-      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-    });
-    gpu.buffer[1] = device.createBuffer({
-      size: 256 * 1024,
-      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-    });
-    gpu.sampler[0] = device.createSampler({
-      magFilter: "linear",
-      minFilter: "linear",
-      mipmapFilter: "linear"
-    });
-    gpu.bindGroup[0] = device.createBindGroup({
-      layout: gpu.bindGroupLayout[0],
-      entries: [
-        { binding: 0, resource: { buffer: gpu.buffer[0] } },
-        { binding: 1, resource: { buffer: gpu.buffer[1], size: 256, offset: 0 } }
-      ]
     });
     return gpu;
   };
@@ -827,11 +828,13 @@
         view.light.color[0] = desc.light.color.r !== void 0 ? desc.light.color.r : 0;
         view.light.color[1] = desc.light.color.g !== void 0 ? desc.light.color.g : 0;
         view.light.color[2] = desc.light.color.b !== void 0 ? desc.light.color.b : 0;
+        view.light.color[3] = desc.light.color.a !== void 0 ? desc.light.color.a : 0;
       }
       if (desc.light.ambient) {
         view.light.ambient[0] = desc.light.ambient.r !== void 0 ? desc.light.ambient.r : 0;
         view.light.ambient[1] = desc.light.ambient.g !== void 0 ? desc.light.ambient.g : 0;
         view.light.ambient[2] = desc.light.ambient.b !== void 0 ? desc.light.ambient.b : 0;
+        view.light.ambient[3] = desc.light.ambient.a !== void 0 ? desc.light.ambient.a : 0;
       }
     }
     if (desc.entity) {
