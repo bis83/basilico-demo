@@ -17,6 +17,12 @@
     const elem = html_message();
     elem.style.display = `none`;
   };
+  const div = (v, n) => {
+    return Math.floor(v / n);
+  };
+  const mod = (v, n) => {
+    return (v % n + n) % n;
+  };
   const deg2rad = (deg) => {
     return deg / 180 * Math.PI;
   };
@@ -152,10 +158,25 @@
       (a[8] * b03 - a[9] * b01 + a[10] * b00) * det
     ];
   };
-  const mat4translated = (m, x, y, z) => {
-    m[12] = x;
-    m[13] = y;
-    m[14] = z;
+  const mat4translate = (x, y, z) => {
+    return [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      x,
+      y,
+      z,
+      1
+    ];
   };
   const mat4lookat = (eye, at, up) => {
     const tz = vec3normalize(vec3sub(at, eye));
@@ -529,6 +550,285 @@
     });
     return gpu;
   };
+  const basil3d_gpu_on_frame_start = (gpu, device, canvas) => {
+    basil3d_gpu_gbuffer(gpu, device, canvas);
+  };
+  const basil3d_gpu_on_frame_loading = (gpu, device, context) => {
+    const ce = device.createCommandEncoder();
+    const pass = ce.beginRenderPass({
+      colorAttachments: [{
+        view: context.getCurrentTexture().createView(),
+        clearValue: { r: 0.2, g: 0.2, b: 0.2, a: 1 },
+        loadOp: "clear",
+        storeOp: "store"
+      }]
+    });
+    pass.end();
+    device.queue.submit([ce.finish()]);
+  };
+  const basil3d_gpu_on_frame_view = (gpu, device, context, canvas, app, view) => {
+    basil3d_gpu_upload_view_input(gpu, device, canvas, view);
+    const batch = basil3d_gpu_upload_instance_input(gpu, device, app, view);
+    const ce = device.createCommandEncoder();
+    {
+      const pass = ce.beginRenderPass({
+        depthStencilAttachment: {
+          view: gpu.gbuffer[0].createView(),
+          depthClearValue: 1,
+          depthLoadOp: "clear",
+          depthStoreOp: "store"
+        },
+        colorAttachments: [
+          {
+            view: gpu.gbuffer[1].createView(),
+            clearValue: { r: 0, g: 0, b: 0, a: 0 },
+            loadOp: "clear",
+            storeOp: "store"
+          },
+          {
+            view: gpu.gbuffer[2].createView(),
+            clearValue: { r: 0, g: 0, b: 0, a: 0 },
+            loadOp: "clear",
+            storeOp: "store"
+          },
+          {
+            view: gpu.gbuffer[3].createView(),
+            clearValue: { r: 0, g: 0, b: 0, a: 0 },
+            loadOp: "clear",
+            storeOp: "store"
+          }
+        ]
+      });
+      for (let i = 0; i < batch.length; ++i) {
+        if (batch[i].length <= 0) {
+          continue;
+        }
+        const mesh = app.gpu.mesh[i];
+        pass.setPipeline(gpu.pipeline[0]);
+        if (mesh.vb0) {
+          const [index, offset, size] = mesh.vb0;
+          pass.setVertexBuffer(0, app.gpu.buffer[index], offset, size);
+        }
+        if (mesh.vb1) {
+          const [index, offset, size] = mesh.vb1;
+          pass.setVertexBuffer(1, app.gpu.buffer[index], offset, size);
+        }
+        if (mesh.ib) {
+          const [index, offset, size] = mesh.ib;
+          pass.setIndexBuffer(app.gpu.buffer[index], "uint16", offset, size);
+        }
+        for (const offset of batch[i]) {
+          pass.setBindGroup(0, gpu.bindGroup[0], [offset]);
+          pass.drawIndexed(mesh.count);
+        }
+      }
+      pass.end();
+    }
+    {
+      const pass = ce.beginRenderPass({
+        depthStencilAttachment: {
+          view: gpu.gbuffer[0].createView(),
+          depthReadOnly: true
+        },
+        colorAttachments: [{
+          view: gpu.gbuffer[4].createView(),
+          clearValue: { r: 0, g: 0, b: 0, a: 0 },
+          loadOp: "clear",
+          storeOp: "store"
+        }]
+      });
+      pass.setPipeline(gpu.pipeline[1]);
+      pass.setBindGroup(0, gpu.bindGroup[1]);
+      pass.draw(4);
+      pass.setPipeline(gpu.pipeline[2]);
+      pass.draw(4);
+      pass.end();
+    }
+    {
+      const pass = ce.beginRenderPass({
+        colorAttachments: [{
+          view: context.getCurrentTexture().createView(),
+          clearValue: { r: 0, g: 0, b: 0, a: 0 },
+          loadOp: "clear",
+          storeOp: "store"
+        }]
+      });
+      pass.setPipeline(gpu.pipeline[3]);
+      pass.setBindGroup(0, gpu.bindGroup[2]);
+      pass.draw(4);
+      pass.end();
+    }
+    device.queue.submit([ce.finish()]);
+  };
+  const basil3d_gpu_upload_view_input = (gpu, device, canvas, view) => {
+    const buf = new Float32Array(52);
+    const camera = view.camera;
+    camera.aspect = canvas.width / canvas.height;
+    const dir = vec3dir(camera.ha, camera.va);
+    const at = vec3add(camera.eye, dir);
+    const look = mat4lookat(camera.eye, at, camera.up);
+    const proj = mat4perspective(camera.fovy, camera.aspect, camera.zNear, camera.zFar);
+    const vp = mat4multiply(look, proj);
+    const ivp = mat4invert(vp);
+    buf.set(vp, 0);
+    buf.set(ivp, 16);
+    buf.set(camera.eye, 32);
+    const light = view.light;
+    const ldir = vec3dir(light.ha, light.va);
+    buf.set(ldir, 36);
+    buf.set(light.color, 40);
+    buf.set(light.ambient, 44);
+    buf.set(light.background, 48);
+    device.queue.writeBuffer(gpu.buffer[0], 0, buf);
+  };
+  const basil3d_gpu_upload_instance_input = (gpu, device, app, view) => {
+    const batch = [];
+    batch.length = app.gpu.mesh.length;
+    for (let i = 0; i < batch.length; ++i) {
+      batch[i] = [];
+    }
+    const buf = new Float32Array(24);
+    let offset = 0;
+    for (const room of view.room) {
+      for (let i = 0; i < room.indices.length; ++i) {
+        const node = room.node[room.indices[i]];
+        if (!node) {
+          continue;
+        }
+        const dx = mod(i, room.size[0]);
+        const dz = div(i, room.size[0]);
+        for (const mesh of node.mesh) {
+          const id = basil3d_app_gpu_id(app, mesh.name);
+          if (id < 0) {
+            continue;
+          }
+          for (const n of app.gpu.id[id].mesh) {
+            batch[n].push(offset);
+          }
+          let x = dx * room.unit;
+          let y = 0;
+          let z = dz * room.unit;
+          if (mesh.transform) {
+            x += mesh.transform.x || 0;
+            y += mesh.transform.y || 0;
+            z += mesh.transform.z || 0;
+          }
+          const matrix = mat4translate(x, y, z);
+          const factor0 = [1, 1, 1, 1];
+          if (mesh.albedo) {
+            factor0[0] = mesh.albedo.r !== void 0 ? mesh.albedo.r : 1;
+            factor0[1] = mesh.albedo.g !== void 0 ? mesh.albedo.g : 1;
+            factor0[2] = mesh.albedo.b !== void 0 ? mesh.albedo.b : 1;
+            factor0[3] = mesh.albedo.a !== void 0 ? mesh.albedo.a : 1;
+          }
+          const factor1 = [1, 0.5, 0.5, 0];
+          if (mesh.occlusion !== void 0) {
+            factor1[0] = mesh.occlusion;
+          }
+          if (mesh.metallic !== void 0) {
+            factor1[1] = mesh.metallic;
+          }
+          if (mesh.roughness !== void 0) {
+            factor1[2] = mesh.roughness;
+          }
+          if (mesh.emission !== void 0) {
+            factor1[3] = mesh.emission;
+          }
+          buf.set(matrix, 0);
+          buf.set(factor0, 16);
+          buf.set(factor1, 20);
+          device.queue.writeBuffer(gpu.buffer[1], offset, buf);
+          offset += 256;
+        }
+      }
+    }
+    return batch;
+  };
+  const basil3d_gpu_gbuffer = (gpu, device, canvas) => {
+    if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+      const deleteTexture = (no) => {
+        if (gpu.gbuffer[no] !== void 0) {
+          gpu.gbuffer[no].destroy();
+          delete gpu.gbuffer[no];
+        }
+      };
+      deleteTexture(0);
+      deleteTexture(1);
+      deleteTexture(2);
+      deleteTexture(3);
+      deleteTexture(4);
+      const deleteBindGroup = (no) => {
+        if (gpu.bindGroup[no] !== void 0) {
+          delete gpu.bindGroup[no];
+        }
+      };
+      deleteBindGroup(1);
+      deleteBindGroup(2);
+    }
+    if (gpu.gbuffer[0] === void 0) {
+      gpu.gbuffer[0] = device.createTexture({
+        size: [canvas.width, canvas.height],
+        format: "depth24plus",
+        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+      });
+    }
+    if (gpu.gbuffer[1] === void 0) {
+      gpu.gbuffer[1] = device.createTexture({
+        size: [canvas.width, canvas.height],
+        format: "rgb10a2unorm",
+        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+      });
+    }
+    if (gpu.gbuffer[2] === void 0) {
+      gpu.gbuffer[2] = device.createTexture({
+        size: [canvas.width, canvas.height],
+        format: "rgba8unorm",
+        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+      });
+    }
+    if (gpu.gbuffer[3] === void 0) {
+      gpu.gbuffer[3] = device.createTexture({
+        size: [canvas.width, canvas.height],
+        format: "rgba8unorm",
+        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+      });
+    }
+    if (gpu.gbuffer[4] === void 0) {
+      gpu.gbuffer[4] = device.createTexture({
+        size: [canvas.width, canvas.height],
+        format: "rgba16float",
+        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+      });
+    }
+    if (gpu.bindGroup[1] === void 0) {
+      gpu.bindGroup[1] = device.createBindGroup({
+        layout: gpu.bindGroupLayout[1],
+        entries: [
+          { binding: 0, resource: { buffer: gpu.buffer[0] } },
+          { binding: 1, resource: gpu.gbuffer[0].createView() },
+          { binding: 2, resource: gpu.gbuffer[1].createView() },
+          { binding: 3, resource: gpu.gbuffer[2].createView() },
+          { binding: 4, resource: gpu.gbuffer[3].createView() },
+          { binding: 5, resource: gpu.sampler[0] }
+        ]
+      });
+    }
+    if (gpu.bindGroup[2] === void 0) {
+      gpu.bindGroup[2] = device.createBindGroup({
+        layout: gpu.bindGroupLayout[1],
+        entries: [
+          { binding: 0, resource: { buffer: gpu.buffer[0] } },
+          { binding: 1, resource: gpu.gbuffer[0].createView() },
+          { binding: 2, resource: gpu.gbuffer[4].createView() },
+          { binding: 3, resource: gpu.gbuffer[4].createView() },
+          { binding: 4, resource: gpu.gbuffer[4].createView() },
+          { binding: 5, resource: gpu.sampler[0] }
+        ]
+      });
+    }
+  };
   const basil3d_listen_create = () => {
     const listen = {
       timer: {
@@ -813,13 +1113,20 @@
         ambient: [0, 0, 0],
         background: [0, 0, 0]
       },
-      entity: []
+      room: []
     };
   };
   const basil3d_view_setup = (view, app, desc) => {
+    basil3d_view_camera(view, desc);
+    basil3d_view_light(view, desc);
+    basil3d_view_room(view, app, desc);
+  };
+  const basil3d_view_camera = (view, desc) => {
     if (desc.camera) {
       Object.assign(view.camera, desc.camera);
     }
+  };
+  const basil3d_view_light = (view, desc) => {
     if (desc.light) {
       if (desc.light.ha !== void 0) {
         view.light.ha = desc.light.ha;
@@ -846,277 +1153,11 @@
         view.light.background[3] = desc.light.background.a !== void 0 ? desc.light.background.a : 0;
       }
     }
-    if (desc.entity) {
-      for (const e of desc.entity) {
-        const id = basil3d_app_gpu_id(app, e.name);
-        if (id < 0) {
-          continue;
-        }
-        const matrix = mat4identity();
-        if (e.transform) {
-          const x = e.transform.x || 0;
-          const y = e.transform.y || 0;
-          const z = e.transform.z || 0;
-          mat4translated(matrix, x, y, z);
-        }
-        const factor0 = [1, 1, 1, 1];
-        if (e.albedo) {
-          factor0[0] = e.albedo.r !== void 0 ? e.albedo.r : 1;
-          factor0[1] = e.albedo.g !== void 0 ? e.albedo.g : 1;
-          factor0[2] = e.albedo.b !== void 0 ? e.albedo.b : 1;
-          factor0[3] = e.albedo.a !== void 0 ? e.albedo.a : 1;
-        }
-        const factor1 = [1, 0.5, 0.5, 0];
-        if (e.occlusion !== void 0) {
-          factor1[0] = e.occlusion;
-        }
-        if (e.metallic !== void 0) {
-          factor1[1] = e.metallic;
-        }
-        if (e.roughness !== void 0) {
-          factor1[2] = e.roughness;
-        }
-        if (e.emission !== void 0) {
-          factor1[3] = e.emission;
-        }
-        view.entity.push({
-          id,
-          matrix,
-          factor0,
-          factor1
-        });
-      }
-    }
   };
-  const basil3d_gpu_on_frame_start = (gpu, device, canvas) => {
-    if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-      const deleteTexture = (no) => {
-        if (gpu.gbuffer[no] !== void 0) {
-          gpu.gbuffer[no].destroy();
-          delete gpu.gbuffer[no];
-        }
-      };
-      deleteTexture(0);
-      deleteTexture(1);
-      deleteTexture(2);
-      deleteTexture(3);
-      deleteTexture(4);
-      const deleteBindGroup = (no) => {
-        if (gpu.bindGroup[no] !== void 0) {
-          delete gpu.bindGroup[no];
-        }
-      };
-      deleteBindGroup(1);
-      deleteBindGroup(2);
+  const basil3d_view_room = (view, app, desc) => {
+    if (desc.room) {
+      view.room = desc.room;
     }
-    if (gpu.gbuffer[0] === void 0) {
-      gpu.gbuffer[0] = device.createTexture({
-        size: [canvas.width, canvas.height],
-        format: "depth24plus",
-        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-      });
-    }
-    if (gpu.gbuffer[1] === void 0) {
-      gpu.gbuffer[1] = device.createTexture({
-        size: [canvas.width, canvas.height],
-        format: "rgb10a2unorm",
-        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-      });
-    }
-    if (gpu.gbuffer[2] === void 0) {
-      gpu.gbuffer[2] = device.createTexture({
-        size: [canvas.width, canvas.height],
-        format: "rgba8unorm",
-        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-      });
-    }
-    if (gpu.gbuffer[3] === void 0) {
-      gpu.gbuffer[3] = device.createTexture({
-        size: [canvas.width, canvas.height],
-        format: "rgba8unorm",
-        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-      });
-    }
-    if (gpu.gbuffer[4] === void 0) {
-      gpu.gbuffer[4] = device.createTexture({
-        size: [canvas.width, canvas.height],
-        format: "rgba16float",
-        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-      });
-    }
-    if (gpu.bindGroup[1] === void 0) {
-      gpu.bindGroup[1] = device.createBindGroup({
-        layout: gpu.bindGroupLayout[1],
-        entries: [
-          { binding: 0, resource: { buffer: gpu.buffer[0] } },
-          { binding: 1, resource: gpu.gbuffer[0].createView() },
-          { binding: 2, resource: gpu.gbuffer[1].createView() },
-          { binding: 3, resource: gpu.gbuffer[2].createView() },
-          { binding: 4, resource: gpu.gbuffer[3].createView() },
-          { binding: 5, resource: gpu.sampler[0] }
-        ]
-      });
-    }
-    if (gpu.bindGroup[2] === void 0) {
-      gpu.bindGroup[2] = device.createBindGroup({
-        layout: gpu.bindGroupLayout[1],
-        entries: [
-          { binding: 0, resource: { buffer: gpu.buffer[0] } },
-          { binding: 1, resource: gpu.gbuffer[0].createView() },
-          { binding: 2, resource: gpu.gbuffer[4].createView() },
-          { binding: 3, resource: gpu.gbuffer[4].createView() },
-          { binding: 4, resource: gpu.gbuffer[4].createView() },
-          { binding: 5, resource: gpu.sampler[0] }
-        ]
-      });
-    }
-  };
-  const basil3d_gpu_on_frame_loading = (gpu, device, context) => {
-    const ce = device.createCommandEncoder();
-    const pass = ce.beginRenderPass({
-      colorAttachments: [{
-        view: context.getCurrentTexture().createView(),
-        clearValue: { r: 0.2, g: 0.2, b: 0.2, a: 1 },
-        loadOp: "clear",
-        storeOp: "store"
-      }]
-    });
-    pass.end();
-    device.queue.submit([ce.finish()]);
-  };
-  const basil3d_gpu_on_frame_view = (gpu, device, context, canvas, app, view) => {
-    const batch = [];
-    {
-      const buf = new Float32Array(52);
-      const camera = view.camera;
-      camera.aspect = canvas.width / canvas.height;
-      const dir = vec3dir(camera.ha, camera.va);
-      const at = vec3add(camera.eye, dir);
-      const look = mat4lookat(camera.eye, at, camera.up);
-      const proj = mat4perspective(camera.fovy, camera.aspect, camera.zNear, camera.zFar);
-      const vp = mat4multiply(look, proj);
-      const ivp = mat4invert(vp);
-      buf.set(vp, 0);
-      buf.set(ivp, 16);
-      buf.set(camera.eye, 32);
-      const light = view.light;
-      const ldir = vec3dir(light.ha, light.va);
-      buf.set(ldir, 36);
-      buf.set(light.color, 40);
-      buf.set(light.ambient, 44);
-      buf.set(light.background, 48);
-      device.queue.writeBuffer(gpu.buffer[0], 0, buf);
-    }
-    {
-      batch.length = app.gpu.mesh.length;
-      for (let i = 0; i < batch.length; ++i) {
-        batch[i] = [];
-      }
-      let offset = 0;
-      const buf = new Float32Array(24);
-      for (const e of view.entity) {
-        for (const i of app.gpu.id[e.id].mesh) {
-          batch[i].push(offset);
-        }
-        buf.set(e.matrix, 0);
-        buf.set(e.factor0, 16);
-        buf.set(e.factor1, 20);
-        device.queue.writeBuffer(gpu.buffer[1], offset, buf);
-        offset += 256;
-      }
-    }
-    const ce = device.createCommandEncoder();
-    {
-      const pass = ce.beginRenderPass({
-        depthStencilAttachment: {
-          view: gpu.gbuffer[0].createView(),
-          depthClearValue: 1,
-          depthLoadOp: "clear",
-          depthStoreOp: "store"
-        },
-        colorAttachments: [
-          {
-            view: gpu.gbuffer[1].createView(),
-            clearValue: { r: 0, g: 0, b: 0, a: 0 },
-            loadOp: "clear",
-            storeOp: "store"
-          },
-          {
-            view: gpu.gbuffer[2].createView(),
-            clearValue: { r: 0, g: 0, b: 0, a: 0 },
-            loadOp: "clear",
-            storeOp: "store"
-          },
-          {
-            view: gpu.gbuffer[3].createView(),
-            clearValue: { r: 0, g: 0, b: 0, a: 0 },
-            loadOp: "clear",
-            storeOp: "store"
-          }
-        ]
-      });
-      for (let i = 0; i < batch.length; ++i) {
-        if (batch[i].length <= 0) {
-          continue;
-        }
-        const mesh = app.gpu.mesh[i];
-        pass.setPipeline(gpu.pipeline[0]);
-        if (mesh.vb0) {
-          const [index, offset, size] = mesh.vb0;
-          pass.setVertexBuffer(0, app.gpu.buffer[index], offset, size);
-        }
-        if (mesh.vb1) {
-          const [index, offset, size] = mesh.vb1;
-          pass.setVertexBuffer(1, app.gpu.buffer[index], offset, size);
-        }
-        if (mesh.ib) {
-          const [index, offset, size] = mesh.ib;
-          pass.setIndexBuffer(app.gpu.buffer[index], "uint16", offset, size);
-        }
-        for (const offset of batch[i]) {
-          pass.setBindGroup(0, gpu.bindGroup[0], [offset]);
-          pass.drawIndexed(mesh.count);
-        }
-      }
-      pass.end();
-    }
-    {
-      const pass = ce.beginRenderPass({
-        depthStencilAttachment: {
-          view: gpu.gbuffer[0].createView(),
-          depthReadOnly: true
-        },
-        colorAttachments: [{
-          view: gpu.gbuffer[4].createView(),
-          clearValue: { r: 0, g: 0, b: 0, a: 0 },
-          loadOp: "clear",
-          storeOp: "store"
-        }]
-      });
-      pass.setPipeline(gpu.pipeline[1]);
-      pass.setBindGroup(0, gpu.bindGroup[1]);
-      pass.draw(4);
-      pass.setPipeline(gpu.pipeline[2]);
-      pass.draw(4);
-      pass.end();
-    }
-    {
-      const pass = ce.beginRenderPass({
-        colorAttachments: [{
-          view: context.getCurrentTexture().createView(),
-          clearValue: { r: 0, g: 0, b: 0, a: 0 },
-          loadOp: "clear",
-          storeOp: "store"
-        }]
-      });
-      pass.setPipeline(gpu.pipeline[3]);
-      pass.setBindGroup(0, gpu.bindGroup[2]);
-      pass.draw(4);
-      pass.end();
-    }
-    device.queue.submit([ce.finish()]);
   };
   const basil3d_start = async (setup2, update2) => {
     if (!navigator.gpu) {
