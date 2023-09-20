@@ -39,6 +39,9 @@ const update = (app, view, listen) => {
   if (rb) {
     mob.eye[1] += 0.75 * dt;
   }
+
+  const light = view.light;
+  light.ha += 45 * dt;
 };
 
 html_listen(window, "load", () => {
