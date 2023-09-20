@@ -246,8 +246,8 @@
     eyePosition : vec4<f32>,
     lightDir : vec4<f32>,
     lightColor : vec4<f32>,
-    ambientColor : vec4<f32>,
-    backgroundColor : vec4<f32>,
+    ambientColor0 : vec4<f32>,
+    ambientColor1 : vec4<f32>,
   }
   `;
     gpu.buffer[0] = device.createBuffer({
@@ -289,15 +289,17 @@
     };
     @vertex
     fn mainVertex(input : VertexInput) -> VertexOutput {
+      var nWorld = mat3x3<f32>(inst.world[0].xyz, inst.world[1].xyz, inst.world[2].xyz);
+
       var output : VertexOutput;
       output.position = (view.viewProj * inst.world * vec4(input.position, 1.0));
-      output.normal = normalize((inst.world * vec4(input.normal, 1.0)).xyz);
+      output.normal = normalize(nWorld * input.normal);
       return output;
     }
     @fragment
     fn mainFragment(input : VertexOutput) -> FragmentOutput {
       var output : FragmentOutput;
-      output.gbuffer0 = vec4(input.normal * 0.5 + 0.5, 0);
+      output.gbuffer0 = vec4(normalize(input.normal) * 0.5 + 0.5, 0);
       output.gbuffer1 = inst.factor0.xyzw;
       output.gbuffer2 = inst.factor1.xyzw;
       return output;
@@ -381,9 +383,9 @@
       var P = decodeWorldPosition(xy);
       var V = normalize(view.eyePosition.xyz - P);
 
-      var L = view.lightDir.xyz;
+      var L = normalize(view.lightDir.xyz);
       var C_L = (view.lightColor.rgb * view.lightColor.a) * BRDF(N, L, V, F0.rgb, F1.y, F1.z);
-      var C_A = (view.ambientColor.rgb * view.ambientColor.a) * (F1.x * F0.rgb);
+      var C_A = mix(view.ambientColor0.rgb * view.ambientColor0.a, view.ambientColor1.rgb * view.ambientColor1.a, -dot(N, vec3<f32>(0, 1, 0)) * 0.5 + 0.5) * (F1.x * F0.rgb);
       var C_E = F0.rgb * F1.w;
       return vec4(C_L + C_A + C_E, 1.0);
     }
@@ -392,15 +394,30 @@
     gpu.shaderModule[3] = device.createShaderModule({
       code: buffer0struct + `
     @group(0) @binding(0) var<uniform> view : ViewInput;
-    
+    @group(0) @binding(1) var zbuffer : texture_depth_2d;
+
+    fn decodeWorldPosition(xy : vec2<i32>) -> vec3<f32> {
+      var d = textureLoad(zbuffer, xy, 0);
+      var uv = vec2<f32>(xy) / vec2<f32>(textureDimensions(zbuffer, 0).xy);
+      var posClip = vec4<f32>(uv * vec2(2.0, -2.0) + vec2(-1.0, 1.0), d, 1);
+      var posWorldW = view.invViewProj * posClip;
+      var posWorld = posWorldW.xyz / posWorldW.www;
+      return posWorld;
+    }
+
     @fragment
     fn mainFragment(@builtin(position) coord : vec4<f32>) -> @location(0) vec4<f32> {
-      var C_A = (view.backgroundColor.rgb * view.backgroundColor.a);
+      var xy = vec2<i32>(floor(coord.xy));
+      var P = decodeWorldPosition(xy);
+      var V = normalize(view.eyePosition.xyz - P);
+
+      var C_A = mix(view.ambientColor0.rgb * view.ambientColor0.a, view.ambientColor1.rgb * view.ambientColor1.a, dot(V, vec3<f32>(0, 1, 0)) * 0.5 + 0.5);
       return vec4(C_A, 1.0);
     }
     `
     });
     gpu.shaderModule[4] = device.createShaderModule({
+      // tonemapping: https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/
       code: `
     @group(0) @binding(2) var lbuffer0 : texture_2d<f32>;
     @group(0) @binding(5) var sampler0 : sampler;
@@ -475,7 +492,16 @@
         entryPoint: "mainVertex",
         buffers: [
           { arrayStride: 12, attributes: [{ format: "float32x3", offset: 0, shaderLocation: 0 }] },
+          // position
           { arrayStride: 12, attributes: [{ format: "float32x3", offset: 0, shaderLocation: 1 }] }
+          // normal
+          /*
+          { arrayStride: 4, attributes: [{ format: "float16x2", offset: 0, shaderLocation: 2 }] }, // tangent
+          { arrayStride: 4, attributes: [{ format: "float16x2", offset: 0, shaderLocation: 3 }] }, // texcoord0
+          { arrayStride: 8, attributes: [{ format: "uint16x4", offset: 0, shaderLocation: 4 }] }, // joints0
+          { arrayStride: 8, attributes: [{ format: "float16x4", offset: 0, shaderLocation: 5 }] }, // weights0
+          { arrayStride: 4, attributes: [{ format: "uint32", offset: 0, shaderLocation: 6 }], stepMode: "instance" }, // instance
+          */
         ]
       },
       fragment: {
@@ -677,8 +703,8 @@
     const ldir = vec3dir(light.ha, light.va);
     buf.set(ldir, 36);
     buf.set(light.color, 40);
-    buf.set(light.ambient, 44);
-    buf.set(light.background, 48);
+    buf.set(light.ambient0, 44);
+    buf.set(light.ambient1, 48);
     device.queue.writeBuffer(gpu.buffer[0], 0, buf);
   };
   const basil3d_gpu_upload_instance_input = (gpu, device, app, view) => {
@@ -1109,9 +1135,9 @@
       light: {
         ha: 0,
         va: 0,
-        color: [0, 0, 0],
-        ambient: [0, 0, 0],
-        background: [0, 0, 0]
+        color: [0, 0, 0, 0],
+        ambient0: [0, 0, 0, 0],
+        ambient1: [0, 0, 0, 0]
       },
       room: []
     };
@@ -1140,17 +1166,17 @@
         view.light.color[2] = desc.light.color.b !== void 0 ? desc.light.color.b : 0;
         view.light.color[3] = desc.light.color.a !== void 0 ? desc.light.color.a : 0;
       }
-      if (desc.light.ambient) {
-        view.light.ambient[0] = desc.light.ambient.r !== void 0 ? desc.light.ambient.r : 0;
-        view.light.ambient[1] = desc.light.ambient.g !== void 0 ? desc.light.ambient.g : 0;
-        view.light.ambient[2] = desc.light.ambient.b !== void 0 ? desc.light.ambient.b : 0;
-        view.light.ambient[3] = desc.light.ambient.a !== void 0 ? desc.light.ambient.a : 0;
+      if (desc.light.ambient0) {
+        view.light.ambient0[0] = desc.light.ambient0.r !== void 0 ? desc.light.ambient0.r : 0;
+        view.light.ambient0[1] = desc.light.ambient0.g !== void 0 ? desc.light.ambient0.g : 0;
+        view.light.ambient0[2] = desc.light.ambient0.b !== void 0 ? desc.light.ambient0.b : 0;
+        view.light.ambient0[3] = desc.light.ambient0.a !== void 0 ? desc.light.ambient0.a : 0;
       }
-      if (desc.light.background) {
-        view.light.background[0] = desc.light.background.r !== void 0 ? desc.light.background.r : 0;
-        view.light.background[1] = desc.light.background.g !== void 0 ? desc.light.background.g : 0;
-        view.light.background[2] = desc.light.background.b !== void 0 ? desc.light.background.b : 0;
-        view.light.background[3] = desc.light.background.a !== void 0 ? desc.light.background.a : 0;
+      if (desc.light.ambient1) {
+        view.light.ambient1[0] = desc.light.ambient1.r !== void 0 ? desc.light.ambient1.r : 0;
+        view.light.ambient1[1] = desc.light.ambient1.g !== void 0 ? desc.light.ambient1.g : 0;
+        view.light.ambient1[2] = desc.light.ambient1.b !== void 0 ? desc.light.ambient1.b : 0;
+        view.light.ambient1[3] = desc.light.ambient1.a !== void 0 ? desc.light.ambient1.a : 0;
       }
     }
   };
@@ -1235,6 +1261,8 @@
     if (rb) {
       mob.eye[1] += 0.75 * dt;
     }
+    const light = view.light;
+    light.ha += 45 * dt;
   };
   html_listen(window, "load", () => {
     html_show_message("Welcome Basilico.");
