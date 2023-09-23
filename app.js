@@ -256,15 +256,24 @@
     lightColor : vec4<f32>,
     ambientColor0 : vec4<f32>,
     ambientColor1 : vec4<f32>,
-  }
-  `;
+  }`;
     gpu.buffer[0] = device.createBuffer({
       size: 256 * 1,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
     });
+    const buffer1struct = `
+  struct InstanceInput {
+    world : mat4x4<f32>,
+    factor0 : vec4<f32>,
+    factor1 : vec4<f32>,
+  }`;
     gpu.buffer[1] = device.createBuffer({
       size: 256 * 1024,
-      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
+    });
+    gpu.buffer[2] = device.createBuffer({
+      size: 4 * 1024,
+      usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
     });
     gpu.sampler[0] = device.createSampler({
       magFilter: "linear",
@@ -272,23 +281,19 @@
       mipmapFilter: "linear"
     });
     gpu.shaderModule[0] = device.createShaderModule({
-      code: buffer0struct + `
+      code: buffer0struct + buffer1struct + `
     @group(0) @binding(0) var<uniform> view : ViewInput;
-
-    struct InstanceInput {
-      world : mat4x4<f32>,
-      factor0 : vec4<f32>,
-      factor1 : vec4<f32>,
-    }
-    @group(0) @binding(1) var<uniform> inst : InstanceInput;
+    @group(0) @binding(1) var<storage, read> inst : array<InstanceInput>;
 
     struct VertexInput {
-      @location(0) position: vec3<f32>,
-      @location(1) normal : vec3<f32>,
+      @location(0) id: u32,
+      @location(1) position: vec3<f32>,
+      @location(2) normal : vec3<f32>,
     };
     struct VertexOutput {
       @builtin(position) position : vec4<f32>,
       @location(0) normal : vec3<f32>,
+      @location(1) @interpolate(flat) id : u32,
     };
     struct FragmentOutput {
       @location(0) gbuffer0 : vec4<f32>,
@@ -297,19 +302,21 @@
     };
     @vertex
     fn mainVertex(input : VertexInput) -> VertexOutput {
-      var nWorld = mat3x3<f32>(inst.world[0].xyz, inst.world[1].xyz, inst.world[2].xyz);
+      var world = inst[input.id].world;
+      var nWorld = mat3x3<f32>(world[0].xyz, world[1].xyz, world[2].xyz);
 
       var output : VertexOutput;
-      output.position = (view.viewProj * inst.world * vec4(input.position, 1.0));
+      output.position = (view.viewProj * world * vec4(input.position, 1.0));
       output.normal = normalize(nWorld * input.normal);
+      output.id = input.id;
       return output;
     }
     @fragment
     fn mainFragment(input : VertexOutput) -> FragmentOutput {
       var output : FragmentOutput;
       output.gbuffer0 = vec4(normalize(input.normal) * 0.5 + 0.5, 0);
-      output.gbuffer1 = inst.factor0.xyzw;
-      output.gbuffer2 = inst.factor1.xyzw;
+      output.gbuffer1 = inst[input.id].factor0.xyzw;
+      output.gbuffer2 = inst[input.id].factor1.xyzw;
       return output;
     }
     `
@@ -463,7 +470,7 @@
     gpu.bindGroupLayout[0] = device.createBindGroupLayout({
       entries: [
         { binding: 0, visibility: GPUShaderStage.VERTEX, buffer: {} },
-        { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { hasDynamicOffset: true } }
+        { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "read-only-storage" } }
       ]
     });
     gpu.bindGroupLayout[1] = device.createBindGroupLayout({
@@ -480,7 +487,7 @@
       layout: gpu.bindGroupLayout[0],
       entries: [
         { binding: 0, resource: { buffer: gpu.buffer[0] } },
-        { binding: 1, resource: { buffer: gpu.buffer[1], size: 256, offset: 0 } }
+        { binding: 1, resource: { buffer: gpu.buffer[1] } }
       ]
     });
     gpu.pipelineLayout[0] = device.createPipelineLayout({
@@ -499,16 +506,17 @@
         module: gpu.shaderModule[0],
         entryPoint: "mainVertex",
         buffers: [
-          { arrayStride: 12, attributes: [{ format: "float32x3", offset: 0, shaderLocation: 0 }] },
+          { arrayStride: 4, attributes: [{ format: "uint32", offset: 0, shaderLocation: 0 }], stepMode: "instance" },
+          // instance
+          { arrayStride: 12, attributes: [{ format: "float32x3", offset: 0, shaderLocation: 1 }] },
           // position
-          { arrayStride: 12, attributes: [{ format: "float32x3", offset: 0, shaderLocation: 1 }] }
+          { arrayStride: 12, attributes: [{ format: "float32x3", offset: 0, shaderLocation: 2 }] }
           // normal
           /*
           { arrayStride: 4, attributes: [{ format: "float16x2", offset: 0, shaderLocation: 2 }] }, // tangent
           { arrayStride: 4, attributes: [{ format: "float16x2", offset: 0, shaderLocation: 3 }] }, // texcoord0
           { arrayStride: 8, attributes: [{ format: "uint16x4", offset: 0, shaderLocation: 4 }] }, // joints0
           { arrayStride: 8, attributes: [{ format: "float16x4", offset: 0, shaderLocation: 5 }] }, // weights0
-          { arrayStride: 4, attributes: [{ format: "uint32", offset: 0, shaderLocation: 6 }], stepMode: "instance" }, // instance
           */
         ]
       },
@@ -602,7 +610,7 @@
   };
   const basil3d_gpu_on_frame_view = (gpu, device, context, canvas, app, view) => {
     basil3d_gpu_upload_view_input(gpu, device, canvas, view);
-    const batch = basil3d_gpu_upload_instance_input(gpu, device, app, view);
+    const range = basil3d_gpu_upload_instance_input(gpu, device, app, view);
     const ce = device.createCommandEncoder();
     {
       const pass = ce.beginRenderPass({
@@ -633,28 +641,29 @@
           }
         ]
       });
-      for (let i = 0; i < batch.length; ++i) {
-        if (batch[i].length <= 0) {
+      for (let i = 0; i < range.length; ++i) {
+        if (!range[i]) {
           continue;
         }
         const mesh = app.gpu.mesh[i];
         pass.setPipeline(gpu.pipeline[0]);
+        pass.setBindGroup(0, gpu.bindGroup[0]);
+        pass.setVertexBuffer(0, gpu.buffer[2]);
         if (mesh.vb0) {
           const [index, offset, size] = mesh.vb0;
-          pass.setVertexBuffer(0, app.gpu.buffer[index], offset, size);
+          pass.setVertexBuffer(1, app.gpu.buffer[index], offset, size);
         }
         if (mesh.vb1) {
           const [index, offset, size] = mesh.vb1;
-          pass.setVertexBuffer(1, app.gpu.buffer[index], offset, size);
+          pass.setVertexBuffer(2, app.gpu.buffer[index], offset, size);
         }
         if (mesh.ib) {
           const [index, offset, size] = mesh.ib;
           pass.setIndexBuffer(app.gpu.buffer[index], "uint16", offset, size);
         }
-        for (const offset of batch[i]) {
-          pass.setBindGroup(0, gpu.bindGroup[0], [offset]);
-          pass.drawIndexed(mesh.count);
-        }
+        const start = range[i][0];
+        const count = range[i][1];
+        pass.drawIndexed(mesh.count, count, 0, 0, start);
       }
       pass.end();
     }
@@ -722,7 +731,8 @@
       batch[i] = [];
     }
     const buf = new Float32Array(24);
-    let offset = 0;
+    const stride = 4 * 24;
+    let index = 0;
     for (const room of view.room) {
       for (let i = 0; i < room.indices.length; ++i) {
         const node = room.node[room.indices[i]];
@@ -737,7 +747,7 @@
             continue;
           }
           for (const n of app.gpu.id[id].mesh) {
-            batch[n].push(offset);
+            batch[n].push(index);
           }
           let x = dx * room.unit;
           let y = 0;
@@ -776,12 +786,24 @@
           buf.set(matrix, 0);
           buf.set(factor0, 16);
           buf.set(factor1, 20);
-          device.queue.writeBuffer(gpu.buffer[1], offset, buf);
-          offset += 256;
+          device.queue.writeBuffer(gpu.buffer[1], index * stride, buf);
+          index += 1;
         }
       }
     }
-    return batch;
+    const range = [];
+    range.length = batch.length;
+    let start = 0;
+    for (let i = 0; i < batch.length; ++i) {
+      if (batch[i].length <= 0) {
+        continue;
+      }
+      const count = batch[i].length;
+      device.queue.writeBuffer(gpu.buffer[2], start * 4, new Uint32Array(batch[i]));
+      range[i] = [start, count];
+      start += count;
+    }
+    return range;
   };
   const basil3d_gpu_gbuffer = (gpu, device, canvas) => {
     if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
@@ -1134,28 +1156,33 @@
     return app.json[name];
   };
   const basil3d_view_create = () => {
-    return {
-      camera: {
-        aspect: 1,
-        fovy: deg2rad(30),
-        zNear: 0.1,
-        zFar: 1e3,
-        eye: [0, 0, 0],
-        ha: 0,
-        va: 0,
-        up: [0, 1, 0]
-      },
-      light: {
-        ha: 0,
-        va: 0,
-        color: [0, 0, 0, 0],
-        ambient0: [0, 0, 0, 0],
-        ambient1: [0, 0, 0, 0]
-      },
-      room: []
-    };
+    const view = {};
+    basil3d_view_reset(view);
+    return view;
   };
-  const basil3d_view_setup = (view, app, desc) => {
+  const basil3d_view_reset = (view) => {
+    view.camera = {
+      aspect: 1,
+      fovy: deg2rad(30),
+      zNear: 0.1,
+      zFar: 1e3,
+      eye: [0, 0, 0],
+      ha: 0,
+      va: 0,
+      up: [0, 1, 0]
+    };
+    view.light = {
+      ha: 0,
+      va: 0,
+      color: [0, 0, 0, 0],
+      ambient0: [0, 0, 0, 0],
+      ambient1: [0, 0, 0, 0]
+    };
+    view.room = [];
+    view.celeste = [];
+    view.mob = [];
+  };
+  const basil3d_view_open = (view, app, desc) => {
     basil3d_view_camera(view, desc);
     basil3d_view_light(view, desc);
     basil3d_view_room(view, app, desc);
@@ -1238,7 +1265,8 @@
   };
   const setup = (app, view) => {
     html_hide_message();
-    basil3d_view_setup(view, app, basil3d_app_json(app, "sample"));
+    basil3d_view_open(view, app, basil3d_app_json(app, "sample"));
+    basil3d_view_open(view, app, basil3d_app_json(app, "room000"));
   };
   const update = (app, view, listen) => {
     const mob = view.camera;
