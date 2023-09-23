@@ -3,7 +3,7 @@
     target.addEventListener(key, func);
   };
   const html_canvas = () => {
-    return document.getElementById("main");
+    return document.getElementById("canvas");
   };
   const html_message = () => {
     return document.getElementById("message");
@@ -158,23 +158,31 @@
       (a[8] * b03 - a[9] * b01 + a[10] * b00) * det
     ];
   };
-  const mat4translate = (x, y, z) => {
+  const mat4translated = (m, x, y, z) => {
+    m[12] = x;
+    m[13] = y;
+    m[14] = z;
+  };
+  const mat4angle = (ha, va) => {
+    const h = deg2rad(ha);
+    const sinH = Math.sin(h);
+    const cosH = Math.cos(h);
     return [
-      1,
+      cosH,
       0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      0,
+      sinH,
       0,
       0,
       1,
       0,
-      x,
-      y,
-      z,
+      0,
+      -sinH,
+      0,
+      cosH,
+      0,
+      0,
+      0,
+      0,
       1
     ];
   };
@@ -734,12 +742,17 @@
           let x = dx * room.unit;
           let y = 0;
           let z = dz * room.unit;
+          let ha = 0;
+          let va = 0;
           if (mesh.transform) {
             x += mesh.transform.x || 0;
             y += mesh.transform.y || 0;
             z += mesh.transform.z || 0;
+            ha = mesh.transform.ha || 0;
+            va = mesh.transform.va || 0;
           }
-          const matrix = mat4translate(x, y, z);
+          const matrix = mat4angle(ha, va);
+          mat4translated(matrix, x, y, z);
           const factor0 = [1, 1, 1, 1];
           if (mesh.albedo) {
             factor0[0] = mesh.albedo.r !== void 0 ? mesh.albedo.r : 1;
@@ -1229,9 +1242,15 @@
   };
   const update = (app, view, listen) => {
     const mob = view.camera;
+    const rect = [
+      0,
+      html_canvas().clientWidth,
+      0,
+      html_canvas().clientHeight
+    ];
     const dt = basil3d_listen_delta_time(listen);
     const moveXY = basil3d_listen_get(listen, "wasd", "left-stick");
-    const cameraXY = basil3d_listen_get(listen, "arrow", "right-stick");
+    const cameraXY = basil3d_listen_get(listen, "arrow", "right-stick", rect);
     if (cameraXY) {
       const cameraSpeed = 90;
       const cameraX = -cameraXY[0];

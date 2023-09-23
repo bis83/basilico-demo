@@ -217,6 +217,7 @@
                                     "emission": 0.8,
                                     "name": "wa_00",
                                     "transform": {
+                                        "ha": 90,
                                         "x": 0,
                                         "y": 0,
                                         "z": 0
