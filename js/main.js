@@ -7,9 +7,16 @@ const setup = (app, view) => {
 const update = (app, view, listen) => {
   const mob = view.camera;
 
+  const rect = [
+    0,
+    html_canvas().clientWidth,
+    0,
+    html_canvas().clientHeight
+  ];
+
   const dt = basil3d_listen_delta_time(listen);
   const moveXY = basil3d_listen_get(listen, "wasd", "left-stick");
-  const cameraXY = basil3d_listen_get(listen, "arrow", "right-stick");
+  const cameraXY = basil3d_listen_get(listen, "arrow", "right-stick", rect);
   if (cameraXY) {
     const cameraSpeed = 90; // deg/s
     const cameraX = -cameraXY[0];
