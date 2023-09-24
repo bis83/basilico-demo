@@ -268,11 +268,23 @@
     factor1 : vec4<f32>,
   }`;
     gpu.buffer[1] = device.createBuffer({
-      size: 256 * 1024,
+      size: 96 * (2 * 1024),
       usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
     });
     gpu.buffer[2] = device.createBuffer({
-      size: 4 * 1024,
+      size: 4 * (16 * 1024),
+      usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+    });
+    gpu.buffer[3] = device.createBuffer({
+      size: 20 * (2 * 1024),
+      usage: GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_DST
+    });
+    gpu.buffer[4] = device.createBuffer({
+      size: 12 * (4 * 1024),
+      usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+    });
+    gpu.buffer[5] = device.createBuffer({
+      size: 4 * (4 * 1024),
       usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
     });
     gpu.sampler[0] = device.createSampler({
@@ -467,6 +479,31 @@
     }
     `
     });
+    gpu.shaderModule[5] = device.createShaderModule({
+      code: buffer0struct + `
+    @group(0) @binding(0) var<uniform> view : ViewInput;
+
+    struct VertexInput {
+      @location(0) position: vec3<f32>,
+      @location(1) color : vec4<f32>,
+    };
+    struct VertexOutput {
+      @builtin(position) position : vec4<f32>,
+      @location(0) color : vec4<f32>,
+    };
+    @vertex
+    fn mainVertex(input : VertexInput) -> VertexOutput {
+      var output : VertexOutput;
+      output.position = view.viewProj * vec4<f32>(input.position, 1.0);
+      output.color = input.color;
+      return output;
+    }
+    @fragment
+    fn mainFragment(input : VertexOutput) -> @location(0) vec4<f32> {
+      return input.color;
+    }
+    `
+    });
     gpu.bindGroupLayout[0] = device.createBindGroupLayout({
       entries: [
         { binding: 0, visibility: GPUShaderStage.VERTEX, buffer: {} },
@@ -533,6 +570,10 @@
         depthWriteEnabled: true,
         depthCompare: "less",
         format: "depth24plus"
+      },
+      primitive: {
+        cullMode: "back",
+        frontFace: "cw"
       }
     });
     gpu.pipeline[1] = device.createRenderPipeline({
@@ -588,6 +629,39 @@
         targets: [
           { format: canvasFormat }
         ]
+      },
+      depthStencil: {
+        depthWriteEnabled: false,
+        depthCompare: "always",
+        format: "depth24plus"
+      }
+    });
+    gpu.pipeline[4] = device.createRenderPipeline({
+      layout: gpu.pipelineLayout[0],
+      vertex: {
+        module: gpu.shaderModule[5],
+        entryPoint: "mainVertex",
+        buffers: [
+          { arrayStride: 12, attributes: [{ format: "float32x3", offset: 0, shaderLocation: 0 }] },
+          // position
+          { arrayStride: 4, attributes: [{ format: "unorm8x4", offset: 0, shaderLocation: 1 }] }
+          // color
+        ]
+      },
+      fragment: {
+        module: gpu.shaderModule[5],
+        entryPoint: "mainFragment",
+        targets: [
+          { format: canvasFormat }
+        ]
+      },
+      depthStencil: {
+        depthWriteEnabled: false,
+        depthCompare: "less",
+        format: "depth24plus"
+      },
+      primitive: {
+        topology: "line-list"
       }
     });
     return gpu;
@@ -610,7 +684,8 @@
   };
   const basil3d_gpu_on_frame_view = (gpu, device, context, canvas, app, view) => {
     basil3d_gpu_upload_view_input(gpu, device, canvas, view);
-    const range = basil3d_gpu_upload_instance_input(gpu, device, app, view);
+    basil3d_gpu_upload_lines(gpu, device, view);
+    const batch = basil3d_gpu_upload_instance_input(gpu, device, app, view);
     const ce = device.createCommandEncoder();
     {
       const pass = ce.beginRenderPass({
@@ -641,14 +716,11 @@
           }
         ]
       });
-      for (let i = 0; i < range.length; ++i) {
-        if (!range[i]) {
-          continue;
-        }
-        const mesh = app.gpu.mesh[i];
+      for (const b of batch) {
         pass.setPipeline(gpu.pipeline[0]);
         pass.setBindGroup(0, gpu.bindGroup[0]);
-        pass.setVertexBuffer(0, gpu.buffer[2]);
+        pass.setVertexBuffer(0, gpu.buffer[2], b.first * 4);
+        const mesh = app.gpu.mesh[b.id];
         if (mesh.vb0) {
           const [index, offset, size] = mesh.vb0;
           pass.setVertexBuffer(1, app.gpu.buffer[index], offset, size);
@@ -661,9 +733,7 @@
           const [index, offset, size] = mesh.ib;
           pass.setIndexBuffer(app.gpu.buffer[index], "uint16", offset, size);
         }
-        const start = range[i][0];
-        const count = range[i][1];
-        pass.drawIndexed(mesh.count, count, 0, 0, start);
+        pass.drawIndexedIndirect(gpu.buffer[3], b.offset);
       }
       pass.end();
     }
@@ -689,6 +759,10 @@
     }
     {
       const pass = ce.beginRenderPass({
+        depthStencilAttachment: {
+          view: gpu.gbuffer[0].createView(),
+          depthReadOnly: true
+        },
         colorAttachments: [{
           view: context.getCurrentTexture().createView(),
           clearValue: { r: 0, g: 0, b: 0, a: 0 },
@@ -699,6 +773,13 @@
       pass.setPipeline(gpu.pipeline[3]);
       pass.setBindGroup(0, gpu.bindGroup[2]);
       pass.draw(4);
+      if (view.lines.length > 0) {
+        pass.setPipeline(gpu.pipeline[4]);
+        pass.setBindGroup(0, gpu.bindGroup[0]);
+        pass.setVertexBuffer(0, gpu.buffer[4]);
+        pass.setVertexBuffer(1, gpu.buffer[5]);
+        pass.draw(view.lines.length);
+      }
       pass.end();
     }
     device.queue.submit([ce.finish()]);
@@ -724,11 +805,30 @@
     buf.set(light.ambient1, 48);
     device.queue.writeBuffer(gpu.buffer[0], 0, buf);
   };
+  const basil3d_gpu_upload_lines = (gpu, device, view) => {
+    if (view.lines.length <= 0) {
+      return;
+    }
+    const position = new Float32Array(view.lines.length * 3);
+    const color = new Uint8Array(view.lines.length * 4);
+    for (let i = 0; i < view.lines.length; ++i) {
+      const line = view.lines[i];
+      position[i * 3 + 0] = line.pos[0];
+      position[i * 3 + 1] = line.pos[1];
+      position[i * 3 + 2] = line.pos[2];
+      color[i * 4 + 0] = line.color[0];
+      color[i * 4 + 1] = line.color[1];
+      color[i * 4 + 2] = line.color[2];
+      color[i * 4 + 3] = line.color[3];
+    }
+    device.queue.writeBuffer(gpu.buffer[4], 0, position);
+    device.queue.writeBuffer(gpu.buffer[5], 0, color);
+  };
   const basil3d_gpu_upload_instance_input = (gpu, device, app, view) => {
-    const batch = [];
-    batch.length = app.gpu.mesh.length;
-    for (let i = 0; i < batch.length; ++i) {
-      batch[i] = [];
+    const instance = [];
+    instance.length = app.gpu.mesh.length;
+    for (let i = 0; i < instance.length; ++i) {
+      instance[i] = [];
     }
     const buf = new Float32Array(24);
     const stride = 4 * 24;
@@ -747,7 +847,7 @@
             continue;
           }
           for (const n of app.gpu.id[id].mesh) {
-            batch[n].push(index);
+            instance[n].push(index);
           }
           let x = dx * room.unit;
           let y = 0;
@@ -791,19 +891,32 @@
         }
       }
     }
-    const range = [];
-    range.length = batch.length;
-    let start = 0;
-    for (let i = 0; i < batch.length; ++i) {
-      if (batch[i].length <= 0) {
+    const batch = [];
+    let first = 0;
+    let offset = 0;
+    const args = new Uint32Array(5);
+    for (let i = 0; i < instance.length; ++i) {
+      if (instance[i].length <= 0) {
         continue;
       }
-      const count = batch[i].length;
-      device.queue.writeBuffer(gpu.buffer[2], start * 4, new Uint32Array(batch[i]));
-      range[i] = [start, count];
-      start += count;
+      const mesh = app.gpu.mesh[i];
+      const count = instance[i].length;
+      device.queue.writeBuffer(gpu.buffer[2], first * 4, new Uint32Array(instance[i]));
+      args[0] = mesh.count;
+      args[1] = count;
+      args[2] = 0;
+      args[3] = 0;
+      args[4] = 0;
+      device.queue.writeBuffer(gpu.buffer[3], offset, args);
+      batch.push({
+        id: i,
+        first,
+        offset
+      });
+      first += count;
+      offset += 20;
     }
-    return range;
+    return batch;
   };
   const basil3d_gpu_gbuffer = (gpu, device, canvas) => {
     if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
@@ -1181,11 +1294,13 @@
     view.room = [];
     view.celeste = [];
     view.mob = [];
+    view.lines = [];
   };
   const basil3d_view_open = (view, app, desc) => {
     basil3d_view_camera(view, desc);
     basil3d_view_light(view, desc);
     basil3d_view_room(view, app, desc);
+    basil3d_view_lines(view, desc);
   };
   const basil3d_view_camera = (view, desc) => {
     if (desc.camera) {
@@ -1223,6 +1338,20 @@
   const basil3d_view_room = (view, app, desc) => {
     if (desc.room) {
       view.room = desc.room;
+    }
+  };
+  const basil3d_view_lines = (view, desc) => {
+    if (desc.lines) {
+      for (const line of desc.lines) {
+        view.lines.push({
+          pos: line.from,
+          color: line.color
+        });
+        view.lines.push({
+          pos: line.to,
+          color: line.color
+        });
+      }
     }
   };
   const basil3d_start = async (setup2, update2) => {
@@ -1267,6 +1396,7 @@
     html_hide_message();
     basil3d_view_open(view, app, basil3d_app_json(app, "sample"));
     basil3d_view_open(view, app, basil3d_app_json(app, "room000"));
+    addDebugGrid(view, app);
   };
   const update = (app, view, listen) => {
     const mob = view.camera;
@@ -1315,4 +1445,20 @@
     html_show_message("Welcome Basilico.");
     basil3d_start(setup, update);
   });
+  const addDebugGrid = (view, app) => {
+    const lines = [];
+    lines.push({
+      from: [-50, 0, 0],
+      to: [50, 0, 0],
+      color: [255, 0, 0, 255]
+    });
+    lines.push({
+      from: [0, 0, -50],
+      to: [0, 0, 50],
+      color: [0, 0, 255, 255]
+    });
+    basil3d_view_open(view, app, {
+      "lines": lines
+    });
+  };
 })();
