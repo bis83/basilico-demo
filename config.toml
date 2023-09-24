@@ -1,4 +1,4 @@
 middleware = ["basil3d"]
 minify = false
-script = ["js/main.js"]
+script = ["js/main.js", "js/grid.js"]
 title = "Demo"

@@ -3,6 +3,8 @@ const setup = (app, view) => {
   html_hide_message();
   basil3d_view_open(view, app, basil3d_app_json(app, "sample"));
   basil3d_view_open(view, app, basil3d_app_json(app, "room000"));
+
+  addDebugGrid(view, app);
 };
 
 const update = (app, view, listen) => {
