@@ -1,0 +1,11 @@
+{
+  "middleware": [
+    "basil3d"
+  ],
+  "minify": true,
+  "script": [
+    "js/main.js",
+    "js/grid.js"
+  ],
+  "title": "Demo"
+}
