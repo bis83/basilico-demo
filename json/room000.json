@@ -74,6 +74,11 @@
           ]
         }
       ],
+      "transform": {
+        "x": 1,
+        "y": 0,
+        "z": 1
+      },
       "unit": 2,
       "divisor": 4,
       "indices": [
