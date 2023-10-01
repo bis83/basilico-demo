@@ -15,9 +15,7 @@
             "b": 0.8
           },
           "metallic": 0.5,
-          "roughness": 0.5,
-          "occlusion": 0.9,
-          "emission": 0.0
+          "roughness": 0.5
         },
         {
           "name": "tr_01",
@@ -32,8 +30,7 @@
             "b": 0.8
           },
           "metallic": 0.2,
-          "roughness": 0.7,
-          "occlusion": 0.9
+          "roughness": 0.7
         },
         {
           "name": "wa_00",
