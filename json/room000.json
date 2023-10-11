@@ -4,7 +4,7 @@
       "mesh": [
         {
           "name": "tr_01",
-          "transform": {
+          "offset": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
@@ -12,7 +12,7 @@
         },
         {
           "name": "wa_00",
-          "transform": {
+          "offset": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0,
@@ -21,7 +21,7 @@
         },
         {
           "name": "wa_00",
-          "transform": {
+          "offset": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0,
@@ -30,7 +30,7 @@
         },
         {
           "name": "wa_00",
-          "transform": {
+          "offset": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0,
@@ -39,7 +39,7 @@
         },
         {
           "name": "wa_00",
-          "transform": {
+          "offset": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0,
@@ -78,7 +78,7 @@
           ]
         }
       ],
-      "transform": {
+      "offset": {
         "x": 1,
         "y": 0,
         "z": 1
