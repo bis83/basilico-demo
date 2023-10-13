@@ -1,13 +1,15 @@
 
-const setup = (app, view) => {
+const setup = (app) => {
   html_hide_message();
-  basil3d_view_open(view, app, basil3d_app_json(app, "sample"));
-  basil3d_view_open(view, app, basil3d_app_json(app, "room000"));
+  basil3d_view_open(app.view, basil3d_app_json(app, "sample"));
+  basil3d_view_open(app.view, basil3d_app_json(app, "room000"));
 
-  addDebugGrid(view, app);
+  addDebugGrid(app);
 };
 
-const update = (app, view, listen) => {
+const update = (app) => {
+  const listen = app.listen;
+  const view = app.view;
   const mob = view.camera;
 
   const rect = [

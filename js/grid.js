@@ -1,5 +1,5 @@
 
-const addDebugGrid = (view, app) => {
+const addDebugGrid = (app) => {
   const lines = [];
 
   lines.push({
@@ -13,7 +13,7 @@ const addDebugGrid = (view, app) => {
     color: [0, 0, 255, 255],
   });
 
-  basil3d_view_open(view, app, {
+  basil3d_view_open(app.view, {
     "lines": lines,
   });
 };
