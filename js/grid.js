@@ -13,7 +13,7 @@ const addDebugGrid = (app) => {
     color: [0, 0, 255, 255],
   });
 
-  basil3d_view_open(app.view, {
+  $viewOpen(app.view, {
     "lines": lines,
   });
 };

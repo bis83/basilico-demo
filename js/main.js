@@ -1,8 +1,8 @@
 
 const setup = (app) => {
   html_hide_message();
-  basil3d_view_open(app.view, basil3d_app_json(app, "sample"));
-  basil3d_view_open(app.view, basil3d_app_json(app, "room000"));
+  $viewOpen(app.view, $json(app, "sample"));
+  $viewOpen(app.view, $json(app, "room000"));
 
   addDebugGrid(app);
 };
@@ -19,9 +19,9 @@ const update = (app) => {
     html_canvas().clientHeight
   ];
 
-  const dt = basil3d_listen_delta_time(listen);
-  const moveXY = basil3d_listen_get(listen, "wasd", "left-stick");
-  const cameraXY = basil3d_listen_get(listen, "arrow", "right-stick", rect);
+  const dt = $listenDeltaTime(listen);
+  const moveXY = $listenGet(listen, "wasd", "left-stick");
+  const cameraXY = $listenGet(listen, "arrow", "right-stick", rect);
   if (cameraXY) {
     const cameraSpeed = 90; // deg/s
     const cameraX = -cameraXY[0];
@@ -43,11 +43,11 @@ const update = (app) => {
     mob.eye[0] += dx;
     mob.eye[2] += dy;
   }
-  const lb = basil3d_listen_get(listen, "q", "lb");
+  const lb = $listenGet(listen, "q", "lb");
   if (lb) {
     mob.eye[1] -= 0.75 * dt;
   }
-  const rb = basil3d_listen_get(listen, "e", "rb");
+  const rb = $listenGet(listen, "e", "rb");
   if (rb) {
     mob.eye[1] += 0.75 * dt;
   }
@@ -58,5 +58,5 @@ const update = (app) => {
 
 html_listen(window, "load", () => {
   html_show_message("Welcome Basilico.");
-  basil3d_start(setup, update);
+  $start(setup, update);
 });
