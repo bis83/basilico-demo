@@ -12,16 +12,9 @@ const update = (app) => {
   const view = app.view;
   const mob = view.camera;
 
-  const rect = [
-    0,
-    html_canvas().clientWidth,
-    0,
-    html_canvas().clientHeight
-  ];
-
   const dt = $listenDeltaTime(listen);
-  const moveXY = $listenGet(listen, "wasd", "left-stick");
-  const cameraXY = $listenGet(listen, "arrow", "right-stick", rect);
+  const moveXY = $listenGet(listen, "wasd", "ls");
+  const cameraXY = $listenGet(listen, "mouse", "rs");
   if (cameraXY) {
     const cameraSpeed = 90; // deg/s
     const cameraX = -cameraXY[0];
