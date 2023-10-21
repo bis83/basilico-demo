@@ -13,7 +13,5 @@ const addDebugGrid = (app) => {
     color: [0, 0, 255, 255],
   });
 
-  $viewOpen(app.view, {
-    "lines": lines,
-  });
+  $viewLines(app.view, lines);
 };
