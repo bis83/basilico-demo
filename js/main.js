@@ -7,13 +7,13 @@ const setup = (app) => {
 };
 
 const update = (app) => {
-  const listen = app.listen;
+  const com = app.com;
   const view = app.view;
   const eye = view.camera;
 
-  const dt = $listenDeltaTime(listen);
-  const moveXY = $listenGet(listen, "wasd", "ls");
-  const cameraXY = $listenGet(listen, "mouse", "rs");
+  const dt = $comDeltaTime(com);
+  const moveXY = $comGet(com, "wasd", "ls");
+  const cameraXY = $comGet(com, "mouse", "rs");
   if (cameraXY) {
     const cameraSpeed = 90; // deg/s
     const cameraX = -cameraXY[0];
@@ -35,11 +35,11 @@ const update = (app) => {
     eye.offset.x += dx;
     eye.offset.z += dy;
   }
-  const lb = $listenGet(listen, "q", "lb");
+  const lb = $comGet(com, "q", "lb");
   if (lb) {
     eye.offset.y -= 0.75 * dt;
   }
-  const rb = $listenGet(listen, "e", "rb");
+  const rb = $comGet(com, "e", "rb");
   if (rb) {
     eye.offset.y += 0.75 * dt;
   }
