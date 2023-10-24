@@ -7,13 +7,12 @@ const setup = (app) => {
 };
 
 const update = (app) => {
-  const com = app.com;
   const view = app.view;
   const eye = view.camera;
 
-  const dt = $comDeltaTime(com);
-  const moveXY = $comGet(com, "wasd", "ls");
-  const cameraXY = $comGet(com, "mouse", "rs");
+  const dt = $deltaTime(app);
+  const moveXY = $event(app, "wasd", "ls");
+  const cameraXY = $event(app, "mouse", "rs");
   if (cameraXY) {
     const cameraSpeed = 90; // deg/s
     const cameraX = -cameraXY[0];
@@ -35,11 +34,11 @@ const update = (app) => {
     eye.offset.x += dx;
     eye.offset.z += dy;
   }
-  const lb = $comGet(com, "q", "lb");
+  const lb = $event(app, "q", "lb");
   if (lb) {
     eye.offset.y -= 0.75 * dt;
   }
-  const rb = $comGet(com, "e", "rb");
+  const rb = $event(app, "e", "rb");
   if (rb) {
     eye.offset.y += 0.75 * dt;
   }
