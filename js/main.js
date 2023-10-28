@@ -10,11 +10,20 @@ const update = (app) => {
   const view = app.view;
   const eye = view.camera;
 
-  const dt = $deltaTime(app);
-  const moveXY = $event(app, "wasd", "ls");
-  const cameraXY = $event(app, "mouse", "rs");
+  const dt = $signal(app, "dt");
+  const moveXY = [0, 0];
+  moveXY[0] += -$signal(app, "l0");
+  moveXY[0] += $signal(app, "l1");
+  moveXY[1] += $signal(app, "l2");
+  moveXY[1] += -$signal(app, "l3");
+  const cameraXY = [0, 0];
+  cameraXY[0] += -$signal(app, "r0");
+  cameraXY[0] += $signal(app, "r1");
+  cameraXY[1] += $signal(app, "r2");
+  cameraXY[1] += -$signal(app, "r3");
+
   if (cameraXY) {
-    const cameraSpeed = 90; // deg/s
+    const cameraSpeed = 90;
     const cameraX = -cameraXY[0];
     const cameraY = cameraXY[1];
     eye.offset.ha += cameraSpeed * dt * cameraX;
@@ -22,7 +31,7 @@ const update = (app) => {
     eye.offset.va = Math.max(-60, Math.min(eye.offset.va, 80));
   }
   if (moveXY) {
-    const moveSpeed = 2;    // cell/s
+    const moveSpeed = 2;
     const rx = deg2rad(eye.offset.ha + 90);
     const ry = deg2rad(eye.offset.ha);
     const moveX = -moveXY[0];
@@ -34,11 +43,11 @@ const update = (app) => {
     eye.offset.x += dx;
     eye.offset.z += dy;
   }
-  const lb = $event(app, "q", "lb");
+  const lb = $signal(app, "a2");
   if (lb) {
     eye.offset.y -= 0.75 * dt;
   }
-  const rb = $event(app, "e", "rb");
+  const rb = $signal(app, "a3");
   if (rb) {
     eye.offset.y += 0.75 * dt;
   }
