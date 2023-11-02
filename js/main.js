@@ -1,9 +1,10 @@
 
 const setup = (app) => {
   html_hide_message();
-
   Object.assign(app.view, $json(app, "sample"));
   addDebugGrid(app);
+
+  app.func.update = update;
 };
 
 const update = (app) => {
@@ -58,5 +59,5 @@ const update = (app) => {
 
 html_listen(window, "load", () => {
   html_show_message("Welcome Basilico.");
-  $start(setup, update);
+  $start(setup);
 });
