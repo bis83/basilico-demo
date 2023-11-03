@@ -22,6 +22,7 @@ const update = (app) => {
   cameraXY[0] += $signal(app, "r1");
   cameraXY[1] += $signal(app, "r2");
   cameraXY[1] += -$signal(app, "r3");
+  const dash = $signal(app, "b1");
 
   if (cameraXY) {
     const cameraSpeed = 90;
@@ -32,7 +33,7 @@ const update = (app) => {
     eye.offset.va = Math.max(-60, Math.min(eye.offset.va, 80));
   }
   if (moveXY) {
-    const moveSpeed = 2;
+    const moveSpeed = dash ? 4 : 2;
     const rx = deg2rad(eye.offset.ha + 90);
     const ry = deg2rad(eye.offset.ha);
     const moveX = -moveXY[0];
