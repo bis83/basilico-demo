@@ -4,7 +4,7 @@ const setup = (app) => {
   Object.assign(app.view, $json(app, "sample"));
   addDebugGrid(app);
 
-  app.func.update = update;
+  app.update = update;
 };
 
 const update = (app) => {
