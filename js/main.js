@@ -1,10 +1,15 @@
 
+let setuped = false;
+
 const setup = (app) => {
+  if (setuped) {
+    return;
+  }
+
   html_hide_message();
   Object.assign(app.view, $json(app, "sample"));
   addDebugGrid(app);
-
-  app.update = update;
+  setuped = true;
 };
 
 const update = (app) => {
@@ -60,5 +65,8 @@ const update = (app) => {
 
 html_listen(window, "load", () => {
   html_show_message("Welcome Basilico.");
-  $start(setup);
+  $start({
+    setup: setup,
+    update: update,
+  });
 });
