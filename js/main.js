@@ -16,7 +16,7 @@ const update = (app) => {
   const view = app.view;
   const eye = view.camera;
 
-  const dt = $signal(app, "dt");
+  const dt = $signalDelta(app, "t");
   const moveXY = [0, 0];
   moveXY[0] += -$signal(app, "l0");
   moveXY[0] += $signal(app, "l1");
