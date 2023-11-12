@@ -1,0 +1,16 @@
+{
+  "branch": [
+    {
+      "next": 1,
+      "action": [
+        "setup"
+      ]
+    },
+    {
+      "next": 1,
+      "action": [
+        "update"
+      ]
+    }
+  ]
+}
