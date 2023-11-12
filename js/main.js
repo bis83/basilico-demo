@@ -1,15 +1,8 @@
 
-let setuped = false;
-
 const setup = (app) => {
-  if (setuped) {
-    return;
-  }
-
   html_hide_message();
   Object.assign(app.view, $json(app, "sample"));
   addDebugGrid(app);
-  setuped = true;
 };
 
 const update = (app) => {
