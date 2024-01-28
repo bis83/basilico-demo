@@ -9,18 +9,18 @@ const update = (app) => {
   const view = app.view;
   const eye = view.camera;
 
-  const dt = $signalDelta(app, "t");
+  const dt = $hidDelta(app, "t");
   const moveXY = [0, 0];
-  moveXY[0] += -$signal(app, "l0");
-  moveXY[0] += $signal(app, "l1");
-  moveXY[1] += $signal(app, "l2");
-  moveXY[1] += -$signal(app, "l3");
+  moveXY[0] += -$hid(app, "l0");
+  moveXY[0] += $hid(app, "l1");
+  moveXY[1] += $hid(app, "l2");
+  moveXY[1] += -$hid(app, "l3");
   const cameraXY = [0, 0];
-  cameraXY[0] += -$signal(app, "r0");
-  cameraXY[0] += $signal(app, "r1");
-  cameraXY[1] += $signal(app, "r2");
-  cameraXY[1] += -$signal(app, "r3");
-  const dash = $signal(app, "b1");
+  cameraXY[0] += -$hid(app, "r0");
+  cameraXY[0] += $hid(app, "r1");
+  cameraXY[1] += $hid(app, "r2");
+  cameraXY[1] += -$hid(app, "r3");
+  const dash = $hid(app, "b1");
 
   if (cameraXY) {
     const cameraSpeed = 90;
@@ -43,11 +43,11 @@ const update = (app) => {
     eye.offset.x += dx;
     eye.offset.z += dy;
   }
-  const lb = $signal(app, "a2");
+  const lb = $hid(app, "a2");
   if (lb) {
     eye.offset.y -= 0.75 * dt;
   }
-  const rb = $signal(app, "a3");
+  const rb = $hid(app, "a3");
   if (rb) {
     eye.offset.y += 0.75 * dt;
   }
