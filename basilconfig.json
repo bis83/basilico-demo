@@ -4,8 +4,7 @@
   ],
   "minify": true,
   "script": [
-    "js/main.js",
-    "js/grid.js"
+    "js/main.js"
   ],
   "title": "Demo"
 }

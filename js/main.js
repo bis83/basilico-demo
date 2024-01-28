@@ -2,7 +2,6 @@
 const setup = (app) => {
   html_hide_message();
   Object.assign(app.view, $json(app, "sample"));
-  addDebugGrid(app);
 };
 
 const update = (app) => {
