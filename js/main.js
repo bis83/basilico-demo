@@ -1,12 +1,11 @@
 
 const setup = (app) => {
   html_hide_message();
-  Object.assign(app.view, $json(app, "sample"));
+  Object.assign(app, $json(app, "sample"));
 };
 
 const update = (app) => {
-  const view = app.view;
-  const eye = view.camera;
+  const eye = app.camera;
 
   const dt = $hidDelta(app, "t");
   const moveXY = [0, 0];
@@ -51,7 +50,7 @@ const update = (app) => {
     eye.offset.y += 0.75 * dt;
   }
 
-  const light = view.light;
+  const light = app.light;
   light.offset.ha += 45 * dt;
 };
 
