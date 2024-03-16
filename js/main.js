@@ -1,10 +1,10 @@
 
-const setup = (app) => {
+$__exec["setup"] = (app) => {
   html_hide_message();
   Object.assign(app, $json(app, "sample"));
 };
 
-const update = (app) => {
+$__exec["update"] = (app) => {
   const dt = $hidDelta(app, "t");
   const eye = app.mob.find(m => m.name === "p000");
   if (eye) {
@@ -63,8 +63,5 @@ const update = (app) => {
 
 html_listen(window, "load", () => {
   html_show_message("Welcome Basilico.");
-  $start({
-    setup: setup,
-    update: update,
-  });
+  $start();
 });
