@@ -1,12 +1,12 @@
 
 $__exec["setup"] = (app) => {
   html_hide_message();
-  Object.assign(app, $json(app, "sample"));
 };
 
 $__exec["update"] = (app) => {
   const dt = $hidDelta(app, "t");
-  const eye = app.mob.find(m => m.name === "p000");
+  const stage = $stageCurrent(app);
+  const eye = stage.mob.find(m => m.name === "p000");
   if (eye) {
     const moveXY = [0, 0];
     moveXY[0] += -$hid(app, "l0");
@@ -50,14 +50,15 @@ $__exec["update"] = (app) => {
       eye.offset.y += 0.75 * dt;
     }
 
-    app.camera.offset.x = eye.offset.x;
-    app.camera.offset.y = eye.offset.y;
-    app.camera.offset.z = eye.offset.z;
-    app.camera.offset.ha = eye.offset.ha;
-    app.camera.offset.va = eye.offset.va;
+    const camera = stage.camera;
+    camera.offset.x = eye.offset.x;
+    camera.offset.y = eye.offset.y;
+    camera.offset.z = eye.offset.z;
+    camera.offset.ha = eye.offset.ha;
+    camera.offset.va = eye.offset.va;
   }
 
-  const light = app.light;
+  const light = stage.light;
   light.offset.ha += 45 * dt;
 };
 
