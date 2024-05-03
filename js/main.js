@@ -6,7 +6,7 @@ $__exec["setup"] = (app) => {
 $__exec["update"] = (app) => {
   const dt = $hidDelta(app, "t");
   const stage = $stageCurrent(app);
-  const eye = stage.mob.find(m => m.name === "p000");
+  const eye = stage.mob.find(m => m.data === "p000");
   if (eye) {
     const moveXY = [0, 0];
     moveXY[0] += -$hid(app, "l0");
