@@ -14,9 +14,7 @@
       }
     }
   ],
-  "space": {
-    "min": 0.0,
-    "max": 3.0,
-    "radius": 1.0
-  }
+  "mass": 1.0,
+  "radius": 1.0,
+  "height": 3.0
 }

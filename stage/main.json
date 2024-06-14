@@ -10,6 +10,9 @@
       "event": "update"
     },
     {
+      "solve": true
+    },
+    {
       "goto": "loop",
       "yield": true
     }

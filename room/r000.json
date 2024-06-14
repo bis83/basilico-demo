@@ -53,9 +53,7 @@
           "mesh": [
             0
           ],
-          "space": {
-            "min": 0.5
-          }
+          "height": 0.5
         },
         {
           "mesh": [

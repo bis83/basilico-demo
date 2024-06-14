@@ -1,8 +1,6 @@
 {
   "mesh": [],
-  "space": {
-    "min": 0.0,
-    "max": 2.0,
-    "radius": 0.8
-  }
+  "mass": 1.0,
+  "radius": 0.8,
+  "height": 2.0
 }
