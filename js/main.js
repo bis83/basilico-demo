@@ -6,8 +6,10 @@ $__exec["setup"] = (app) => {
 $__exec["update"] = (app) => {
   const dt = $hidDelta(app, "t");
   const stage = $stageCurrent(app);
-  const eye = stage.mob.find(m => m.data === "p000");
-  if (eye) {
+  const mob = stage.mob.find(m => m.data === "p000");
+  if (mob) {
+    const data = $mob(app, mob.data);
+
     const moveXY = [0, 0];
     moveXY[0] += -$hid(app, "l0");
     moveXY[0] += $hid(app, "l1");
@@ -24,38 +26,30 @@ $__exec["update"] = (app) => {
       const cameraSpeed = 90;
       const cameraX = -cameraXY[0];
       const cameraY = cameraXY[1];
-      eye.offset.ha += cameraSpeed * dt * cameraX;
-      eye.offset.va += cameraSpeed * dt * cameraY;
-      eye.offset.va = Math.max(-60, Math.min(eye.offset.va, 80));
+      mob.offset.ha += cameraSpeed * dt * cameraX;
+      mob.offset.va += cameraSpeed * dt * cameraY;
+      mob.offset.va = Math.max(-60, Math.min(mob.offset.va, 80));
     }
     if (moveXY) {
       const moveSpeed = dash ? 4 : 2;
-      const rx = deg2rad(eye.offset.ha + 90);
-      const ry = deg2rad(eye.offset.ha);
+      const rx = deg2rad(mob.offset.ha + 90);
+      const ry = deg2rad(mob.offset.ha);
       const moveX = -moveXY[0];
       const moveY = moveXY[1];
       const vx = moveX * Math.cos(rx) + moveY * Math.cos(ry);
       const vy = moveX * Math.sin(rx) + moveY * Math.sin(ry);
       const dx = moveSpeed * dt * vx;
       const dy = moveSpeed * dt * vy;
-      eye.offset.x += dx;
-      eye.offset.z += dy;
-    }
-    const lb = $hid(app, "a2");
-    if (lb) {
-      eye.offset.y -= 0.75 * dt;
-    }
-    const rb = $hid(app, "a3");
-    if (rb) {
-      eye.offset.y += 0.75 * dt;
+      mob.offset.x += dx;
+      mob.offset.z += dy;
     }
 
     const camera = stage.camera;
-    camera.offset.x = eye.offset.x;
-    camera.offset.y = eye.offset.y;
-    camera.offset.z = eye.offset.z;
-    camera.offset.ha = eye.offset.ha;
-    camera.offset.va = eye.offset.va;
+    camera.offset.x = mob.offset.x;
+    camera.offset.y = mob.offset.y + data.height;
+    camera.offset.z = mob.offset.z;
+    camera.offset.ha = mob.offset.ha;
+    camera.offset.va = mob.offset.va;
   }
 
   const light = stage.light;

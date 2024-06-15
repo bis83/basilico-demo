@@ -58,22 +58,26 @@
         {
           "mesh": [
             1
-          ]
+          ],
+          "height": 5
         },
         {
           "mesh": [
             2
-          ]
+          ],
+          "height": 5
         },
         {
           "mesh": [
             3
-          ]
+          ],
+          "height": 5
         },
         {
           "mesh": [
             4
-          ]
+          ],
+          "height": 5
         }
       ],
       "unit": 2,
