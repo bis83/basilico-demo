@@ -28,7 +28,7 @@ $__exec["update"] = (app) => {
       const cameraY = cameraXY[1];
       mob.offset.ha += cameraSpeed * dt * cameraX;
       mob.offset.va += cameraSpeed * dt * cameraY;
-      mob.offset.va = Math.max(-60, Math.min(mob.offset.va, 80));
+      mob.offset.va = clamp(mob.offset.va, -60, 80);
     }
     if (moveXY) {
       const moveSpeed = dash ? 4 : 2;
