@@ -4,7 +4,7 @@ $__exec["setup"] = (app) => {
 };
 
 $__exec["update"] = (app) => {
-  const dt = $hidDelta(app, "t");
+  const dt = app.dt;
   const stage = $stageCurrent(app);
   const mob = stage.mob.find(m => m.data === "p000");
   if (mob) {
