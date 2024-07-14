@@ -8,7 +8,7 @@ $__exec["update"] = (app) => {
   const stage = $stageCurrent(app);
   const mob = stage.mob.find(m => m.data === "p000");
   if (mob) {
-    const data = $mob(app, mob.data);
+    const data = $dataMob(app, mob.data);
 
     const moveXY = [0, 0];
     moveXY[0] += -$hid(app, "l0");
