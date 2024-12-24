@@ -26,34 +26,34 @@ $callback("main", {
         const cameraSpeed = 90;
         const cameraX = -cameraXY[0];
         const cameraY = cameraXY[1];
-        mob.offset.ha += cameraSpeed * dt * cameraX;
-        mob.offset.va += cameraSpeed * dt * cameraY;
-        mob.offset.va = clamp(mob.offset.va, -60, 80);
+        mob.ha += cameraSpeed * dt * cameraX;
+        mob.va += cameraSpeed * dt * cameraY;
+        mob.va = clamp(mob.va, -60, 80);
       }
       if (moveXY) {
         const moveSpeed = dash ? 4 : 2;
-        const rx = deg2rad(mob.offset.ha + 90);
-        const ry = deg2rad(mob.offset.ha);
+        const rx = deg2rad(mob.ha + 90);
+        const ry = deg2rad(mob.ha);
         const moveX = -moveXY[0];
         const moveY = moveXY[1];
         const vx = moveX * Math.cos(rx) + moveY * Math.cos(ry);
         const vy = moveX * Math.sin(rx) + moveY * Math.sin(ry);
         const dx = moveSpeed * dt * vx;
         const dy = moveSpeed * dt * vy;
-        mob.offset.x += dx;
-        mob.offset.z += dy;
+        mob.x += dx;
+        mob.z += dy;
       }
 
       const camera = stage.camera;
-      camera.offset.x = mob.offset.x;
-      camera.offset.y = mob.offset.y + data.height;
-      camera.offset.z = mob.offset.z;
-      camera.offset.ha = mob.offset.ha;
-      camera.offset.va = mob.offset.va;
+      camera.x = mob.x;
+      camera.y = mob.y + data.height;
+      camera.z = mob.z;
+      camera.ha = mob.ha;
+      camera.va = mob.va;
     }
 
     const light = stage.light;
-    light.offset.ha += 45 * dt;
+    light.ha += 45 * dt;
   },
 });
 
