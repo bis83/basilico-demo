@@ -19,7 +19,7 @@ jobs:
       - name: Get Basilico
         run: go get tool
       - name: Execute Basilico
-        run: go tool basilico .
+        run: go tool basilico . build
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
