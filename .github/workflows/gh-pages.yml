@@ -12,18 +12,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Download Basilico
-        uses: dawidd6/action-download-artifact@v2
+      - name: Setup
+        uses: actions/setup-go@v5
         with:
-          github_token: ${{secrets.GITHUB_TOKEN}}
-          repo: bis83/basilico
-          workflow: upload-artifact.yml
-          name: basilico-linux-amd64
-          path: ./bin/
+          go-version: 1.24
+      - name: Get Basilico
+        run: go get tool
       - name: Execute Basilico
-        run: |
-          chmod +x ./bin/basilico
-          ./bin/basilico ./ build
+        run: go tool basilico .
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
