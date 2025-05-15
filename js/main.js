@@ -1,7 +1,6 @@
 
 $callback("main", {
   setup: (app) => {
-    html_hide_message();
   },
   update: (app) => {
     const dt = app.dt;
@@ -58,6 +57,5 @@ $callback("main", {
 });
 
 html_listen(window, "load", () => {
-  html_show_message("Welcome Basilico.");
   $start("main");
 });
