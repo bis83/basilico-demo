@@ -2,7 +2,7 @@
   "middleware": [
     "basil3d"
   ],
-  "minify": true,
+  "minify": false,
   "script": [
     "js/main.js"
   ],
