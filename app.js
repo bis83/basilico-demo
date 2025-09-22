@@ -502,7 +502,7 @@
     return text;
   };
   const __strideOfStageInput = 512;
-  const __strideOfMeshInput = 128;
+  const __strideOfMeshInput = 16;
   const __strideOfMeshID = 4;
   const __strideOfIndirectArgs = 20;
   const $__gpuInit = async () => {
@@ -525,8 +525,8 @@
       });
     };
     createCBuffer(0, __strideOfStageInput * 1, GPUBufferUsage.UNIFORM);
-    createCBuffer(1, __strideOfMeshInput * (2 * 1024), GPUBufferUsage.STORAGE);
-    createCBuffer(2, __strideOfMeshID * (16 * 1024), GPUBufferUsage.VERTEX);
+    createCBuffer(1, __strideOfMeshInput * 65536, GPUBufferUsage.STORAGE);
+    createCBuffer(2, __strideOfMeshID * (4 * 1024), GPUBufferUsage.VERTEX);
     createCBuffer(3, __strideOfIndirectArgs * (2 * 1024), GPUBufferUsage.INDIRECT);
     gpu.sampler[0] = device.createSampler({
       magFilter: "linear",
@@ -636,7 +636,6 @@
     gpu.pass3d = [];
   };
   const $__gpuFrameEnd = () => {
-    $__gpuUploadStageInput();
     const device = $$.gpu.device;
     const ce = device.createCommandEncoder();
     $__gpuPassGBuffer(ce);
@@ -644,47 +643,6 @@
     $__gpuPassHDR(ce);
     $__gpuPassLDR(ce);
     device.queue.submit([ce.finish()]);
-  };
-  const $__gpuUploadStageInput = () => {
-    const gpu = $$.gpu;
-    const device = $$.gpu.device;
-    const buf = new Float32Array(__strideOfStageInput / 4);
-    {
-      const camera = gpu.stage.camera;
-      const aspect = gpu.canvas.width / gpu.canvas.height;
-      const fovy = deg2rad(camera.fov);
-      const x = camera.x;
-      const y = camera.y;
-      const z = camera.z;
-      const ha = camera.ha;
-      const va = camera.va;
-      const dir = vec3dir(ha, va);
-      const eye = [x, y, z];
-      const at = vec3add(eye, dir);
-      const up = [0, 1, 0];
-      const look = mat4lookat(eye, at, up);
-      const proj = mat4perspective(fovy, aspect, camera.near, camera.far);
-      const vp = mat4multiply(look, proj);
-      const ivp = mat4invert(vp);
-      const ortho = mat4ortho(gpu.canvas.width, gpu.canvas.height, 0, 1);
-      buf.set(vp, 0);
-      buf.set(ivp, 16);
-      buf.set(look, 32);
-      buf.set(ortho, 48);
-      buf.set(eye, 64);
-    }
-    {
-      const light = gpu.stage.light;
-      const ldir = vec3dir(light.ha, light.va);
-      const color = light.color;
-      const ambient0 = light.ambient0;
-      const ambient1 = light.ambient1;
-      buf.set(ldir, 68);
-      buf.set(color, 72);
-      buf.set(ambient0, 76);
-      buf.set(ambient1, 80);
-    }
-    device.queue.writeBuffer(gpu.cbuffer[0], 0, buf);
   };
   const $__gpuPassGBuffer = (ce) => {
     const gpu = $$.gpu;
@@ -832,26 +790,7 @@
       indexOfMeshInput: 0,
       indexOfMeshID: 0,
       indexOfIndirectArgs: 0,
-      pass3d: [],
-      stage: {
-        camera: {
-          x: 0,
-          y: 0,
-          z: 0,
-          ha: 0,
-          va: 0,
-          fov: 0,
-          near: 0,
-          far: 0
-        },
-        light: {
-          ha: 0,
-          va: 0,
-          color: 0,
-          ambient0: 0,
-          ambient1: 0
-        }
-      }
+      pass3d: []
     },
     audio: {
       context: null
@@ -908,29 +847,140 @@
     };
     requestAnimationFrame(frame);
   };
-  const $submitCamera = (x, y, z, ha, va, fov, near, far) => {
-    const camera = $$.gpu.stage.camera;
+  const $newCamera = () => {
+    return {
+      x: 0,
+      y: 0,
+      z: 0,
+      ha: 0,
+      va: 0,
+      fov: 0,
+      near: 0,
+      far: 0
+    };
+  };
+  const $cameraPosition = (camera, x, y, z) => {
     camera.x = x;
     camera.y = y;
     camera.z = z;
+  };
+  const $cameraAngle = (camera, ha, va) => {
     camera.ha = ha;
     camera.va = va;
+  };
+  const $cameraFov = (camera, fov) => {
     camera.fov = fov;
+  };
+  const $cameraZClip = (camera, near, far) => {
     camera.near = near;
     camera.far = far;
   };
-  const $submitLightDirectional = (ha, va, color) => {
-    const light = $$.gpu.stage.light;
+  const $newLight = () => {
+    return {
+      ha: 0,
+      va: 0,
+      color: 0,
+      ambient0: 0,
+      ambient1: 0
+    };
+  };
+  const $lightDirection = (light, ha, va) => {
     light.ha = ha;
     light.va = va;
-    light.color = color;
   };
-  const $submitLightAmbient = (color0, color1) => {
-    const light = $$.gpu.stage.light;
-    light.ambient0 = color0;
-    light.ambient1 = color1;
+  const $lightColor = (light, r, g, b, a) => {
+    light.color = [r, g, b, a];
   };
-  const $submitMesh = (id, items) => {
+  const $lightAmbient0 = (light, r, g, b, a) => {
+    light.ambient0 = [r, g, b, a];
+  };
+  const $lightAmbient1 = (light, r, g, b, a) => {
+    light.ambient1 = [r, g, b, a];
+  };
+  const $newMesh = () => {
+    return {
+      x: 0,
+      y: 0,
+      z: 0,
+      ha: 0,
+      va: 0,
+      f0: [1, 1, 1, 1],
+      f1: [1, 0, 0, 0],
+      f2: [0, 0, 0, 0]
+    };
+  };
+  const $meshPosition = (mesh, x, y, z) => {
+    mesh.x = x;
+    mesh.y = y;
+    mesh.z = z;
+  };
+  const $meshAngle = (mesh, ha, va) => {
+    mesh.ha = ha;
+    mesh.va = va;
+  };
+  const $packStage = (camera, light) => {
+    const gpu = $$.gpu;
+    const pack = new Float32Array(__strideOfStageInput / 4);
+    {
+      const aspect = gpu.canvas.width / gpu.canvas.height;
+      const fovy = deg2rad(camera.fov);
+      const x = camera.x;
+      const y = camera.y;
+      const z = camera.z;
+      const ha = camera.ha;
+      const va = camera.va;
+      const dir = vec3dir(ha, va);
+      const eye = [x, y, z];
+      const at = vec3add(eye, dir);
+      const up = [0, 1, 0];
+      const look = mat4lookat(eye, at, up);
+      const proj = mat4perspective(fovy, aspect, camera.near, camera.far);
+      const vp = mat4multiply(look, proj);
+      const ivp = mat4invert(vp);
+      const ortho = mat4ortho(gpu.canvas.width, gpu.canvas.height, 0, 1);
+      pack.set(vp, 0);
+      pack.set(ivp, 16);
+      pack.set(look, 32);
+      pack.set(ortho, 48);
+      pack.set(eye, 64);
+    }
+    {
+      const ldir = vec3dir(light.ha, light.va);
+      const color = light.color;
+      const ambient0 = light.ambient0;
+      const ambient1 = light.ambient1;
+      pack.set(ldir, 68);
+      pack.set(color, 72);
+      pack.set(ambient0, 76);
+      pack.set(ambient1, 80);
+    }
+    return pack;
+  };
+  const $packMesh = (mesh) => {
+    const num = 7;
+    const pack = new Float32Array(__strideOfMeshInput / 4 * num);
+    const matrix = mat4angle(mesh.ha, mesh.va);
+    mat4translated(matrix, mesh.x, mesh.y, mesh.z);
+    pack.set(matrix, 0);
+    pack.set(mesh.f0, 16);
+    pack.set(mesh.f1, 20);
+    pack.set(mesh.f2, 24);
+    return pack;
+  };
+  const $writeStage = (pack) => {
+    const gpu = $$.gpu;
+    const device = $$.gpu.device;
+    device.queue.writeBuffer(gpu.cbuffer[0], 0, pack);
+  };
+  const $writeMesh = (pack) => {
+    const gpu = $$.gpu;
+    const device = $$.gpu.device;
+    device.queue.writeBuffer(gpu.cbuffer[1], gpu.indexOfMeshInput * __strideOfMeshInput, pack);
+    const startIndexOfMeshInput = gpu.indexOfMeshInput;
+    gpu.indexOfMeshInput += pack.length / 4;
+    return startIndexOfMeshInput;
+  };
+  const $draw = (id, lst) => {
     const gpu = $$.gpu;
     const device = $$.gpu.device;
     const gltf = $$.data.gltf;
@@ -938,31 +988,13 @@
     if (!mesh) {
       return;
     }
-    if (items.length <= 0) {
+    const instanceCount = lst.length;
+    if (instanceCount <= 0) {
       return;
     }
     const startIndexOfMeshID = gpu.indexOfMeshID;
-    const ids = new Uint32Array(items.length);
-    for (let i = 0; i < items.length; ++i) {
-      const item = items[i];
-      const matrix = mat4angle(item.ha, item.va);
-      mat4translated(matrix, item.x, item.y, item.z);
-      const factor0 = item.factor0;
-      const factor1 = item.factor1;
-      const factor2 = item.factor2;
-      const factor3 = item.factor3;
-      const buf = new Float32Array(__strideOfMeshInput / 4);
-      buf.set(matrix, 0);
-      buf.set(factor0, 16);
-      buf.set(factor1, 20);
-      buf.set(factor2, 24);
-      buf.set(factor3, 28);
-      device.queue.writeBuffer(gpu.cbuffer[1], gpu.indexOfMeshInput * __strideOfMeshInput, buf);
-      ids[i] = gpu.indexOfMeshInput;
-      gpu.indexOfMeshInput += 1;
-    }
-    device.queue.writeBuffer(gpu.cbuffer[2], gpu.indexOfMeshID * __strideOfMeshID, ids);
-    gpu.indexOfMeshID += items.length;
+    device.queue.writeBuffer(gpu.cbuffer[2], gpu.indexOfMeshID * __strideOfMeshID, new Uint32Array(lst));
+    gpu.indexOfMeshID += instanceCount;
     for (const sid of mesh.segment) {
       const segment = gltf.segment[sid];
       if (!segment) {
@@ -970,7 +1002,7 @@
       }
       const args = new Uint32Array(20 / 4);
       args[0] = segment.count;
-      args[1] = items.length;
+      args[1] = instanceCount;
       args[2] = 0;
       args[3] = 0;
       args[4] = 0;
@@ -987,21 +1019,47 @@
     $start(update);
   });
   const update = () => {
-    $submitCamera(0, 2, -5, 90, -20, 35, 0.01, 1e3);
-    $submitLightDirectional(0, 65, [0.8, 0.8, 0.8, 1]);
-    $submitLightAmbient([0.4, 0.4, 0.9, 0.8], [0.5, 0.4, 0.1, 0.4]);
-    $submitMesh("tr_01", [
-      {
-        x: 0,
-        y: 0,
-        z: 0,
-        ha: 0,
-        va: 0,
-        factor0: [1, 1, 1, 1],
-        factor1: [1, 0, 0, 0],
-        factor2: [0, 0, 0, 0],
-        factor3: [0, 0, 0, 0]
-      }
-    ]);
+    {
+      const camera = $newCamera();
+      $cameraPosition(camera, 0, 2, -5);
+      $cameraAngle(camera, 90, -10);
+      $cameraFov(camera, 35);
+      $cameraZClip(camera, 0.01, 1e3);
+      const light = $newLight();
+      $lightDirection(light, 0, 65);
+      $lightColor(light, 0.8, 0.8, 0.8, 1);
+      $lightAmbient0(light, 0.4, 0.4, 0.9, 0.8);
+      $lightAmbient1(light, 0.5, 0.4, 0.1, 0.4);
+      $writeStage($packStage(camera, light));
+    }
+    {
+      const lst = [];
+      const m = $newMesh();
+      $meshPosition(m, -2, 0, 0);
+      lst.push($writeMesh($packMesh(m)));
+      $meshPosition(m, 0, 0, 0);
+      lst.push($writeMesh($packMesh(m)));
+      $meshPosition(m, 2, 0, 0);
+      lst.push($writeMesh($packMesh(m)));
+      $meshPosition(m, -2, 0, -2);
+      lst.push($writeMesh($packMesh(m)));
+      $meshPosition(m, 0, 0, -2);
+      lst.push($writeMesh($packMesh(m)));
+      $meshPosition(m, 2, 0, -2);
+      lst.push($writeMesh($packMesh(m)));
+      $draw("tr_01", lst);
+    }
+    {
+      const lst = [];
+      const m = $newMesh();
+      $meshAngle(m, 90, 0);
+      $meshPosition(m, -2, 0, 2);
+      lst.push($writeMesh($packMesh(m)));
+      $meshPosition(m, 0, 0, 2);
+      lst.push($writeMesh($packMesh(m)));
+      $meshPosition(m, 2, 0, 2);
+      lst.push($writeMesh($packMesh(m)));
+      $draw("wa_00", lst);
+    }
   };
 })();
