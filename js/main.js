@@ -10,31 +10,38 @@ const update = () => {
     $cameraAngle(camera, 90, -10);
     $cameraFov(camera, 35);
     $cameraZClip(camera, 0.01, 1000);
+
     const light = $newLight();
     $lightDirection(light, 0, 65);
     $lightColor(light, 0.8, 0.8, 0.8, 1.0);
     $lightAmbient0(light, 0.4, 0.4, 0.9, 0.8);
     $lightAmbient1(light, 0.5, 0.4, 0.1, 0.4);
-    $writeStage($packStage(camera, light));
+
+    $writeSlot(
+      $writePack($packCamera(camera)),
+      $writePack($packLight(light)));
   }
   {
     const lst = [];
     const m = $newMesh();
 
     $meshPosition(m, -2, 0, 0);
-    lst.push($writeMesh($packMesh(m)));
+    lst.push($writePack($packMesh(m)));
     $meshPosition(m, 0, 0, 0);
-    lst.push($writeMesh($packMesh(m)));
+    lst.push($writePack($packMesh(m)));
     $meshPosition(m, 2, 0, 0);
-    lst.push($writeMesh($packMesh(m)));
+    lst.push($writePack($packMesh(m)));
     $meshPosition(m, -2, 0, -2);
-    lst.push($writeMesh($packMesh(m)));
+    lst.push($writePack($packMesh(m)));
     $meshPosition(m, 0, 0, -2);
-    lst.push($writeMesh($packMesh(m)));
+    lst.push($writePack($packMesh(m)));
     $meshPosition(m, 2, 0, -2);
-    lst.push($writeMesh($packMesh(m)));
+    lst.push($writePack($packMesh(m)));
 
-    $draw("tr_01", lst);
+    const name = "tr_01";
+    const slot = $writeDrawSlot(lst);
+    const args = $writeDrawArgs(name, lst.length);
+    $draw(name, slot, args);
   }
   {
     const lst = [];
@@ -42,12 +49,15 @@ const update = () => {
     $meshAngle(m, 90, 0);
 
     $meshPosition(m, -2, 0, 2);
-    lst.push($writeMesh($packMesh(m)));
+    lst.push($writePack($packMesh(m)));
     $meshPosition(m, 0, 0, 2);
-    lst.push($writeMesh($packMesh(m)));
+    lst.push($writePack($packMesh(m)));
     $meshPosition(m, 2, 0, 2);
-    lst.push($writeMesh($packMesh(m)));
+    lst.push($writePack($packMesh(m)));
 
-    $draw("wa_00", lst);
+    const name = "wa_00";
+    const slot = $writeDrawSlot(lst);
+    const args = $writeDrawArgs(name, lst.length);
+    $draw(name, slot, args);
   }
 };
