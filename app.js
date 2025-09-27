@@ -501,10 +501,10 @@
     const text = await new Response(stream).text();
     return text;
   };
-  const __strideOfStageInput = 512;
-  const __strideOfMeshInput = 16;
-  const __strideOfMeshID = 4;
-  const __strideOfIndirectArgs = 20;
+  const __strideOfPack = 16;
+  const __strideOfSlot = 16;
+  const __strideOfDrawSlot = 4;
+  const __strideOfDrawArgs = 20;
   const $__gpuInit = async () => {
     const gpu = $$.gpu;
     gpu.adapter = await navigator.gpu.requestAdapter();
@@ -524,10 +524,10 @@
         usage: usage | GPUBufferUsage.COPY_DST
       });
     };
-    createCBuffer(0, __strideOfStageInput * 1, GPUBufferUsage.UNIFORM);
-    createCBuffer(1, __strideOfMeshInput * 65536, GPUBufferUsage.STORAGE);
-    createCBuffer(2, __strideOfMeshID * (4 * 1024), GPUBufferUsage.VERTEX);
-    createCBuffer(3, __strideOfIndirectArgs * (2 * 1024), GPUBufferUsage.INDIRECT);
+    createCBuffer(0, __strideOfPack * 65536, GPUBufferUsage.STORAGE);
+    createCBuffer(1, __strideOfSlot * 1, GPUBufferUsage.UNIFORM);
+    createCBuffer(2, __strideOfDrawSlot * (4 * 1024), GPUBufferUsage.VERTEX);
+    createCBuffer(3, __strideOfDrawArgs * (2 * 1024), GPUBufferUsage.INDIRECT);
     gpu.sampler[0] = device.createSampler({
       magFilter: "linear",
       minFilter: "linear",
@@ -535,18 +535,17 @@
     });
     gpu.bindGroupLayout[0] = device.createBindGroupLayout({
       entries: [
-        { binding: 0, visibility: GPUShaderStage.VERTEX, buffer: {} },
-        { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "read-only-storage" } }
+        { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "read-only-storage" } },
+        { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: {} }
       ]
     });
     gpu.bindGroupLayout[1] = device.createBindGroupLayout({
       entries: [
-        { binding: 0, visibility: GPUShaderStage.FRAGMENT, buffer: {} },
-        { binding: 1, visibility: GPUShaderStage.FRAGMENT, texture: { sampleType: "depth" } },
+        { binding: 0, visibility: GPUShaderStage.FRAGMENT, texture: { sampleType: "depth" } },
+        { binding: 1, visibility: GPUShaderStage.FRAGMENT, texture: {} },
         { binding: 2, visibility: GPUShaderStage.FRAGMENT, texture: {} },
         { binding: 3, visibility: GPUShaderStage.FRAGMENT, texture: {} },
-        { binding: 4, visibility: GPUShaderStage.FRAGMENT, texture: {} },
-        { binding: 5, visibility: GPUShaderStage.FRAGMENT, sampler: {} }
+        { binding: 4, visibility: GPUShaderStage.FRAGMENT, sampler: {} }
       ]
     });
     gpu.pipelineLayout[0] = device.createPipelineLayout({
@@ -556,6 +555,7 @@
     });
     gpu.pipelineLayout[1] = device.createPipelineLayout({
       bindGroupLayouts: [
+        gpu.bindGroupLayout[0],
         gpu.bindGroupLayout[1]
       ]
     });
@@ -613,12 +613,11 @@
         gpu.bindGroup[i] = device.createBindGroup({
           layout: gpu.bindGroupLayout[1],
           entries: [
-            { binding: 0, resource: { buffer: gpu.cbuffer[0] } },
-            { binding: 1, resource: gpu.gbuffer[t0].createView() },
-            { binding: 2, resource: gpu.gbuffer[t1].createView() },
-            { binding: 3, resource: gpu.gbuffer[t2].createView() },
-            { binding: 4, resource: gpu.gbuffer[t3].createView() },
-            { binding: 5, resource: gpu.sampler[0] }
+            { binding: 0, resource: gpu.gbuffer[t0].createView() },
+            { binding: 1, resource: gpu.gbuffer[t1].createView() },
+            { binding: 2, resource: gpu.gbuffer[t2].createView() },
+            { binding: 3, resource: gpu.gbuffer[t3].createView() },
+            { binding: 4, resource: gpu.sampler[0] }
           ]
         });
       }
@@ -630,9 +629,9 @@
   const $__gpuFrameBegin = () => {
     $__gpuUpdateGBuffer();
     const gpu = $$.gpu;
-    gpu.indexOfMeshInput = 0;
-    gpu.indexOfMeshID = 0;
-    gpu.indexOfIndirectArgs = 0;
+    gpu.indexOfPack = 0;
+    gpu.indexOfDrawSlot = 0;
+    gpu.indexOfDrawArgs = 0;
     gpu.pass3d = [];
   };
   const $__gpuFrameEnd = () => {
@@ -686,7 +685,10 @@
     pass.setBindGroup(0, gpu.bindGroup[0]);
     for (const p of gpu.pass3d) {
       const segment = gltf.segment[p.sid];
-      pass.setVertexBuffer(0, gpu.cbuffer[2], p.indexOfMeshID * __strideOfMeshID);
+      if (!segment) {
+        continue;
+      }
+      pass.setVertexBuffer(0, gpu.cbuffer[2], p.slot * __strideOfDrawSlot);
       if (segment.vb0) {
         const [index, offset, size] = segment.vb0;
         pass.setVertexBuffer(1, gltf.buffer[index], offset, size);
@@ -699,7 +701,7 @@
         const [index, offset, size] = segment.ib;
         pass.setIndexBuffer(gltf.buffer[index], "uint16", offset, size);
       }
-      pass.drawIndexedIndirect(gpu.cbuffer[3], p.indexOfIndirectArgs * __strideOfIndirectArgs);
+      pass.drawIndexedIndirect(gpu.cbuffer[3], p.args * __strideOfDrawArgs);
     }
     pass.end();
   };
@@ -714,7 +716,8 @@
       }]
     });
     pass.setPipeline(wgsl.pipeline[1]);
-    pass.setBindGroup(0, gpu.bindGroup[2]);
+    pass.setBindGroup(0, gpu.bindGroup[0]);
+    pass.setBindGroup(1, gpu.bindGroup[2]);
     pass.draw(4);
     pass.end();
   };
@@ -733,7 +736,8 @@
       }]
     });
     pass.setPipeline(wgsl.pipeline[2]);
-    pass.setBindGroup(0, gpu.bindGroup[1]);
+    pass.setBindGroup(0, gpu.bindGroup[0]);
+    pass.setBindGroup(1, gpu.bindGroup[1]);
     pass.draw(4);
     pass.setPipeline(wgsl.pipeline[3]);
     pass.draw(4);
@@ -755,7 +759,8 @@
       }]
     });
     pass.setPipeline(wgsl.pipeline[4]);
-    pass.setBindGroup(0, gpu.bindGroup[3]);
+    pass.setBindGroup(0, gpu.bindGroup[0]);
+    pass.setBindGroup(1, gpu.bindGroup[3]);
     pass.draw(4);
     pass.end();
   };
@@ -787,9 +792,9 @@
       bindGroup: [],
       cbuffer: [],
       gbuffer: [],
-      indexOfMeshInput: 0,
-      indexOfMeshID: 0,
-      indexOfIndirectArgs: 0,
+      indexOfPack: 0,
+      indexOfDrawSlot: 0,
+      indexOfDrawArgs: 0,
       pass3d: []
     },
     audio: {
@@ -918,69 +923,77 @@
     mesh.ha = ha;
     mesh.va = va;
   };
-  const $packStage = (camera, light) => {
+  const $packCamera = (camera) => {
     const gpu = $$.gpu;
-    const pack = new Float32Array(__strideOfStageInput / 4);
-    {
-      const aspect = gpu.canvas.width / gpu.canvas.height;
-      const fovy = deg2rad(camera.fov);
-      const x = camera.x;
-      const y = camera.y;
-      const z = camera.z;
-      const ha = camera.ha;
-      const va = camera.va;
-      const dir = vec3dir(ha, va);
-      const eye = [x, y, z];
-      const at = vec3add(eye, dir);
-      const up = [0, 1, 0];
-      const look = mat4lookat(eye, at, up);
-      const proj = mat4perspective(fovy, aspect, camera.near, camera.far);
-      const vp = mat4multiply(look, proj);
-      const ivp = mat4invert(vp);
-      const ortho = mat4ortho(gpu.canvas.width, gpu.canvas.height, 0, 1);
-      pack.set(vp, 0);
-      pack.set(ivp, 16);
-      pack.set(look, 32);
-      pack.set(ortho, 48);
-      pack.set(eye, 64);
-    }
-    {
-      const ldir = vec3dir(light.ha, light.va);
-      const color = light.color;
-      const ambient0 = light.ambient0;
-      const ambient1 = light.ambient1;
-      pack.set(ldir, 68);
-      pack.set(color, 72);
-      pack.set(ambient0, 76);
-      pack.set(ambient1, 80);
-    }
+    const aspect = gpu.canvas.width / gpu.canvas.height;
+    const fovy = deg2rad(camera.fov);
+    const x = camera.x;
+    const y = camera.y;
+    const z = camera.z;
+    const ha = camera.ha;
+    const va = camera.va;
+    const dir = vec3dir(ha, va);
+    const eye = [x, y, z];
+    const at = vec3add(eye, dir);
+    const up = [0, 1, 0];
+    const look = mat4lookat(eye, at, up);
+    const proj = mat4perspective(fovy, aspect, camera.near, camera.far);
+    const vp = mat4multiply(look, proj);
+    const ivp = mat4invert(vp);
+    const ortho = mat4ortho(gpu.canvas.width, gpu.canvas.height, 0, 1);
+    const pack = new Float32Array(4 * 17);
+    pack.set(vp, 0);
+    pack.set(ivp, 16);
+    pack.set(look, 32);
+    pack.set(ortho, 48);
+    pack.set(eye, 64);
+    return pack;
+  };
+  const $packLight = (light) => {
+    const ldir = vec3dir(light.ha, light.va);
+    const color = light.color;
+    const ambient0 = light.ambient0;
+    const ambient1 = light.ambient1;
+    const pack = new Float32Array(4 * 4);
+    pack.set(ldir, 0);
+    pack.set(color, 4);
+    pack.set(ambient0, 8);
+    pack.set(ambient1, 12);
     return pack;
   };
   const $packMesh = (mesh) => {
-    const num = 7;
-    const pack = new Float32Array(__strideOfMeshInput / 4 * num);
     const matrix = mat4angle(mesh.ha, mesh.va);
     mat4translated(matrix, mesh.x, mesh.y, mesh.z);
+    const pack = new Float32Array(4 * 7);
     pack.set(matrix, 0);
     pack.set(mesh.f0, 16);
     pack.set(mesh.f1, 20);
     pack.set(mesh.f2, 24);
     return pack;
   };
-  const $writeStage = (pack) => {
+  const $writePack = (pack) => {
     const gpu = $$.gpu;
     const device = $$.gpu.device;
-    device.queue.writeBuffer(gpu.cbuffer[0], 0, pack);
+    const index = gpu.indexOfPack;
+    device.queue.writeBuffer(gpu.cbuffer[0], gpu.indexOfPack * __strideOfPack, pack);
+    gpu.indexOfPack += pack.length / 4;
+    return index;
   };
-  const $writeMesh = (pack) => {
+  const $writeSlot = (camera, light) => {
     const gpu = $$.gpu;
     const device = $$.gpu.device;
-    device.queue.writeBuffer(gpu.cbuffer[1], gpu.indexOfMeshInput * __strideOfMeshInput, pack);
-    const startIndexOfMeshInput = gpu.indexOfMeshInput;
-    gpu.indexOfMeshInput += pack.length / 4;
-    return startIndexOfMeshInput;
+    const slot = [camera, light, 0, 0];
+    device.queue.writeBuffer(gpu.cbuffer[1], 0, new Uint32Array(slot));
   };
-  const $draw = (id, lst) => {
+  const $writeDrawSlot = (lst) => {
+    const gpu = $$.gpu;
+    const device = $$.gpu.device;
+    const index = gpu.indexOfDrawSlot;
+    device.queue.writeBuffer(gpu.cbuffer[2], gpu.indexOfDrawSlot * __strideOfDrawSlot, new Uint32Array(lst));
+    gpu.indexOfDrawSlot += lst.length;
+    return index;
+  };
+  const $writeDrawArgs = (id, count) => {
     const gpu = $$.gpu;
     const device = $$.gpu.device;
     const gltf = $$.data.gltf;
@@ -988,31 +1001,42 @@
     if (!mesh) {
       return;
     }
-    const instanceCount = lst.length;
-    if (instanceCount <= 0) {
-      return;
-    }
-    const startIndexOfMeshID = gpu.indexOfMeshID;
-    device.queue.writeBuffer(gpu.cbuffer[2], gpu.indexOfMeshID * __strideOfMeshID, new Uint32Array(lst));
-    gpu.indexOfMeshID += instanceCount;
+    const index = gpu.indexOfDrawArgs;
     for (const sid of mesh.segment) {
       const segment = gltf.segment[sid];
       if (!segment) {
         continue;
       }
-      const args = new Uint32Array(20 / 4);
+      const args = new Uint32Array(__strideOfDrawArgs / 4);
       args[0] = segment.count;
-      args[1] = instanceCount;
+      args[1] = count;
       args[2] = 0;
       args[3] = 0;
       args[4] = 0;
-      device.queue.writeBuffer(gpu.cbuffer[3], gpu.indexOfIndirectArgs * __strideOfIndirectArgs, args);
+      device.queue.writeBuffer(gpu.cbuffer[3], gpu.indexOfDrawArgs * __strideOfDrawArgs, args);
+      gpu.indexOfDrawArgs += 1;
+    }
+    return index;
+  };
+  const $draw = (id, slot, args) => {
+    const gpu = $$.gpu;
+    const gltf = $$.data.gltf;
+    const mesh = gltf.mesh[id];
+    if (!mesh) {
+      return;
+    }
+    let index = 0;
+    for (const sid of mesh.segment) {
+      const segment = gltf.segment[sid];
+      if (!segment) {
+        continue;
+      }
       gpu.pass3d.push({
         sid,
-        indexOfMeshID: startIndexOfMeshID,
-        indexOfIndirectArgs: gpu.indexOfIndirectArgs
+        slot,
+        args: args + index
       });
-      gpu.indexOfIndirectArgs += 1;
+      index += 1;
     }
   };
   html_listen(window, "load", () => {
@@ -1030,36 +1054,45 @@
       $lightColor(light, 0.8, 0.8, 0.8, 1);
       $lightAmbient0(light, 0.4, 0.4, 0.9, 0.8);
       $lightAmbient1(light, 0.5, 0.4, 0.1, 0.4);
-      $writeStage($packStage(camera, light));
+      $writeSlot(
+        $writePack($packCamera(camera)),
+        $writePack($packLight(light))
+      );
     }
     {
       const lst = [];
       const m = $newMesh();
       $meshPosition(m, -2, 0, 0);
-      lst.push($writeMesh($packMesh(m)));
+      lst.push($writePack($packMesh(m)));
       $meshPosition(m, 0, 0, 0);
-      lst.push($writeMesh($packMesh(m)));
+      lst.push($writePack($packMesh(m)));
       $meshPosition(m, 2, 0, 0);
-      lst.push($writeMesh($packMesh(m)));
+      lst.push($writePack($packMesh(m)));
       $meshPosition(m, -2, 0, -2);
-      lst.push($writeMesh($packMesh(m)));
+      lst.push($writePack($packMesh(m)));
       $meshPosition(m, 0, 0, -2);
-      lst.push($writeMesh($packMesh(m)));
+      lst.push($writePack($packMesh(m)));
       $meshPosition(m, 2, 0, -2);
-      lst.push($writeMesh($packMesh(m)));
-      $draw("tr_01", lst);
+      lst.push($writePack($packMesh(m)));
+      const name = "tr_01";
+      const slot = $writeDrawSlot(lst);
+      const args = $writeDrawArgs(name, lst.length);
+      $draw(name, slot, args);
     }
     {
       const lst = [];
       const m = $newMesh();
       $meshAngle(m, 90, 0);
       $meshPosition(m, -2, 0, 2);
-      lst.push($writeMesh($packMesh(m)));
+      lst.push($writePack($packMesh(m)));
       $meshPosition(m, 0, 0, 2);
-      lst.push($writeMesh($packMesh(m)));
+      lst.push($writePack($packMesh(m)));
       $meshPosition(m, 2, 0, 2);
-      lst.push($writeMesh($packMesh(m)));
-      $draw("wa_00", lst);
+      lst.push($writePack($packMesh(m)));
+      const name = "wa_00";
+      const slot = $writeDrawSlot(lst);
+      const args = $writeDrawArgs(name, lst.length);
+      $draw(name, slot, args);
     }
   };
 })();
