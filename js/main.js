@@ -37,11 +37,11 @@ const update = () => {
     lst.push($writePack($packMesh(m)));
     $meshPosition(m, 2, 0, -2);
     lst.push($writePack($packMesh(m)));
-
-    const name = "tr_01";
     const slot = $writeDrawSlot(lst);
-    const args = $writeDrawArgs(name, lst.length);
-    $draw(name, slot, args);
+
+    for (const id of $meshInput("tr_01")) {
+      $draw(id, slot, $writeDrawArgs(id, lst.length));
+    }
   }
   {
     const lst = [];
@@ -54,10 +54,10 @@ const update = () => {
     lst.push($writePack($packMesh(m)));
     $meshPosition(m, 2, 0, 2);
     lst.push($writePack($packMesh(m)));
-
-    const name = "wa_00";
     const slot = $writeDrawSlot(lst);
-    const args = $writeDrawArgs(name, lst.length);
-    $draw(name, slot, args);
+
+    for (const id of $meshInput("wa_00")) {
+      $draw(id, slot, $writeDrawArgs(id, lst.length));
+    }
   }
 };
