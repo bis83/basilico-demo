@@ -684,21 +684,21 @@
     pass.setPipeline(wgsl.pipeline[0]);
     pass.setBindGroup(0, gpu.bindGroup[0]);
     for (const p of gpu.pass3d) {
-      const segment = gltf.segment[p.sid];
-      if (!segment) {
+      const input = gltf.input[p.id];
+      if (!input) {
         continue;
       }
       pass.setVertexBuffer(0, gpu.cbuffer[2], p.slot * __strideOfDrawSlot);
-      if (segment.vb0) {
-        const [index, offset, size] = segment.vb0;
+      if (input.vb0) {
+        const [index, offset, size] = input.vb0;
         pass.setVertexBuffer(1, gltf.buffer[index], offset, size);
       }
-      if (segment.vb1) {
-        const [index, offset, size] = segment.vb1;
+      if (input.vb1) {
+        const [index, offset, size] = input.vb1;
         pass.setVertexBuffer(2, gltf.buffer[index], offset, size);
       }
-      if (segment.ib) {
-        const [index, offset, size] = segment.ib;
+      if (input.ib) {
+        const [index, offset, size] = input.ib;
         pass.setIndexBuffer(gltf.buffer[index], "uint16", offset, size);
       }
       pass.drawIndexedIndirect(gpu.cbuffer[3], p.args * __strideOfDrawArgs);
@@ -997,47 +997,33 @@
     const gpu = $$.gpu;
     const device = $$.gpu.device;
     const gltf = $$.data.gltf;
-    const mesh = gltf.mesh[id];
-    if (!mesh) {
-      return;
-    }
+    const icount = gltf.input[id] ? gltf.input[id].count : 0;
+    const args = new Uint32Array(__strideOfDrawArgs / 4);
+    args[0] = icount;
+    args[1] = count;
+    args[2] = 0;
+    args[3] = 0;
+    args[4] = 0;
+    device.queue.writeBuffer(gpu.cbuffer[3], gpu.indexOfDrawArgs * __strideOfDrawArgs, args);
     const index = gpu.indexOfDrawArgs;
-    for (const sid of mesh.segment) {
-      const segment = gltf.segment[sid];
-      if (!segment) {
-        continue;
-      }
-      const args = new Uint32Array(__strideOfDrawArgs / 4);
-      args[0] = segment.count;
-      args[1] = count;
-      args[2] = 0;
-      args[3] = 0;
-      args[4] = 0;
-      device.queue.writeBuffer(gpu.cbuffer[3], gpu.indexOfDrawArgs * __strideOfDrawArgs, args);
-      gpu.indexOfDrawArgs += 1;
-    }
+    gpu.indexOfDrawArgs += 1;
     return index;
   };
   const $draw = (id, slot, args) => {
     const gpu = $$.gpu;
+    gpu.pass3d.push({
+      id,
+      slot,
+      args
+    });
+  };
+  const $meshInput = (name) => {
     const gltf = $$.data.gltf;
-    const mesh = gltf.mesh[id];
+    const mesh = gltf.mesh[name];
     if (!mesh) {
-      return;
+      return [];
     }
-    let index = 0;
-    for (const sid of mesh.segment) {
-      const segment = gltf.segment[sid];
-      if (!segment) {
-        continue;
-      }
-      gpu.pass3d.push({
-        sid,
-        slot,
-        args: args + index
-      });
-      index += 1;
-    }
+    return mesh.input || [];
   };
   html_listen(window, "load", () => {
     $start(update);
@@ -1074,10 +1060,10 @@
       lst.push($writePack($packMesh(m)));
       $meshPosition(m, 2, 0, -2);
       lst.push($writePack($packMesh(m)));
-      const name = "tr_01";
       const slot = $writeDrawSlot(lst);
-      const args = $writeDrawArgs(name, lst.length);
-      $draw(name, slot, args);
+      for (const id of $meshInput("tr_01")) {
+        $draw(id, slot, $writeDrawArgs(id, lst.length));
+      }
     }
     {
       const lst = [];
@@ -1089,10 +1075,10 @@
       lst.push($writePack($packMesh(m)));
       $meshPosition(m, 2, 0, 2);
       lst.push($writePack($packMesh(m)));
-      const name = "wa_00";
       const slot = $writeDrawSlot(lst);
-      const args = $writeDrawArgs(name, lst.length);
-      $draw(name, slot, args);
+      for (const id of $meshInput("wa_00")) {
+        $draw(id, slot, $writeDrawArgs(id, lst.length));
+      }
     }
   };
 })();
