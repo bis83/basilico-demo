@@ -25,6 +25,7 @@ jobs:
           go tool basilico deepone build
           go tool basilico kurenai build
           go tool basilico salvage build
+          cp index.html dist/
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
