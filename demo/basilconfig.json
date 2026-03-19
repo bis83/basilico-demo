@@ -6,5 +6,6 @@
   "script": [
     "js/main.js"
   ],
-  "title": "Demo"
+  "title": "Demo",
+  "dist": "../dist/demo"
 }

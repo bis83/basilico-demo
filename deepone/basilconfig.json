@@ -1,0 +1,33 @@
+{
+  "dist": "../dist/deepone",
+  "title": "Deep One",
+  "extern-script": [
+    "deps/gl-matrix-min.js"
+  ],
+  "minify": true,
+  "script": [
+    "js/util.js",
+    "js/input.js",
+    "js/sprite.js",
+    "js/scene.js",
+    "js/main.js"
+  ],
+  "resource": [
+    "deps/gl-matrix-min.js",
+    "img/clear.png",
+    "img/field01.png",
+    "img/frame.png",
+    "img/gameover.png",
+    "img/gate.png",
+    "img/level.png",
+    "img/number.png",
+    "img/player_cristal.png",
+    "img/push_start.png",
+    "img/score.png",
+    "img/tama.png",
+    "img/time_f.png",
+    "img/time.png",
+    "img/title_back.png",
+    "img/title.png"
+  ]
+}

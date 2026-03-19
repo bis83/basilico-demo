@@ -19,7 +19,12 @@ jobs:
       - name: Get Basilico
         run: go get tool
       - name: Execute Basilico
-        run: go tool basilico . build
+        run: |
+          go tool basilico demo build
+          go tool basilico deephack build
+          go tool basilico deepone build
+          go tool basilico kurenai build
+          go tool basilico salvage build
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:

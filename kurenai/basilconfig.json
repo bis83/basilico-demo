@@ -1,0 +1,31 @@
+{
+  "dist": "../dist/kurenai",
+  "title": "Kurenai",
+  "extern-script": [
+    "deps/gl-matrix-min.js"
+  ],
+  "minify": true,
+  "script": [
+    "js/util.js",
+    "js/input.js",
+    "js/sprite.js",
+    "js/scene.js",
+    "js/main.js"
+  ],
+  "resource": [
+    "deps/gl-matrix-min.js",
+    "img/back.png",
+    "img/back2.png",
+    "img/clear.png",
+    "img/frame.png",
+    "img/gameover.png",
+    "img/gate.png",
+    "img/number.png",
+    "img/player.png",
+    "img/shoot.png",
+    "img/tama.png",
+    "img/time.png",
+    "img/title_back.png",
+    "img/title.png"
+  ]
+}
