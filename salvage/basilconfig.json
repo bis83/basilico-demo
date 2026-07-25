@@ -1,11 +1,12 @@
 {
   "dist": "../dist/salvage",
   "title": "Salvage",
-  "extern-script": [
+  "script": [
     "deps/gl-matrix-min.js"
   ],
   "minify": true,
-  "script": [
+  "coreonly": true,
+  "use": [
     "js/util.js",
     "js/input.js",
     "js/fx_sprite.js",
@@ -14,7 +15,7 @@
     "js/scene.js",
     "js/main.js"
   ],
-  "resource": [
+  "extern": [
     "deps/gl-matrix-min.js",
     "img/menu0.png",
     "img/menu1.png",

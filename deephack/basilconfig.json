@@ -1,11 +1,12 @@
 {
   "dist": "../dist/deephack",
   "title": "Deep Hack",
-  "extern-script": [
+  "script": [
     "deps/gl-matrix-min.js"
   ],
   "minify": true,
-  "script": [
+  "coreonly": true,
+  "use": [
     "js/util.js",
     "js/input.js",
     "js/fx_sprite.js",
@@ -13,7 +14,7 @@
     "js/scene.js",
     "js/main.js"
   ],
-  "resource": [
+  "extern": [
     "deps/gl-matrix-min.js",
     "img/drilltex.png",
     "img/drillui.png",

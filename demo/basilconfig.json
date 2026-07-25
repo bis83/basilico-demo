@@ -1,11 +1,8 @@
 {
-  "middleware": [
-    "basil3d"
-  ],
-  "minify": false,
-  "script": [
-    "js/main.js"
-  ],
+  "dist": "../dist/demo",
   "title": "Demo",
-  "dist": "../dist/demo"
+  "minify": false,
+  "use": [
+    "js/main.js"
+  ]
 }
