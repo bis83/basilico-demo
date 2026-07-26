@@ -1,9 +1,7 @@
 {
   "dist": "../dist/deephack",
   "title": "Deep Hack",
-  "script": [
-    "deps/gl-matrix-min.js"
-  ],
+  "script": ["deps/gl-matrix-min.js"],
   "minify": true,
   "coreonly": true,
   "use": [

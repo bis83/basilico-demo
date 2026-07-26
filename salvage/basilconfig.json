@@ -1,9 +1,7 @@
 {
   "dist": "../dist/salvage",
   "title": "Salvage",
-  "script": [
-    "deps/gl-matrix-min.js"
-  ],
+  "script": ["deps/gl-matrix-min.js"],
   "minify": true,
   "coreonly": true,
   "use": [

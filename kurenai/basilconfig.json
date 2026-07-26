@@ -1,9 +1,7 @@
 {
   "dist": "../dist/kurenai",
   "title": "Kurenai",
-  "script": [
-    "deps/gl-matrix-min.js"
-  ],
+  "script": ["deps/gl-matrix-min.js"],
   "minify": true,
   "coreonly": true,
   "use": [

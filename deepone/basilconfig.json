@@ -1,9 +1,7 @@
 {
   "dist": "../dist/deepone",
   "title": "Deep One",
-  "script": [
-    "deps/gl-matrix-min.js"
-  ],
+  "script": ["deps/gl-matrix-min.js"],
   "minify": true,
   "coreonly": true,
   "use": [

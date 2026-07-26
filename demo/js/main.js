@@ -1,9 +1,4 @@
-
-html_listen(window, "load", () => {
-  $start(update);
-});
-
-const update = () => {
+__onupdate = () => {
   {
     const camera = $newCamera();
     $cameraPosition(camera, 0, 2, -5);
@@ -17,9 +12,7 @@ const update = () => {
     $lightAmbient0(light, 0.4, 0.4, 0.9, 0.8);
     $lightAmbient1(light, 0.5, 0.4, 0.1, 0.4);
 
-    $writeSlot(
-      $writePack($packCamera(camera)),
-      $writePack($packLight(light)));
+    $writeSlot($writePack($packCamera(camera)), $writePack($packLight(light)));
   }
   {
     const lst = [];
