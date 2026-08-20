@@ -1,5 +1,5 @@
-github.com/bis83/basilico v0.0.0-20260726030201-88c8aed33d83 h1:7kahgVT5JBG0egzvDjcWrfL7nnn6xeTpfvJ/7KIudZ8=
-github.com/bis83/basilico v0.0.0-20260726030201-88c8aed33d83/go.mod h1:sCp+lt5NrBvU3CHm5aSLPC/kFqAnzWTZ3DqqnTQjtws=
+github.com/bis83/basilico v0.0.0-20260820165238-acbd27ae5156 h1:2FuL0tnOWanEY8lOVlKFuKwX+kFc9xAuqehz6TY/3OE=
+github.com/bis83/basilico v0.0.0-20260820165238-acbd27ae5156/go.mod h1:84zMvTrrdWSfu0z6T8PmG2BNb91yI1tEUh6v2YZTz+U=
 github.com/evanw/esbuild v0.23.0 h1:PLUwTn2pzQfIBRrMKcD3M0g1ALOKIHMDefdFCk7avwM=
 github.com/evanw/esbuild v0.23.0/go.mod h1:D2vIQZqV/vIf/VRHtViaUtViZmG7o+kKmlBfVQuRi48=
 github.com/go-test/deep v1.0.1 h1:UQhStjbkDClarlmv0am7OXXO4/GaPdCGiUiMTvi28sg=
